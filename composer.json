@@ -1,0 +1,74 @@
+{
+    "name": "darvis/nuki",
+    "description": "Laravel package for the NUKI Web API (smartlocks, logs, authorizations, webhooks).",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "nuki",
+        "smartlock",
+        "api",
+        "iot",
+        "webhook"
+    ],
+    "homepage": "https://github.com/darvis/nuki",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arvid de Jong",
+            "email": "info@darvis.nl",
+            "homepage": "https://darvis.nl",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/darvis/nuki/issues",
+        "source": "https://github.com/darvis/nuki",
+        "docs": "https://github.com/darvis/nuki#readme",
+        "email": "info@darvis.nl"
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "laravel/framework": "^11.0|^12.0|^13.0",
+        "livewire/flux": "^2.0",
+        "livewire/livewire": "^3.5|^4.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+        "laravel/pint": "^1.27"
+    },
+    "autoload": {
+        "psr-4": {
+            "Darvis\\Nuki\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Darvis\\Nuki\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Darvis\\Nuki\\NukiServiceProvider"
+            ],
+            "aliases": {
+                "Nuki": "Darvis\\Nuki\\Facades\\Nuki"
+            }
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "lint": "pint",
+        "lint:check": "pint --test"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
