@@ -10,7 +10,7 @@
         "iot",
         "webhook"
     ],
-    "homepage": "https://github.com/darvis/nuki",
+    "homepage": "https://github.com/ArvidDeJong/nuki",
     "license": "MIT",
     "authors": [
         {
@@ -21,9 +21,9 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/darvis/nuki/issues",
-        "source": "https://github.com/darvis/nuki",
-        "docs": "https://github.com/darvis/nuki#readme",
+        "issues": "https://github.com/ArvidDeJong/nuki/issues",
+        "source": "https://github.com/ArvidDeJong/nuki",
+        "docs": "https://github.com/ArvidDeJong/nuki#readme",
         "email": "info@darvis.nl"
     },
     "require": {

@@ -1,7 +1,7 @@
 # darvis/nuki
 
 [![Latest version on Packagist](https://img.shields.io/packagist/v/darvis/nuki.svg?style=flat-square)](https://packagist.org/packages/darvis/nuki)
-[![Tests](https://img.shields.io/github/actions/workflow/status/darvis/nuki/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/darvis/nuki/actions/workflows/tests.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/ArvidDeJong/nuki/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ArvidDeJong/nuki/actions/workflows/tests.yml)
 [![Total downloads](https://img.shields.io/packagist/dt/darvis/nuki.svg?style=flat-square)](https://packagist.org/packages/darvis/nuki)
 [![License](https://img.shields.io/packagist/l/darvis/nuki.svg?style=flat-square)](LICENSE)
 
