@@ -14,8 +14,8 @@ callbacks.
 - Bearer (API token) **and** OAuth 2.0 Authorization Code support
 - Account-aware: a single application can manage multiple NUKI accounts
 - Webhook receiver with HMAC signature verification and idempotent dispatch
-- Built-in Livewire 3/4 + Flux UI: dashboard, activity timeline, smartlocks,
-  keypad authorizations, webhooks and OAuth status
+- Built-in Livewire 3.5+ / 4 + Flux 2 UI: dashboard, activity timeline,
+  smartlocks, keypad authorizations, webhooks and OAuth status
 - Optional self-contained user-auth (`darvis-nuki` guard) with email OTP,
   sub-users, per-smartlock permissions and a weekday bitmask
 
