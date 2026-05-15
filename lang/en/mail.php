@@ -27,4 +27,15 @@ return [
         'security_note' => 'Did you not request this? Ignore this email; your password remains unchanged.',
     ],
 
+    'verify_email' => [
+        'subject' => 'Confirm your email address :brand',
+        'title' => 'Confirm your email address',
+        'greeting_named' => 'Hello :name,',
+        'greeting_anon' => 'Hello,',
+        'instruction' => 'Welcome! Confirm your email address with the button below to activate your account. The link is valid for :minutes minutes.',
+        'button' => 'Confirm email address',
+        'fallback_note' => 'Button not working? Paste this link into your browser:',
+        'security_note' => 'Did you not create an account? Then ignore this email.',
+    ],
+
 ];

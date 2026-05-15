@@ -27,4 +27,16 @@ return [
         'security_note' => 'Hast du dies nicht angefordert? Ignoriere diese E-Mail; dein Passwort bleibt unverändert.',
     ],
 
+    // NOTE: Have a native speaker review
+    'verify_email' => [
+        'subject' => 'Bestätige deine E-Mail-Adresse :brand',
+        'title' => 'Bestätige deine E-Mail-Adresse',
+        'greeting_named' => 'Hallo :name,',
+        'greeting_anon' => 'Hallo,',
+        'instruction' => 'Willkommen! Bestätige deine E-Mail-Adresse mit der Schaltfläche unten, um dein Konto zu aktivieren. Der Link ist :minutes Minuten gültig.',
+        'button' => 'E-Mail-Adresse bestätigen',
+        'fallback_note' => 'Funktioniert die Schaltfläche nicht? Füge diesen Link in deinen Browser ein:',
+        'security_note' => 'Hast du kein Konto erstellt? Dann ignoriere diese E-Mail.',
+    ],
+
 ];

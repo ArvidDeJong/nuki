@@ -367,6 +367,11 @@ return [
         'otp_code' => 'Login-Code',
         'confirm' => 'Bestätigen',
         'resend' => 'Neuen Code senden',
+        // NOTE: Have a native speaker review
+        'verify_heading' => 'Bestätige deine E-Mail-Adresse',
+        'verify_subheading' => 'Wir haben einen Bestätigungslink an :email gesendet. Klicke auf den Link, um dein Konto zu aktivieren.',
+        'verify_resend' => 'E-Mail erneut senden',
+        'verify_back_to_login' => 'Zurück zum Anmelden',
         'panel' => [
             'heading' => 'Smartlock-Verwaltung für dein Unternehmen',
             'subheading' => 'Verwalte Smartlocks, Berechtigungen und Aktivitäten an einem Ort.',
@@ -384,11 +389,14 @@ return [
             'account_not_found' => 'Konto nicht gefunden oder nicht mehr aktiv.',
             'code_invalid' => 'Der Code ist falsch oder abgelaufen.',
             'reset_link_invalid' => 'Der Link ist ungültig oder abgelaufen. Fordere einen neuen Link an.',
+            'verify_link_invalid' => 'Der Bestätigungslink ist ungültig oder abgelaufen. Fordere einen neuen an.',
         ],
         'info' => [
             'reset_link_sent' => 'Wenn diese E-Mail-Adresse bekannt ist, haben wir einen Wiederherstellungs-Link gesendet.',
             'new_code_sent' => 'Neuer Code gesendet.',
             'password_changed' => 'Dein Passwort wurde geändert. Melde dich mit deinem neuen Passwort an.',
+            'verification_sent' => 'Wir haben dir eine neue Bestätigungs-E-Mail gesendet.',
+            'email_verified' => 'Deine E-Mail-Adresse wurde bestätigt. Du kannst dich jetzt anmelden.',
         ],
     ],
 

@@ -50,7 +50,22 @@ class LoginPage extends Component
             return null;
         }
 
-        if (config('nuki.auth_users.otp.enabled', true) === false || $user->two_factor_enabled === false) {
+        // E-mailverificatie is verplicht: een onbevestigd account komt nooit
+        // voorbij login. We sturen (gethrottled) een nieuwe link en gaan terug
+        // naar de notice-pagina.
+        if (config('nuki.auth_users.email_verification.enabled', true) === true && ! $user->hasVerifiedEmail()) {
+            if ($throttle->checkSend($this->email, request()->ip())) {
+                $user->sendEmailVerificationNotification();
+            }
+
+            session(['nuki.pending_verification_user_id' => $user->id]);
+
+            return $this->redirect(route('nuki.auth.verify.notice'), navigate: false);
+        }
+
+        // OTP is verplicht voor iedereen zolang het globaal aanstaat — de
+        // per-user `two_factor_enabled` kolom speelt hier bewust geen rol.
+        if (config('nuki.auth_users.otp.enabled', true) === false) {
             return $this->completeLogin($user);
         }
 

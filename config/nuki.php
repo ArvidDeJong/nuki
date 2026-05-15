@@ -73,6 +73,10 @@ return [
                 'window_minutes' => 15,
             ],
         ],
+        'email_verification' => [
+            'enabled' => true,
+            'link_lifetime_minutes' => 60,
+        ],
         'password_reset' => [
             'enabled' => true,
             'token_lifetime_minutes' => 60,

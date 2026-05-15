@@ -73,9 +73,11 @@ model and [Auth routes](auth-routes.md) for the registered URLs.
 | Key | Env | Default | Effect |
 |---|---|---|---|
 | `auth_users.enabled` | `NUKI_AUTH_USERS_ENABLED` | `false` | Master switch. When `true`, [AuthConfigRegistrar](../src/Auth/Users/AuthConfigRegistrar.php) registers the guard and provider; [routes/auth.php](../routes/auth.php) is loaded; UI routes get `auth:darvis-nuki` appended. |
-| `auth_users.mail.from.address` | `NUKI_AUTH_USERS_MAIL_FROM_ADDRESS` | `null` | From-address for OTP and password-reset mails. Falls back to Laravel's `mail.from.address`. |
+| `auth_users.mail.from.address` | `NUKI_AUTH_USERS_MAIL_FROM_ADDRESS` | `null` | From-address for OTP, password-reset and email-verification mails. Falls back to Laravel's `mail.from.address`. |
 | `auth_users.mail.from.name` | `NUKI_AUTH_USERS_MAIL_FROM_NAME` | `null` | From-name for the same mails. |
-| `auth_users.otp.enabled` | – | `true` | Global toggle for email OTP (2FA). Set to `false` to skip OTP for every user even if their `two_factor_enabled` is true. |
+| `auth_users.email_verification.enabled` | – | `true` | When `true`, new registrations are not auto-logged-in: a signed link is mailed and login is blocked until the address is confirmed. Set to `false` to disable verification entirely (registration logs in directly). |
+| `auth_users.email_verification.link_lifetime_minutes` | – | `60` | Lifetime of the signed verification link. |
+| `auth_users.otp.enabled` | – | `true` | Global toggle for email OTP. When `true`, OTP is mandatory for **every** user on login; the per-user `two_factor_enabled` column is no longer consulted. Set to `false` to skip OTP for everyone. |
 | `auth_users.otp.expiry_minutes` | – | `5` | OTP code lifetime. |
 | `auth_users.otp.length` | – | `6` | Number of digits in the OTP code. |
 | `auth_users.otp.rate_limit.max_per_window` | – | `5` | Maximum OTP sends/attempts per window. |
@@ -185,7 +187,7 @@ which the package picks up the copies in `database/migrations/`.
 |---|---|---|
 | <a id="nuki_accounts"></a>`nuki_accounts` | [2026_05_11_000100_create_nuki_accounts_table](../database/migrations/2026_05_11_000100_create_nuki_accounts_table.php) | `token_resolver = database`. Columns: `account_key` (unique), `name`, `api_token` (text, encrypted), `description`, `is_active`. |
 | <a id="nuki_oauth_tokens"></a>`nuki_oauth_tokens` | [2026_05_11_000000_create_nuki_oauth_tokens_table](../database/migrations/2026_05_11_000000_create_nuki_oauth_tokens_table.php) | `oauth.token_store = database`. Columns: `account_key` (unique), `access_token` (text), `refresh_token` (text, nullable), `expires_at`, `token_type`, `scope`. |
-| `nuki_users` | [2026_05_12_000000_create_nuki_users_table](../database/migrations/2026_05_12_000000_create_nuki_users_table.php) | `auth_users.enabled = true`. Columns: `parent_id` (self-FK, nullable), `name`, `email` (unique), `password`, `two_factor_enabled`, `is_active`, `last_login_at`, `locale`. |
+| `nuki_users` | [2026_05_12_000000_create_nuki_users_table](../database/migrations/2026_05_12_000000_create_nuki_users_table.php) | `auth_users.enabled = true`. Columns: `parent_id` (self-FK, nullable), `name`, `email` (unique), `email_verified_at` (nullable; set by the email-verification flow), `password`, `two_factor_enabled`, `is_active`, `last_login_at`, `locale`. |
 | `nuki_user_otp_codes` | [2026_05_12_000100_create_nuki_user_otp_codes_table](../database/migrations/2026_05_12_000100_create_nuki_user_otp_codes_table.php) | `auth_users.enabled = true`. Columns: `nuki_user_id`, `code_hash`, `purpose`, `expires_at`, `consumed_at`, `ip`, `user_agent`. |
 | `nuki_password_resets` | [2026_05_12_000200_create_nuki_password_resets_table](../database/migrations/2026_05_12_000200_create_nuki_password_resets_table.php) | `auth_users.enabled = true`. Columns: `email` (primary key), `token_hash`, `created_at`. |
 | `nuki_user_account` | [2026_05_12_000300_create_nuki_user_account_table](../database/migrations/2026_05_12_000300_create_nuki_user_account_table.php) | `auth_users.enabled = true`. Pivot. Columns: `nuki_user_id`, `nuki_account_id`, `role` (default `member`). Unique on the pair. |
