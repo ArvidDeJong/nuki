@@ -5,7 +5,32 @@ All notable changes to `darvis/nuki` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.3] - 2026-05-15
+
+### Added
+- **Mandatory email verification.** New main users registered via
+  [RegisterPage](src/Livewire/Auth/RegisterPage.php) are no longer logged in
+  automatically: a signed verification link is mailed
+  ([NukiVerifyEmailMail](src/Mail/NukiVerifyEmailMail.php)) and the user lands
+  on a new notice page ([VerifyEmailNoticePage](src/Livewire/Auth/VerifyEmailNoticePage.php),
+  route `nuki.auth.verify.notice`) with a throttled resend button. Clicking the
+  link hits [NukiVerifyEmailController](src/Http/Controllers/NukiVerifyEmailController.php)
+  (route `nuki.auth.verify`, `signed` middleware) which marks the account
+  verified. Login is blocked for unverified accounts. `NukiUser` now implements
+  `MustVerifyEmail`. Configurable via
+  `nuki.auth_users.email_verification.{enabled,link_lifetime_minutes}` (default
+  on, 60 min). New translation keys `nuki::nuki.auth.verify_*`,
+  `nuki::nuki.auth.info.{verification_sent,email_verified}`,
+  `nuki::nuki.auth.errors.verify_link_invalid` and a `nuki::mail.verify_email`
+  block in EN, NL, DE and ES.
+
+### Fixed
+- `create_nuki_users_table` migration used `->after('two_factor_enabled')`
+  inside `Schema::create()`. `AFTER` is only valid in `ALTER TABLE`; on MySQL
+  this is a hard syntax error (SQLite silently ignored it, hiding the bug).
+  Removed the `->after()` call — column order already matches definition order.
+
+## [1.0.0] - 2026-05-12
 
 ### Added
 - Split-screen auth layout (`nuki::layouts.auth`): a form column on the left
@@ -85,3 +110,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security policy ([.github/SECURITY.md](.github/SECURITY.md)).
 - `support` block in `composer.json` (issues, source, docs, e-mail) so
   Packagist surfaces clickable links.
+
+### Changed
+- **OTP is now mandatory for every user** as long as
+  `nuki.auth_users.otp.enabled` is `true`. The per-user `two_factor_enabled`
+  column is no longer consulted by the login gate (kept in the schema for
+  potential future use).
+- New main users are no longer auto-logged-in after registration; they must
+  confirm their email address first (see *Mandatory email verification*).

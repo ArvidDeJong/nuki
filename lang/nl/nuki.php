@@ -367,6 +367,10 @@ return [
         'otp_code' => 'Inlogcode',
         'confirm' => 'Bevestigen',
         'resend' => 'Stuur nieuwe code',
+        'verify_heading' => 'Bevestig je e-mailadres',
+        'verify_subheading' => 'We hebben een bevestigingslink gestuurd naar :email. Klik op de link om je account te activeren.',
+        'verify_resend' => 'E-mail opnieuw versturen',
+        'verify_back_to_login' => 'Terug naar inloggen',
         'panel' => [
             'heading' => 'Smartlock-beheer voor jouw bedrijf',
             'subheading' => 'Beheer slimme sloten, autorisaties en activiteit op één plek.',
@@ -384,11 +388,14 @@ return [
             'account_not_found' => 'Account niet gevonden of niet meer actief.',
             'code_invalid' => 'De code is onjuist of verlopen.',
             'reset_link_invalid' => 'De link is ongeldig of verlopen. Vraag een nieuwe link aan.',
+            'verify_link_invalid' => 'De bevestigingslink is ongeldig of verlopen. Vraag een nieuwe aan.',
         ],
         'info' => [
             'reset_link_sent' => 'Als dit e-mailadres bekend is, hebben we een herstel-link gestuurd.',
             'new_code_sent' => 'Nieuwe code verzonden.',
             'password_changed' => 'Je wachtwoord is gewijzigd. Log in met je nieuwe wachtwoord.',
+            'verification_sent' => 'We hebben je een nieuwe bevestigingsmail gestuurd.',
+            'email_verified' => 'Je e-mailadres is bevestigd. Je kunt nu inloggen.',
         ],
     ],
 

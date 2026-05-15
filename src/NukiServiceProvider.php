@@ -27,6 +27,7 @@ use Darvis\Nuki\Livewire\Auth\LoginOtpPage;
 use Darvis\Nuki\Livewire\Auth\LoginPage;
 use Darvis\Nuki\Livewire\Auth\RegisterPage;
 use Darvis\Nuki\Livewire\Auth\ResetPasswordPage;
+use Darvis\Nuki\Livewire\Auth\VerifyEmailNoticePage;
 use Darvis\Nuki\Livewire\Dashboard;
 use Darvis\Nuki\Livewire\OAuthConnect;
 use Darvis\Nuki\Livewire\ProfilePage;
@@ -196,6 +197,7 @@ class NukiServiceProvider extends ServiceProvider
         Livewire::component('nuki.auth.register', RegisterPage::class);
         Livewire::component('nuki.auth.forgot-password', ForgotPasswordPage::class);
         Livewire::component('nuki.auth.reset-password', ResetPasswordPage::class);
+        Livewire::component('nuki.auth.verify-email', VerifyEmailNoticePage::class);
         Livewire::component('nuki.profile', ProfilePage::class);
         Livewire::component('nuki.sub-users-index', SubUsersIndex::class);
         Livewire::component('nuki.sub-user-show', SubUserShow::class);

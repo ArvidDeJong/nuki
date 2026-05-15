@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->boolean('two_factor_enabled')->default(true);
-            $table->string('locale', 5)->nullable()->after('two_factor_enabled');
+            // Column order follows definition order in CREATE TABLE; ->after()
+            // is only valid in ALTER TABLE and is a hard syntax error on MySQL.
+            $table->string('locale', 5)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login_at')->nullable();
             $table->timestamps();

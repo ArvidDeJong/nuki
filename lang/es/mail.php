@@ -27,4 +27,16 @@ return [
         'security_note' => '¿No has solicitado esto? Ignora este correo; tu contraseña no cambiará.',
     ],
 
+    // NOTE: Have a native speaker review
+    'verify_email' => [
+        'subject' => 'Confirma tu correo electrónico :brand',
+        'title' => 'Confirma tu correo electrónico',
+        'greeting_named' => 'Hola :name,',
+        'greeting_anon' => 'Hola,',
+        'instruction' => '¡Bienvenido! Confirma tu correo electrónico con el botón de abajo para activar tu cuenta. El enlace es válido :minutes minutos.',
+        'button' => 'Confirmar correo electrónico',
+        'fallback_note' => '¿No funciona el botón? Pega este enlace en tu navegador:',
+        'security_note' => '¿No has creado una cuenta? Entonces ignora este correo.',
+    ],
+
 ];

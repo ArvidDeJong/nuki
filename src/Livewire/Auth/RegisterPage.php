@@ -55,6 +55,15 @@ class RegisterPage extends Component
             'is_active' => true,
         ]);
 
+        // E-mailverificatie verplicht: niet inloggen. Stuur de bevestigingslink
+        // en toon de notice-pagina. Pas na verificatie kan er ingelogd worden.
+        if (config('nuki.auth_users.email_verification.enabled', true) === true) {
+            $user->sendEmailVerificationNotification();
+            session(['nuki.pending_verification_user_id' => $user->id]);
+
+            return $this->redirect(route('nuki.auth.verify.notice'), navigate: false);
+        }
+
         Auth::guard(AuthConfigRegistrar::GUARD)->login($user);
 
         return $this->redirect(

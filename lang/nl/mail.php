@@ -27,4 +27,15 @@ return [
         'security_note' => 'Heb je dit verzoek niet zelf gedaan? Negeer deze e-mail; je wachtwoord blijft ongewijzigd.',
     ],
 
+    'verify_email' => [
+        'subject' => 'Bevestig je e-mailadres :brand',
+        'title' => 'Bevestig je e-mailadres',
+        'greeting_named' => 'Hallo :name,',
+        'greeting_anon' => 'Hallo,',
+        'instruction' => 'Welkom! Bevestig je e-mailadres met de knop hieronder om je account te activeren. De link is :minutes minuten geldig.',
+        'button' => 'E-mailadres bevestigen',
+        'fallback_note' => 'Werkt de knop niet? Plak deze link in je browser:',
+        'security_note' => 'Heb je geen account aangemaakt? Negeer dan deze e-mail.',
+    ],
+
 ];

@@ -367,6 +367,10 @@ return [
         'otp_code' => 'Login code',
         'confirm' => 'Confirm',
         'resend' => 'Send new code',
+        'verify_heading' => 'Confirm your email address',
+        'verify_subheading' => 'We sent a confirmation link to :email. Click the link to activate your account.',
+        'verify_resend' => 'Resend email',
+        'verify_back_to_login' => 'Back to sign in',
         'panel' => [
             'heading' => 'Smartlock management for your business',
             'subheading' => 'Manage smart locks, authorisations and activity in one place.',
@@ -384,11 +388,14 @@ return [
             'account_not_found' => 'Account not found or no longer active.',
             'code_invalid' => 'The code is incorrect or expired.',
             'reset_link_invalid' => 'The link is invalid or expired. Request a new link.',
+            'verify_link_invalid' => 'The confirmation link is invalid or expired. Request a new one.',
         ],
         'info' => [
             'reset_link_sent' => 'If this email address is known, we have sent a recovery link.',
             'new_code_sent' => 'New code sent.',
             'password_changed' => 'Your password has been changed. Sign in with your new password.',
+            'verification_sent' => 'We sent you a new confirmation email.',
+            'email_verified' => 'Your email address has been confirmed. You can now sign in.',
         ],
     ],
 

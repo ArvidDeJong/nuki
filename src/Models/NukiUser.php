@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Models;
 
 use Darvis\Nuki\Mail\NukiPasswordResetMail;
+use Darvis\Nuki\Mail\NukiVerifyEmailMail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,8 +14,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
-class NukiUser extends Authenticatable
+class NukiUser extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
 
@@ -144,6 +147,45 @@ class NukiUser extends Authenticatable
 
         $mail = new NukiPasswordResetMail(
             resetUrl: $url,
+            expiryMinutes: $expiry,
+            recipientName: $this->name,
+        );
+
+        $locale = (string) ($this->locale ?? config('nuki.ui.default_locale', config('app.locale', 'en')));
+        $mail->locale($locale);
+
+        Mail::to($this->email)->send($mail);
+    }
+
+    public function hasVerifiedEmail(): bool
+    {
+        return $this->email_verified_at !== null;
+    }
+
+    public function markEmailAsVerified(): bool
+    {
+        $this->email_verified_at = now();
+
+        return $this->save();
+    }
+
+    public function getEmailForVerification(): string
+    {
+        return $this->email;
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $expiry = (int) config('nuki.auth_users.email_verification.link_lifetime_minutes', 60);
+
+        $url = URL::temporarySignedRoute(
+            'nuki.auth.verify',
+            now()->addMinutes($expiry),
+            ['id' => $this->id, 'hash' => sha1($this->getEmailForVerification())],
+        );
+
+        $mail = new NukiVerifyEmailMail(
+            verifyUrl: $url,
             expiryMinutes: $expiry,
             recipientName: $this->name,
         );

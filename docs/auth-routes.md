@@ -33,6 +33,14 @@ user hits them.
 | GET | `/register` | `nuki.auth.register` | [RegisterPage](../src/Livewire/Auth/RegisterPage.php) | `auth_users.register_enabled = true` |
 | GET | `/password/forgot` | `nuki.auth.password.forgot` | [ForgotPasswordPage](../src/Livewire/Auth/ForgotPasswordPage.php) | `auth_users.password_reset.enabled = true` |
 | GET | `/password/reset/{token}` | `nuki.auth.password.reset` | [ResetPasswordPage](../src/Livewire/Auth/ResetPasswordPage.php) | `auth_users.password_reset.enabled = true` |
+| GET | `/email/verify` | `nuki.auth.verify.notice` | [VerifyEmailNoticePage](../src/Livewire/Auth/VerifyEmailNoticePage.php) | `auth_users.email_verification.enabled = true` |
+| GET | `/email/verify/{id}/{hash}` | `nuki.auth.verify` | [NukiVerifyEmailController](../src/Http/Controllers/NukiVerifyEmailController.php) (extra `signed` middleware) | `auth_users.email_verification.enabled = true` |
+
+The notice page reads `session('nuki.pending_verification_user_id')` (set on
+registration / a login attempt by an unverified account) and offers a
+throttled resend. The signed link marks the account verified and redirects to
+`nuki.auth.login` with a `status` flash. Unverified accounts cannot complete
+login: they are bounced back to the notice page.
 
 ## Authenticated routes (`auth:darvis-nuki`)
 

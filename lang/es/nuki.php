@@ -367,6 +367,11 @@ return [
         'otp_code' => 'Código de inicio',
         'confirm' => 'Confirmar',
         'resend' => 'Enviar nuevo código',
+        // NOTE: Have a native speaker review
+        'verify_heading' => 'Confirma tu correo electrónico',
+        'verify_subheading' => 'Hemos enviado un enlace de confirmación a :email. Haz clic en el enlace para activar tu cuenta.',
+        'verify_resend' => 'Reenviar correo',
+        'verify_back_to_login' => 'Volver a iniciar sesión',
         'panel' => [
             'heading' => 'Gestión de smartlocks para tu empresa',
             'subheading' => 'Gestiona cerraduras inteligentes, autorizaciones y actividad en un solo lugar.',
@@ -384,11 +389,14 @@ return [
             'account_not_found' => 'Cuenta no encontrada o ya no activa.',
             'code_invalid' => 'El código es incorrecto o ha caducado.',
             'reset_link_invalid' => 'El enlace no es válido o ha caducado. Solicita un nuevo enlace.',
+            'verify_link_invalid' => 'El enlace de confirmación no es válido o ha caducado. Solicita uno nuevo.',
         ],
         'info' => [
             'reset_link_sent' => 'Si este correo es conocido, hemos enviado un enlace de recuperación.',
             'new_code_sent' => 'Nuevo código enviado.',
             'password_changed' => 'Tu contraseña ha sido cambiada. Inicia sesión con tu nueva contraseña.',
+            'verification_sent' => 'Te hemos enviado un nuevo correo de confirmación.',
+            'email_verified' => 'Tu correo electrónico ha sido confirmado. Ya puedes iniciar sesión.',
         ],
     ],
 

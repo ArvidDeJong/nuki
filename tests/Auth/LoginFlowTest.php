@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Darvis\Nuki\Livewire\Auth\LoginOtpPage;
 use Darvis\Nuki\Livewire\Auth\LoginPage;
 use Darvis\Nuki\Mail\NukiLoginOtpMail;
+use Darvis\Nuki\Mail\NukiVerifyEmailMail;
 use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Models\NukiUserOtpCode;
 use Illuminate\Support\Facades\Auth;
@@ -12,13 +13,49 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
-it('logs in directly when 2FA is disabled', function () {
-    $user = NukiUser::create([
+function makeVerifiedUser(array $overrides = []): NukiUser
+{
+    $user = NukiUser::create(array_merge([
         'name' => 'Hoofd',
         'email' => 'hoofd@example.test',
         'password' => 'secret123',
-        'two_factor_enabled' => false,
+        'two_factor_enabled' => true,
         'is_active' => true,
+    ], $overrides));
+
+    $user->markEmailAsVerified();
+
+    return $user->refresh();
+}
+
+it('blocks login for an unverified user and sends a verification mail', function () {
+    $user = NukiUser::create([
+        'name' => 'Hoofd',
+        'email' => 'onbevestigd@example.test',
+        'password' => 'secret123',
+        'two_factor_enabled' => true,
+        'is_active' => true,
+    ]);
+
+    Mail::fake();
+
+    Livewire::test(LoginPage::class)
+        ->set('email', $user->email)
+        ->set('password', 'secret123')
+        ->call('submit');
+
+    Mail::assertSent(NukiVerifyEmailMail::class, fn (NukiVerifyEmailMail $mail) => $mail->hasTo($user->email));
+    Mail::assertNotSent(NukiLoginOtpMail::class);
+    expect(Auth::guard('darvis-nuki')->check())->toBeFalse();
+    expect(session('nuki.pending_verification_user_id'))->toBe($user->id);
+});
+
+it('logs in directly for a verified user when OTP is globally disabled', function () {
+    config()->set('nuki.auth_users.otp.enabled', false);
+
+    $user = makeVerifiedUser([
+        'email' => 'hoofd@example.test',
+        'two_factor_enabled' => false,
     ]);
 
     Mail::fake();
@@ -32,13 +69,10 @@ it('logs in directly when 2FA is disabled', function () {
     expect(Auth::guard('darvis-nuki')->check())->toBeTrue();
 });
 
-it('sends an OTP mail when 2FA is enabled and completes login on valid code', function () {
-    $user = NukiUser::create([
-        'name' => 'Hoofd',
+it('always requires OTP for a verified user even when two_factor_enabled is false', function () {
+    $user = makeVerifiedUser([
         'email' => 'hoofd2@example.test',
-        'password' => 'secret123',
-        'two_factor_enabled' => true,
-        'is_active' => true,
+        'two_factor_enabled' => false,
     ]);
 
     Mail::fake();
@@ -51,10 +85,6 @@ it('sends an OTP mail when 2FA is enabled and completes login on valid code', fu
     Mail::assertSent(NukiLoginOtpMail::class, fn (NukiLoginOtpMail $mail) => $mail->hasTo($user->email));
     expect(Auth::guard('darvis-nuki')->check())->toBeFalse();
 
-    $record = NukiUserOtpCode::query()->where('nuki_user_id', $user->id)->latest('id')->first();
-    expect($record)->not->toBeNull();
-
-    // Plaintext is alleen in de Mail-callable, in een test pakken we hem uit Mail::sent.
     $plain = null;
     foreach (Mail::sent(NukiLoginOtpMail::class) as $mail) {
         $plain = $mail->code;
@@ -69,13 +99,7 @@ it('sends an OTP mail when 2FA is enabled and completes login on valid code', fu
 });
 
 it('rejects a wrong password without sending mail', function () {
-    NukiUser::create([
-        'name' => 'Hoofd',
-        'email' => 'hoofd3@example.test',
-        'password' => 'secret123',
-        'two_factor_enabled' => true,
-        'is_active' => true,
-    ]);
+    makeVerifiedUser(['email' => 'hoofd3@example.test']);
 
     Mail::fake();
 
@@ -89,13 +113,7 @@ it('rejects a wrong password without sending mail', function () {
 });
 
 it('rejects an expired OTP code', function () {
-    $user = NukiUser::create([
-        'name' => 'Hoofd',
-        'email' => 'hoofd4@example.test',
-        'password' => 'secret123',
-        'two_factor_enabled' => true,
-        'is_active' => true,
-    ]);
+    $user = makeVerifiedUser(['email' => 'hoofd4@example.test']);
 
     $plain = '123456';
     NukiUserOtpCode::create([

@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use Darvis\Nuki\Http\Controllers\NukiLogoutController;
+use Darvis\Nuki\Http\Controllers\NukiVerifyEmailController;
 use Darvis\Nuki\Http\Middleware\SetLocale;
 use Darvis\Nuki\Livewire\Auth\ForgotPasswordPage;
 use Darvis\Nuki\Livewire\Auth\LoginOtpPage;
 use Darvis\Nuki\Livewire\Auth\LoginPage;
 use Darvis\Nuki\Livewire\Auth\RegisterPage;
 use Darvis\Nuki\Livewire\Auth\ResetPasswordPage;
+use Darvis\Nuki\Livewire\Auth\VerifyEmailNoticePage;
 use Darvis\Nuki\Livewire\ProfilePage;
 use Darvis\Nuki\Livewire\SubUserShow;
 use Darvis\Nuki\Livewire\SubUsersIndex;
@@ -35,6 +37,14 @@ Route::middleware($authMiddleware)
             if (($config['password_reset']['enabled'] ?? true) === true) {
                 Route::get('/password/forgot', ForgotPasswordPage::class)->name('auth.password.forgot');
                 Route::get('/password/reset/{token}', ResetPasswordPage::class)->name('auth.password.reset');
+            }
+
+            if (($config['email_verification']['enabled'] ?? true) === true) {
+                Route::get('/email/verify', VerifyEmailNoticePage::class)->name('auth.verify.notice');
+                Route::get('/email/verify/{id}/{hash}', NukiVerifyEmailController::class)
+                    ->middleware('signed')
+                    ->whereNumber('id')
+                    ->name('auth.verify');
             }
         });
 
