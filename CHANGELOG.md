@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   archive, issue and pull request templates, a `CODE_OF_CONDUCT.md`, a `CONTRIBUTING.md`, and a
   Laravel Boost guideline in `resources/boost/`.
 
+### Fixed
+- Registering, resetting a password and changing a password did nothing on Laravel 11.0 through
+  11.31: they used the `confirmed:otherField` validation rule, which only accepts a custom field
+  name from a later 11.x release. On an older 11.x the rule never matched, validation failed and
+  no account was created or changed, while `composer.json` promised `^11.0`. The three rules use
+  `same:` now, which every supported Laravel has.
+
 ### Changed
 - CI calls the shared reusable workflow in `ArvidDeJong/.github` instead of its own copy. That
   adds the `prefer-lowest` column, which tests whether the version constraints in
