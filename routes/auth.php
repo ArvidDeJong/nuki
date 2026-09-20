@@ -14,32 +14,31 @@ use Darvis\Nuki\Livewire\Auth\VerifyEmailNoticePage;
 use Darvis\Nuki\Livewire\ProfilePage;
 use Darvis\Nuki\Livewire\SubUserShow;
 use Darvis\Nuki\Livewire\SubUsersIndex;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Support\Facades\Route;
 
-$config = config('nuki.auth_users');
-$authMiddleware = array_values(array_unique(array_merge(
-    $config['routes']['middleware'] ?? ['web'],
-    [SetLocale::class],
-)));
+$authMiddleware = NukiConfig::authRouteMiddleware();
+$authMiddleware[] = SetLocale::class;
+$authMiddleware = array_values(array_unique($authMiddleware));
 
 Route::middleware($authMiddleware)
-    ->prefix($config['routes']['prefix'] ?? 'nuki')
+    ->prefix(NukiConfig::authRoutePrefix())
     ->name('nuki.')
-    ->group(function () use ($config) {
-        Route::middleware('guest:darvis-nuki')->group(function () use ($config) {
+    ->group(function () {
+        Route::middleware('guest:darvis-nuki')->group(function () {
             Route::get('/login', LoginPage::class)->name('auth.login');
             Route::get('/login/otp', LoginOtpPage::class)->name('auth.otp');
 
-            if (($config['register_enabled'] ?? true) === true) {
+            if (NukiConfig::registerEnabled()) {
                 Route::get('/register', RegisterPage::class)->name('auth.register');
             }
 
-            if (($config['password_reset']['enabled'] ?? true) === true) {
+            if (NukiConfig::passwordResetEnabled()) {
                 Route::get('/password/forgot', ForgotPasswordPage::class)->name('auth.password.forgot');
                 Route::get('/password/reset/{token}', ResetPasswordPage::class)->name('auth.password.reset');
             }
 
-            if (($config['email_verification']['enabled'] ?? true) === true) {
+            if (NukiConfig::emailVerificationEnabled()) {
                 Route::get('/email/verify', VerifyEmailNoticePage::class)->name('auth.verify.notice');
                 Route::get('/email/verify/{id}/{hash}', NukiVerifyEmailController::class)
                     ->middleware('signed')

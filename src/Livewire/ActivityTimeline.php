@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\DTOs\LogEntry;
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -30,7 +31,7 @@ class ActivityTimeline extends Component
     public function render(): View
     {
         return view('nuki::livewire.activity-timeline')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     public function refresh(): void

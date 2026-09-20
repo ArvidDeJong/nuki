@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire\Auth;
 
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -25,7 +26,7 @@ class RegisterPage extends Component
 
     public function mount(): void
     {
-        if (config('nuki.auth_users.register_enabled', true) === false) {
+        if (! NukiConfig::registerEnabled()) {
             abort(404);
         }
     }
@@ -57,7 +58,7 @@ class RegisterPage extends Component
 
         // E-mailverificatie verplicht: niet inloggen. Stuur de bevestigingslink
         // en toon de notice-pagina. Pas na verificatie kan er ingelogd worden.
-        if (config('nuki.auth_users.email_verification.enabled', true) === true) {
+        if (NukiConfig::emailVerificationEnabled()) {
             $user->sendEmailVerificationNotification();
             session(['nuki.pending_verification_user_id' => $user->id]);
 
@@ -67,7 +68,7 @@ class RegisterPage extends Component
         Auth::guard(AuthConfigRegistrar::GUARD)->login($user);
 
         return $this->redirect(
-            (string) config('nuki.auth_users.redirect_after_login', '/nuki'),
+            NukiConfig::redirectAfterLogin(),
             navigate: false,
         );
     }

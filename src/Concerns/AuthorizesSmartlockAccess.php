@@ -7,6 +7,7 @@ namespace Darvis\Nuki\Concerns;
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
 use Darvis\Nuki\Models\NukiAccount;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Support\Facades\Auth;
 
 trait AuthorizesSmartlockAccess
@@ -58,7 +59,7 @@ trait AuthorizesSmartlockAccess
 
     protected function currentNukiAuthUser(): ?NukiUser
     {
-        if (config('nuki.auth_users.enabled') !== true) {
+        if (! NukiConfig::authUsersEnabled()) {
             return null;
         }
 

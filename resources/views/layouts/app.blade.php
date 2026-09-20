@@ -1,17 +1,18 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? config('nuki.ui.brand', 'NUKI') }}</title>
+    <title>{{ $title ?? NukiConfig::uiBrand() }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
 <body class="min-h-full bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-900 dark:text-zinc-100">
     <flux:header container class="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <flux:brand href="{{ route('nuki.dashboard') }}" name="{{ config('nuki.ui.brand', 'NUKI') }}" />
+        <flux:brand href="{{ route('nuki.dashboard') }}" name="{{ NukiConfig::uiBrand() }}" />
 
         <flux:navbar class="ms-8 hidden md:flex">
             <flux:navbar.item icon="squares-2x2" href="{{ route('nuki.dashboard') }}"
@@ -30,7 +31,7 @@
                               :current="request()->routeIs('nuki.accounts.*')">
                 {{ __('nuki::nuki.nav.accounts') }}
             </flux:navbar.item>
-            @php($navUser = config('nuki.auth_users.enabled') ? auth('darvis-nuki')->user() : null)
+            @php($navUser = NukiConfig::authUsersEnabled() ? auth('darvis-nuki')->user() : null)
             @if ($navUser && $navUser->isMain())
                 <flux:navbar.item icon="user-group" href="{{ route('nuki.sub-users.index') }}"
                                   :current="request()->routeIs('nuki.sub-users.*')">
@@ -51,7 +52,7 @@
 
         <livewire:nuki.account-switcher />
 
-        @php($authUser = config('nuki.auth_users.enabled') ? auth('darvis-nuki')->user() : null)
+        @php($authUser = NukiConfig::authUsersEnabled() ? auth('darvis-nuki')->user() : null)
 
         <flux:dropdown position="bottom" align="end">
             <flux:button variant="ghost" icon="ellipsis-horizontal" icon:variant="outline" />
@@ -68,7 +69,7 @@
                     <flux:menu.separator />
                 @endif
                 <flux:menu.item icon="arrow-top-right-on-square"
-                                href="{{ config('nuki.web_url') }}" target="_blank">
+                                href="{{ NukiConfig::webUrl() }}" target="_blank">
                     {{ __('nuki::nuki.nav.nuki_web') }}
                 </flux:menu.item>
                 <flux:menu.item icon="document-text"

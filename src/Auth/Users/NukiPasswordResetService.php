@@ -7,6 +7,7 @@ namespace Darvis\Nuki\Auth\Users;
 use Carbon\CarbonImmutable;
 use Darvis\Nuki\Mail\NukiPasswordResetMail;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -38,7 +39,7 @@ final class NukiPasswordResetService
             ],
         );
 
-        $expiryMinutes = (int) config('nuki.auth_users.password_reset.token_lifetime_minutes', 60);
+        $expiryMinutes = NukiConfig::passwordResetLifetimeMinutes();
         $url = route('nuki.auth.password.reset', [
             'token' => $token,
             'email' => $user->email,
@@ -65,7 +66,7 @@ final class NukiPasswordResetService
             return null;
         }
 
-        $expiry = (int) config('nuki.auth_users.password_reset.token_lifetime_minutes', 60);
+        $expiry = NukiConfig::passwordResetLifetimeMinutes();
         if (CarbonImmutable::parse($row->created_at)->addMinutes($expiry)->isPast()) {
             return null;
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Console\Commands;
 
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Console\Command;
 
 class NukiWebhookRegisterCommand extends Command
@@ -20,7 +21,7 @@ class NukiWebhookRegisterCommand extends Command
     {
         $accountKey = (string) $this->option('account');
         $url = (string) ($this->argument('url')
-            ?? rtrim((string) config('app.url'), '/').(string) config('nuki.webhook.route'));
+            ?? rtrim((string) config('app.url'), '/').NukiConfig::webhookRoute());
 
         $events = $this->option('events');
         if (empty($events)) {

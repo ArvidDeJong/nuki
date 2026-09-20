@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Models;
 
 use Carbon\CarbonImmutable;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,8 +53,8 @@ class NukiUserOtpCode extends Model
         ?string $ip = null,
         ?string $userAgent = null,
     ): array {
-        $length = (int) config('nuki.auth_users.otp.length', 6);
-        $expiryMinutes = (int) config('nuki.auth_users.otp.expiry_minutes', 5);
+        $length = NukiConfig::otpLength();
+        $expiryMinutes = NukiConfig::otpExpiryMinutes();
 
         $plain = self::randomNumericCode($length);
 

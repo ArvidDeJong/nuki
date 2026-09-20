@@ -7,6 +7,7 @@ namespace Darvis\Nuki\Http\Middleware;
 use Carbon\Carbon;
 use Closure;
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
@@ -35,10 +36,10 @@ class SetLocale
 
     private function resolveLocale(): string
     {
-        $allowed = array_keys((array) config('nuki.ui.locales', ['en' => 'English']));
-        $default = (string) config('nuki.ui.default_locale', config('app.locale', 'en'));
+        $allowed = array_keys(NukiConfig::uiLocales());
+        $default = NukiConfig::uiDefaultLocale();
 
-        if (config('nuki.auth_users.enabled') === true) {
+        if (NukiConfig::authUsersEnabled()) {
             $user = Auth::guard(AuthConfigRegistrar::GUARD)->user();
             if ($user !== null) {
                 $userLocale = (string) ($user->locale ?? '');

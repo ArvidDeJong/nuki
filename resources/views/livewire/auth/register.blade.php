@@ -1,6 +1,7 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <div>
     <flux:heading size="lg">{{ __('nuki::nuki.auth.register_heading') }}</flux:heading>
-    <flux:subheading class="mt-1">{{ __('nuki::nuki.auth.register_subheading', ['brand' => config('nuki.ui.brand', 'NUKI')]) }}</flux:subheading>
+    <flux:subheading class="mt-1">{{ __('nuki::nuki.auth.register_subheading', ['brand' => NukiConfig::uiBrand()]) }}</flux:subheading>
 
     @if ($error)
         <flux:callout variant="danger" icon="exclamation-triangle" class="mt-6">{{ $error }}</flux:callout>

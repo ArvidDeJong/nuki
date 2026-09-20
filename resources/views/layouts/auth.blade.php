@@ -1,11 +1,12 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 @php
-    $brand = config('nuki.ui.brand', 'NUKI');
-    $logoLight = config('nuki.ui.logo.light');
-    $logoDark = config('nuki.ui.logo.dark');
+    $brand = NukiConfig::uiBrand();
+    $logoLight = NukiConfig::uiLogoLight();
+    $logoDark = NukiConfig::uiLogoDark();
     $hasLogo = ! empty($logoLight) || ! empty($logoDark);
-    $tagline = config('nuki.ui.tagline') ?: __('nuki::nuki.auth.panel.subheading', ['brand' => $brand]);
-    $panelEnabled = config('nuki.ui.auth_panel.enabled', true) === true;
-    $footerLinks = config('nuki.ui.footer.links', []);
+    $tagline = NukiConfig::uiTagline() ?: __('nuki::nuki.auth.panel.subheading', ['brand' => $brand]);
+    $panelEnabled = NukiConfig::uiAuthPanelEnabled();
+    $footerLinks = NukiConfig::uiFooterLinks();
     $panelFeatures = __('nuki::nuki.auth.panel.features');
     if (! is_array($panelFeatures)) {
         $panelFeatures = [];

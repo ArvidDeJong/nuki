@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Livewire\Auth;
 
 use Darvis\Nuki\Auth\Users\NukiPasswordResetService;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -18,7 +19,7 @@ class ForgotPasswordPage extends Component
 
     public function mount(): void
     {
-        if (config('nuki.auth_users.password_reset.enabled', true) === false) {
+        if (! NukiConfig::passwordResetEnabled()) {
             abort(404);
         }
     }

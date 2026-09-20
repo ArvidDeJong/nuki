@@ -30,7 +30,7 @@ authenticator before sending.
 ### Config resolver (`NUKI_TOKEN_RESOLVER=config`)
 
 [ConfigApiTokenResolver](../src/Auth/ConfigApiTokenResolver.php) returns
-`config('nuki.token')` for **every** account key. Use this when you only
+`NukiConfig::apiToken()` for **every** account key. Use this when you only
 manage one NUKI account — there is no database table, nothing to seed, nothing
 to encrypt.
 
@@ -48,7 +48,7 @@ via Eloquent's `encrypted` cast (see
 [NukiAccount](../src/Models/NukiAccount.php)), so your `APP_KEY` is required to
 decrypt it.
 
-It falls back to `config('nuki.token')` for the literal `default` account key
+It falls back to `NukiConfig::apiToken()` for the literal `default` account key
 when no row matches — convenient for development.
 
 Add accounts via the bundled `/nuki/accounts` UI or directly:

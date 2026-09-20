@@ -13,8 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   scripts, a `.gitattributes` that keeps `docs/`, `tests/` and `.github/` out of the dist
   archive, issue and pull request templates, a `CODE_OF_CONDUCT.md`, a `CONTRIBUTING.md`, and a
   Laravel Boost guideline in `resources/boost/`.
+- `Darvis\Nuki\Support\NukiConfig`, the one place that reads the package config. It holds every
+  default exactly once and is used everywhere in the package, so a renamed key now breaks in a
+  single place instead of silently falling back. A test walks `src/`, `resources/`, `routes/` and
+  `database/` and fails the build on a direct `config('nuki.…')` read.
+- `nuki.webhook.verify_signature` (default `true`). Set it to `false` to accept unsigned webhook
+  requests, for example behind a gateway that already authenticates the caller. Only an explicit
+  `false` switches the check off, so a typo leaves it on.
 
 ### Fixed
+- **The webhook receiver accepted every request while no secret was configured.** With
+  `NUKI_WEBHOOK_ENABLED=true` and no `NUKI_WEBHOOK_SECRET`, the signature check returned early and
+  anyone who knew the URL could dispatch `NukiWebhookReceived` events into the application. The
+  receiver now rejects every request with `401` until a secret is set.
 - Registering, resetting a password and changing a password did nothing on Laravel 11.0 through
   11.31: they used the `confirmed:otherField` validation rule, which only accepts a custom field
   name from a later 11.x release. On an older 11.x the rule never matched, validation failed and
@@ -28,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every package.
 - `phpunit/phpunit` is a dev dependency instead of an implied one, and `SECURITY.md` moved from
   `.github/` to the repository root, where the other packages keep it.
+- `config/nuki.php` has its keys sorted alphabetically at every level, guarded by a test. No key
+  was renamed or removed, so a published config file keeps working.
 
 ## [1.0.3] - 2026-05-15
 

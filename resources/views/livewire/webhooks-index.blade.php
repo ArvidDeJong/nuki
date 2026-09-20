@@ -1,3 +1,4 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <div class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -24,7 +25,7 @@
         </flux:callout>
     @endif
 
-    @if (! config('nuki.webhook.enabled'))
+    @if (! NukiConfig::webhookEnabled())
         <flux:callout variant="warning" icon="exclamation-triangle">
             <flux:callout.heading>{{ __('nuki::nuki.webhooks.disabled_heading') }}</flux:callout.heading>
             <flux:callout.text>

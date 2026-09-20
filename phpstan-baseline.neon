@@ -157,12 +157,6 @@ parameters:
 			path: src/Events/NukiWebhookReceived.php
 
 		-
-			message: '#^Method Darvis\\Nuki\\Http\\Controllers\\WebhookController\:\:verifySignature\(\) has parameter \$config with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Http/Controllers/WebhookController.php
-
-		-
 			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:__construct\(\) has parameter \$httpConfig with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

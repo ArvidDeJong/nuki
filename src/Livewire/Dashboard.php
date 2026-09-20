@@ -7,6 +7,7 @@ namespace Darvis\Nuki\Livewire;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\DTOs\SmartLock;
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -22,7 +23,7 @@ class Dashboard extends Component
     public function render(): View
     {
         return view('nuki::livewire.dashboard')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     public function refresh(): void

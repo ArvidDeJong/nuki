@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire\Auth;
 
 use Darvis\Nuki\Auth\Users\LoginThrottle;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -19,7 +20,7 @@ class VerifyEmailNoticePage extends Component
 
     public function mount(): mixed
     {
-        if (config('nuki.auth_users.email_verification.enabled', true) === false) {
+        if (! NukiConfig::emailVerificationEnabled()) {
             abort(404);
         }
 

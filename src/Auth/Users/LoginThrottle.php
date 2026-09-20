@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Auth\Users;
 
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Cache\RateLimiter;
 
 final class LoginThrottle
@@ -12,8 +13,8 @@ final class LoginThrottle
 
     public function checkSend(string $email, ?string $ip): bool
     {
-        $max = (int) config('nuki.auth_users.otp.rate_limit.max_per_window', 5);
-        $window = (int) config('nuki.auth_users.otp.rate_limit.window_minutes', 15) * 60;
+        $max = NukiConfig::otpMaxPerWindow();
+        $window = NukiConfig::otpWindowMinutes() * 60;
         $key = $this->sendKey($email, $ip);
 
         if ($this->limiter->tooManyAttempts($key, $max)) {
@@ -32,8 +33,8 @@ final class LoginThrottle
 
     public function checkAttempt(int $userId): bool
     {
-        $max = (int) config('nuki.auth_users.otp.rate_limit.max_per_window', 5);
-        $window = (int) config('nuki.auth_users.otp.rate_limit.window_minutes', 15) * 60;
+        $max = NukiConfig::otpMaxPerWindow();
+        $window = NukiConfig::otpWindowMinutes() * 60;
         $key = $this->attemptKey($userId);
 
         if ($this->limiter->tooManyAttempts($key, $max)) {

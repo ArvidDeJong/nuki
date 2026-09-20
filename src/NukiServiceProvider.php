@@ -37,6 +37,7 @@ use Darvis\Nuki\Livewire\SubUserShow;
 use Darvis\Nuki\Livewire\SubUsersIndex;
 use Darvis\Nuki\Livewire\WebhooksIndex;
 use Darvis\Nuki\Support\DemoFixtures;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
@@ -53,30 +54,30 @@ class NukiServiceProvider extends ServiceProvider
         // In demo mode the HTTP layer is faked, but the bearer authenticator
         // still needs *some* token to attach. Stub one when missing so a fresh
         // installer only has to flip `NUKI_DEMO=true` in .env.
-        if (config('nuki.demo.enabled') === true && empty(config('nuki.token'))) {
+        if (NukiConfig::demoEnabled() && NukiConfig::apiToken() === null) {
             config(['nuki.token' => 'demo-token']);
         }
 
-        if (config('nuki.auth_users.enabled') === true) {
+        if (NukiConfig::authUsersEnabled()) {
             AuthConfigRegistrar::register($this->app->make(Repository::class));
         }
 
         $this->app->singleton(TokenStore::class, function (Application $app): TokenStore {
-            $driver = (string) config('nuki.oauth.token_store', 'cache');
+            $driver = NukiConfig::oauthTokenStore();
 
             return match ($driver) {
                 'database' => new DatabaseTokenStore($app->make(DatabaseManager::class)->connection()),
                 'cache' => new CacheTokenStore(
-                    $app->make(CacheFactory::class)->store(config('nuki.oauth.cache_store')),
-                    (string) config('nuki.oauth.cache_prefix', 'nuki:oauth:'),
+                    $app->make(CacheFactory::class)->store(NukiConfig::oauthCacheStore()),
+                    NukiConfig::oauthCachePrefix(),
                 ),
                 default => throw new NukiException("Unknown nuki.oauth.token_store driver: {$driver}"),
             };
         });
 
         $this->app->singleton(ApiTokenResolver::class, function (): ApiTokenResolver {
-            $driver = (string) config('nuki.token_resolver', 'database');
-            $defaultToken = config('nuki.token');
+            $driver = NukiConfig::tokenResolver();
+            $defaultToken = NukiConfig::apiToken();
 
             return match ($driver) {
                 'database' => new DatabaseApiTokenResolver($defaultToken),
@@ -86,13 +87,13 @@ class NukiServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Authenticator::class, function (Application $app): Authenticator {
-            $mode = (string) config('nuki.auth', 'token');
+            $mode = NukiConfig::authMethod();
 
             return match ($mode) {
                 'token' => new TokenAuthenticator($app->make(ApiTokenResolver::class)),
                 'oauth' => new OAuthAuthenticator(
                     $app->make(TokenStore::class),
-                    (array) config('nuki.oauth'),
+                    NukiConfig::oauth(),
                 ),
                 default => throw new NukiException("Unknown nuki.auth mode: {$mode}"),
             };
@@ -100,9 +101,9 @@ class NukiServiceProvider extends ServiceProvider
 
         $this->app->singleton(HttpClient::class, function (Application $app): HttpClient {
             return new HttpClient(
-                baseUrl: (string) config('nuki.base_url'),
+                baseUrl: NukiConfig::baseUrl(),
                 authenticator: $app->make(Authenticator::class),
-                httpConfig: (array) config('nuki.http', []),
+                httpConfig: NukiConfig::http(),
             );
         });
 
@@ -110,7 +111,7 @@ class NukiServiceProvider extends ServiceProvider
             return new Nuki(
                 http: $app->make(HttpClient::class),
                 tokens: $app->make(TokenStore::class),
-                oauthConfig: (array) config('nuki.oauth'),
+                oauthConfig: NukiConfig::oauth(),
             );
         });
 
@@ -151,21 +152,21 @@ class NukiServiceProvider extends ServiceProvider
             ]);
         }
 
-        if (config('nuki.webhook.enabled') === true) {
+        if (NukiConfig::webhookEnabled()) {
             $this->loadRoutesFrom(__DIR__.'/../routes/webhooks.php');
         }
 
-        if (config('nuki.ui.enabled') === true) {
+        if (NukiConfig::uiEnabled()) {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
             $this->registerLivewireComponents();
         }
 
-        if (config('nuki.auth_users.enabled') === true) {
+        if (NukiConfig::authUsersEnabled()) {
             $this->loadRoutesFrom(__DIR__.'/../routes/auth.php');
             $this->registerAuthLivewireComponents();
         }
 
-        if (config('nuki.demo.enabled') === true) {
+        if (NukiConfig::demoEnabled()) {
             DemoFixtures::register();
         }
     }

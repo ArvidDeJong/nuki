@@ -10,19 +10,20 @@ use Darvis\Nuki\Livewire\OAuthConnect;
 use Darvis\Nuki\Livewire\SmartlockShow;
 use Darvis\Nuki\Livewire\SmartlocksIndex;
 use Darvis\Nuki\Livewire\WebhooksIndex;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Support\Facades\Route;
 
-$config = config('nuki.ui');
-$middleware = $config['middleware'] ?? ['web'];
+$middleware = NukiConfig::uiMiddleware();
 
-if (config('nuki.auth_users.enabled') === true) {
-    $middleware = array_values(array_unique(array_merge($middleware, ['auth:darvis-nuki'])));
+if (NukiConfig::authUsersEnabled()) {
+    $middleware[] = 'auth:darvis-nuki';
 }
 
-$middleware = array_values(array_unique(array_merge($middleware, [SetLocale::class])));
+$middleware[] = SetLocale::class;
+$middleware = array_values(array_unique($middleware));
 
 Route::middleware($middleware)
-    ->prefix($config['prefix'] ?? 'nuki')
+    ->prefix(NukiConfig::uiPrefix())
     ->name('nuki.')
     ->group(function () {
         Route::get('/', SmartlocksIndex::class)->name('smartlocks.index');

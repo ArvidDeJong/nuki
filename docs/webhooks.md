@@ -13,7 +13,8 @@ NUKI_WEBHOOK_SECRET=a-long-random-string
 ```
 
 The secret is the HMAC-SHA256 key NUKI signs the body with. Treat it like a
-password; store it in `.env`, not in source.
+password; store it in `.env`, not in source. Without a secret the receiver
+rejects every request, so the route is never open by accident.
 
 With the flag on, [NukiServiceProvider](../src/NukiServiceProvider.php) loads
 [routes/webhooks.php](../routes/webhooks.php):
@@ -33,8 +34,10 @@ order:
 1. **Signature check.** Reads the header from `nuki.webhook.signature_header`
    (default `X-Nuki-Signature`), computes
    `hash_hmac('sha256', $request->getContent(), $secret)`, compares with
-   `hash_equals`. On mismatch returns `401 invalid signature`. If `secret` is
-   empty the check is skipped entirely — only acceptable in local dev.
+   `hash_equals`. On mismatch returns `401 invalid signature`. Without a
+   secret every request gets the same `401`. To accept unsigned requests, for
+   example behind a gateway that already authenticates the caller, switch the
+   check off on purpose with `NUKI_WEBHOOK_VERIFY_SIGNATURE=false`.
 2. **Event id extraction.** Picks the id from `payload.id`, `payload.eventId`,
    or falls back to `sha1(json_encode($payload))` so duplicates are still
    recognisable.
@@ -88,7 +91,7 @@ php artisan nuki:webhook-register
 ```
 
 Defaults:
-- URL = `rtrim(APP_URL, '/') . config('nuki.webhook.route')`
+- URL = `rtrim(APP_URL, '/') . NukiConfig::webhookRoute()`
 - Events = `DEVICE_STATUS`, `DEVICE_CONFIG`, `DEVICE_LOGS`, `ACCOUNT_USER`
 
 Override:
@@ -131,11 +134,12 @@ your listener:
 
 ```php
 use Darvis\Nuki\Events\NukiWebhookReceived;
+use Darvis\Nuki\Support\NukiConfig;
 
 Event::fake([NukiWebhookReceived::class]);
 
 $this->post('/nuki/webhook', $payload, [
-    'X-Nuki-Signature' => hash_hmac('sha256', json_encode($payload), config('nuki.webhook.secret')),
+    'X-Nuki-Signature' => hash_hmac('sha256', json_encode($payload), NukiConfig::webhookSecret()),
 ])->assertOk();
 
 Event::assertDispatched(NukiWebhookReceived::class);

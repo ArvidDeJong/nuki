@@ -7,6 +7,7 @@ namespace Darvis\Nuki\Concerns;
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
 use Darvis\Nuki\Models\NukiAccount;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -55,7 +56,7 @@ trait UsesNukiAccount
 
     protected function currentNukiUser(): ?NukiUser
     {
-        if (config('nuki.auth_users.enabled') !== true) {
+        if (! NukiConfig::authUsersEnabled()) {
             return null;
         }
 

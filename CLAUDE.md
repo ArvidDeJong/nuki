@@ -56,7 +56,7 @@ Resources are stateless factories — instantiate via the manager rather than ca
 
 When adding a strategy, bind it in `register()` and document the config key — do **not** instantiate strategies elsewhere.
 
-The provider also: loads views (`nuki::` namespace), auto-loads migrations from [database/migrations/](database/migrations/), publishes the `nuki-config` / `nuki-migrations` / `nuki-views` / `nuki-seeders` tags, registers the two console commands, conditionally loads webhook routes (`config('nuki.webhook.enabled') === true`), conditionally loads UI routes + registers Livewire components (`config('nuki.ui.enabled') === true`), and — when `config('nuki.demo.enabled') === true` — calls [DemoFixtures::register()](src/Support/DemoFixtures.php) to install an `Http::fake()` covering every NUKI endpoint.
+The provider also: loads views (`nuki::` namespace), auto-loads migrations from [database/migrations/](database/migrations/), publishes the `nuki-config` / `nuki-migrations` / `nuki-views` / `nuki-seeders` tags, registers the two console commands, conditionally loads webhook routes (`NukiConfig::webhookEnabled()`), conditionally loads UI routes + registers Livewire components (`NukiConfig::uiEnabled()`), and — when `NukiConfig::demoEnabled()` — calls [DemoFixtures::register()](src/Support/DemoFixtures.php) to install an `Http::fake()` covering every NUKI endpoint.
 
 ## NUKI API authentication
 
@@ -65,7 +65,7 @@ For the package's own end-user login system see "Package user authentication"
 below.
 
 **Token mode** (`NUKI_AUTH=token`): [TokenAuthenticator](src/Auth/TokenAuthenticator.php) calls `ApiTokenResolver->resolve($accountKey)` for every request.
-- `config` resolver returns `config('nuki.token')` for all accounts.
+- `config` resolver returns `NukiConfig::apiToken()` for all accounts.
 - `database` resolver reads the encrypted `api_token` column from [src/Models/NukiAccount.php](src/Models/NukiAccount.php) (table `nuki_accounts`).
 
 **OAuth mode** (`NUKI_AUTH=oauth`): [OAuthAuthenticator](src/Auth/OAuthAuthenticator.php) reads `NukiToken` records from `TokenStore` and refreshes them with a 30-second expiry leeway. Stored tokens live in `nuki_oauth_tokens` (DB driver) or cache. Authorization-code dance is handled by [src/Resources/OAuth.php](src/Resources/OAuth.php) (`authorizationUrl()`, `exchangeCode()`, `refresh()`).
@@ -119,7 +119,7 @@ Optional, enabled with `NUKI_AUTH_USERS_ENABLED=true`. Completely separate from 
 
 Setting `NUKI_DEMO=true` triggers two things at boot:
 
-1. The provider stubs `config('nuki.token')` to `demo-token` if it's null, so the bearer authenticator does not throw before the fake intercepts.
+1. The provider stubs the `nuki.token` config value to `demo-token` if it's null, so the bearer authenticator does not throw before the fake intercepts.
 2. [DemoFixtures::register()](src/Support/DemoFixtures.php) installs `Http::fake(['api.nuki.io/*' => closure])` returning canned data for `/smartlock`, `/smartlock/{id}`, `/smartlock/{id}/log`, `/smartlock/{id}/auth`, `/smartlock/{id}/action`, the account-wide variants, `/account`, `/api/notification`, and `/oauth/token`.
 
 Run [NukiDemoSeeder](src/Database/Seeders/NukiDemoSeeder.php) to populate `nuki_accounts` with four demo accounts so the `AccountSwitcher` has options to show:
@@ -134,10 +134,13 @@ When adding a new NUKI endpoint, also add a corresponding branch in `DemoFixture
 
 - DTOs are `readonly` classes with static `fromArray()` factories — keep new ones in the same shape under [src/DTOs/](src/DTOs/).
 - Resources are stateless; create via the manager, don't cache instances on long-lived objects.
-- Config keys are sorted alphabetically inside each section in [config/nuki.php](config/nuki.php).
+- Config keys are sorted alphabetically at every level in [config/nuki.php](config/nuki.php).
+- [NukiConfig](src/Support/NukiConfig.php) is the only place in the package that reads the config. Add an accessor there instead of calling `config('nuki.…')` anywhere else; a test in [tests/Feature/ConfigAccessorTest.php](tests/Feature/ConfigAccessorTest.php) walks `src/`, `resources/`, `routes/` and `database/` and fails the build on a direct read.
 - [README.md](README.md) and [CHANGELOG.md](CHANGELOG.md) are written in English. Update `CHANGELOG.md` for any behavioural change.
 
 ## Caveats
+
+- The webhook receiver rejects every request while `webhook.secret` is empty. `webhook.verify_signature` set to `false` is the deliberate way out; anything other than `false` leaves the check on.
 
 - The package must run on **Laravel 11, 12, and 13** plus **Livewire 3.5/4** and **Pest 3/4** simultaneously. Avoid framework features added after Laravel 11.0 unless guarded.
 - Migrations are auto-loaded from the package path. Consumers can `vendor:publish --tag=nuki-migrations` if they want to customise; otherwise they apply in place.

@@ -2,31 +2,18 @@
 
 declare(strict_types=1);
 
+/*
+|--------------------------------------------------------------------------
+| NUKI
+|--------------------------------------------------------------------------
+|
+| Keys are sorted alphabetically within every group, so a setting is found
+| by name instead of by history. Read them through
+| Darvis\Nuki\Support\NukiConfig, never with config() directly.
+|
+*/
+
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | NUKI Web API base URL
-    |--------------------------------------------------------------------------
-    |
-    | The base URL of the NUKI Web API. You generally never need to change this.
-    |
-    */
-
-    'base_url' => env('NUKI_BASE_URL', 'https://api.nuki.io'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | NUKI Web URL
-    |--------------------------------------------------------------------------
-    |
-    | Public web portal where customers manage their account and generate
-    | personal API tokens. Used in the UI to deep-link the user to the right
-    | place when adding a new customer.
-    |
-    */
-
-    'web_url' => env('NUKI_WEB_URL', 'https://web.nuki.io'),
 
     /*
     |--------------------------------------------------------------------------
@@ -57,6 +44,10 @@ return [
     */
 
     'auth_users' => [
+        'email_verification' => [
+            'enabled' => true,
+            'link_lifetime_minutes' => 60,
+        ],
         'enabled' => env('NUKI_AUTH_USERS_ENABLED', false),
         'mail' => [
             'from' => [
@@ -73,10 +64,6 @@ return [
                 'window_minutes' => 15,
             ],
         ],
-        'email_verification' => [
-            'enabled' => true,
-            'link_lifetime_minutes' => 60,
-        ],
         'password_reset' => [
             'enabled' => true,
             'token_lifetime_minutes' => 60,
@@ -88,6 +75,88 @@ return [
             'middleware' => ['web'],
             'prefix' => 'nuki',
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | NUKI Web API base URL
+    |--------------------------------------------------------------------------
+    |
+    | The base URL of the NUKI Web API. You generally never need to change this.
+    |
+    */
+
+    'base_url' => env('NUKI_BASE_URL', 'https://api.nuki.io'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Demo mode
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, all outbound calls to the NUKI Web API are intercepted by
+    | `Darvis\Nuki\Support\DemoFixtures` and answered with canned, plausible
+    | data — smartlocks, activity logs, authorizations, webhook subscriptions.
+    | Combined with the `Darvis\Nuki\Database\Seeders\NukiDemoSeeder`, this
+    | gives you a fully populated UI suitable for screenshots and recording
+    | walk-through videos without touching a real NUKI account.
+    |
+    | NEVER enable this in production.
+    |
+    */
+
+    'demo' => [
+        'enabled' => env('NUKI_DEMO', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | HTTP client
+    |--------------------------------------------------------------------------
+    |
+    | Tuning for the underlying Laravel HTTP client. Retries kick in on
+    | connection errors and HTTP 429 (rate limit) responses with exponential
+    | backoff (`retry_sleep` milliseconds, doubled per attempt).
+    |
+    */
+
+    'http' => [
+        'retries' => 3,
+        'retry_sleep' => 200,
+        'timeout' => 10,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OAuth 2.0
+    |--------------------------------------------------------------------------
+    |
+    | Register your application on https://developer.nuki.io/ to obtain a
+    | client id, client secret and configure the redirect URL.
+    |
+    | `scopes` controls the OAuth scopes requested at authorization time.
+    | `token_store` selects where issued tokens are persisted:
+    |   - "cache":    Laravel cache (default, fine for single-account)
+    |   - "database": dedicated `nuki_oauth_tokens` table (multi-account)
+    |
+    */
+
+    'oauth' => [
+        'authorize_url' => env('NUKI_OAUTH_AUTHORIZE_URL', 'https://api.nuki.io/oauth/authorize'),
+        'cache_prefix' => 'nuki:oauth:',
+        'cache_store' => env('NUKI_TOKEN_CACHE_STORE'),
+        'client_id' => env('NUKI_OAUTH_CLIENT_ID'),
+        'client_secret' => env('NUKI_OAUTH_CLIENT_SECRET'),
+        'redirect_url' => env('NUKI_OAUTH_REDIRECT_URL'),
+        'scopes' => [
+            'account',
+            'notification',
+            'smartlock',
+            'smartlock.action',
+            'smartlock.auth',
+            'smartlock.readOnly',
+        ],
+        'token_store' => env('NUKI_TOKEN_STORE', 'cache'),
+        'token_url' => env('NUKI_OAUTH_TOKEN_URL', 'https://api.nuki.io/oauth/token'),
     ],
 
     /*
@@ -110,64 +179,9 @@ return [
     |
     */
 
-    'token_resolver' => env('NUKI_TOKEN_RESOLVER', 'database'),
-
     'token' => env('NUKI_API_TOKEN'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | OAuth 2.0
-    |--------------------------------------------------------------------------
-    |
-    | Register your application on https://developer.nuki.io/ to obtain a
-    | client id, client secret and configure the redirect URL.
-    |
-    | `scopes` controls the OAuth scopes requested at authorization time.
-    | `token_store` selects where issued tokens are persisted:
-    |   - "cache":    Laravel cache (default, fine for single-account)
-    |   - "database": dedicated `nuki_oauth_tokens` table (multi-account)
-    |
-    */
-
-    'oauth' => [
-        'authorize_url' => env('NUKI_OAUTH_AUTHORIZE_URL', 'https://api.nuki.io/oauth/authorize'),
-        'token_url' => env('NUKI_OAUTH_TOKEN_URL', 'https://api.nuki.io/oauth/token'),
-        'client_id' => env('NUKI_OAUTH_CLIENT_ID'),
-        'client_secret' => env('NUKI_OAUTH_CLIENT_SECRET'),
-        'redirect_url' => env('NUKI_OAUTH_REDIRECT_URL'),
-        'scopes' => [
-            'account',
-            'notification',
-            'smartlock',
-            'smartlock.readOnly',
-            'smartlock.action',
-            'smartlock.auth',
-        ],
-        'token_store' => env('NUKI_TOKEN_STORE', 'cache'),
-        'cache_store' => env('NUKI_TOKEN_CACHE_STORE'), // null = default cache store
-        'cache_prefix' => 'nuki:oauth:',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Webhooks
-    |--------------------------------------------------------------------------
-    |
-    | When `enabled` is true, the package registers a POST route at `route`
-    | that accepts NUKI callbacks, verifies the HMAC signature against
-    | `secret`, deduplicates by event id and dispatches the
-    | `NukiWebhookReceived` event.
-    |
-    */
-
-    'webhook' => [
-        'enabled' => env('NUKI_WEBHOOK_ENABLED', false),
-        'route' => env('NUKI_WEBHOOK_ROUTE', '/nuki/webhook'),
-        'middleware' => ['api'],
-        'secret' => env('NUKI_WEBHOOK_SECRET'),
-        'signature_header' => env('NUKI_WEBHOOK_SIGNATURE_HEADER', 'X-Nuki-Signature'),
-        'dedup_ttl' => 600, // seconds
-    ],
+    'token_resolver' => env('NUKI_TOKEN_RESOLVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -197,10 +211,10 @@ return [
         ],
         'layout' => 'nuki::layouts.app',
         'locales' => [
-            'en' => 'English',
-            'nl' => 'Nederlands',
             'de' => 'Deutsch',
+            'en' => 'English',
             'es' => 'Español',
+            'nl' => 'Nederlands',
         ],
         'logo' => [
             // Path/URL to SVG/PNG, swapped via dark mode. Null = icon fallback.
@@ -214,39 +228,41 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | HTTP client
+    | NUKI Web URL
     |--------------------------------------------------------------------------
     |
-    | Tuning for the underlying Laravel HTTP client. Retries kick in on
-    | connection errors and HTTP 429 (rate limit) responses with exponential
-    | backoff (`retry_sleep` milliseconds, doubled per attempt).
+    | Public web portal where customers manage their account and generate
+    | personal API tokens. Used in the UI to deep-link the user to the right
+    | place when adding a new customer.
     |
     */
 
-    'http' => [
-        'timeout' => 10,
-        'retries' => 3,
-        'retry_sleep' => 200,
-    ],
+    'web_url' => env('NUKI_WEB_URL', 'https://web.nuki.io'),
 
     /*
     |--------------------------------------------------------------------------
-    | Demo mode
+    | Webhooks
     |--------------------------------------------------------------------------
     |
-    | When enabled, all outbound calls to the NUKI Web API are intercepted by
-    | `Darvis\Nuki\Support\DemoFixtures` and answered with canned, plausible
-    | data — smartlocks, activity logs, authorizations, webhook subscriptions.
-    | Combined with the `Darvis\Nuki\Database\Seeders\NukiDemoSeeder`, this
-    | gives you a fully populated UI suitable for screenshots and recording
-    | walk-through videos without touching a real NUKI account.
+    | When `enabled` is true, the package registers a POST route at `route`
+    | that accepts NUKI callbacks, verifies the HMAC signature against
+    | `secret`, deduplicates by event id for `dedup_ttl` seconds and
+    | dispatches the `NukiWebhookReceived` event.
     |
-    | NEVER enable this in production.
+    | Without a `secret` every request is rejected. Set `verify_signature`
+    | to false to accept unsigned requests, for example behind a proxy that
+    | already authenticates the caller.
     |
     */
 
-    'demo' => [
-        'enabled' => env('NUKI_DEMO', false),
+    'webhook' => [
+        'dedup_ttl' => 600,
+        'enabled' => env('NUKI_WEBHOOK_ENABLED', false),
+        'middleware' => ['api'],
+        'route' => env('NUKI_WEBHOOK_ROUTE', '/nuki/webhook'),
+        'secret' => env('NUKI_WEBHOOK_SECRET'),
+        'signature_header' => env('NUKI_WEBHOOK_SIGNATURE_HEADER', 'X-Nuki-Signature'),
+        'verify_signature' => env('NUKI_WEBHOOK_VERIFY_SIGNATURE', true),
     ],
 
 ];
