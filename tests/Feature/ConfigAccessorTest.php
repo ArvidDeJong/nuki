@@ -70,6 +70,22 @@ it('falls back to the application locale when no default locale is set', functio
     expect(NukiConfig::uiDefaultLocale())->toBe('de');
 });
 
+it('leaves a middleware list empty when that is what the config says', function () {
+    config([
+        'nuki.ui.middleware' => [],
+        'nuki.webhook.middleware' => [],
+        'nuki.auth_users.routes.middleware' => [],
+    ]);
+
+    expect(NukiConfig::uiMiddleware())->toBe([])
+        ->and(NukiConfig::webhookMiddleware())->toBe([])
+        ->and(NukiConfig::authRouteMiddleware())->toBe([]);
+
+    config(['nuki.ui.middleware' => null]);
+
+    expect(NukiConfig::uiMiddleware())->toBe(['web']);
+});
+
 it('always offers at least one locale', function () {
     config(['nuki.ui.locales' => []]);
 

@@ -217,6 +217,7 @@ final class NukiConfig
 
     /**
      * The locales the UI offers, as code => label. Also the allow list for switching.
+     * An empty list falls back to English, because a UI with no locale at all cannot render.
      *
      * @return array<string, string>
      */
@@ -438,7 +439,8 @@ final class NukiConfig
     }
 
     /**
-     * A configured list of strings, or the given fallback when it is not one.
+     * A configured list of strings, or the given fallback when the key holds no list at all.
+     * An explicit empty list is a choice and is returned as it is.
      *
      * @param  list<string>  $default
      * @return list<string>
@@ -447,7 +449,7 @@ final class NukiConfig
     {
         $value = config($key);
 
-        if (! is_array($value) || $value === []) {
+        if (! is_array($value)) {
             return $default;
         }
 

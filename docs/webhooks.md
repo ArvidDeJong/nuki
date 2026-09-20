@@ -134,12 +134,13 @@ your listener:
 
 ```php
 use Darvis\Nuki\Events\NukiWebhookReceived;
-use Darvis\Nuki\Support\NukiConfig;
 
 Event::fake([NukiWebhookReceived::class]);
 
+config(['nuki.webhook.secret' => 'test-secret']);
+
 $this->post('/nuki/webhook', $payload, [
-    'X-Nuki-Signature' => hash_hmac('sha256', json_encode($payload), NukiConfig::webhookSecret()),
+    'X-Nuki-Signature' => hash_hmac('sha256', json_encode($payload), 'test-secret'),
 ])->assertOk();
 
 Event::assertDispatched(NukiWebhookReceived::class);
