@@ -71,7 +71,7 @@ class ProfilePage extends Component
 
         $this->validate([
             'currentPassword' => 'required|string',
-            'newPassword' => 'required|string|min:8|max:255|confirmed:newPasswordConfirmation',
+            'newPassword' => 'required|string|min:8|max:255|same:newPasswordConfirmation',
             'newPasswordConfirmation' => 'required|string|min:8|max:255',
         ]);
 

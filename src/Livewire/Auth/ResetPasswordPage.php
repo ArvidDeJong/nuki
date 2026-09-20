@@ -42,7 +42,7 @@ class ResetPasswordPage extends Component
         $this->validate([
             'email' => 'required|email|max:255',
             'token' => 'required|string',
-            'password' => 'required|string|min:8|max:255|confirmed:passwordConfirmation',
+            'password' => 'required|string|min:8|max:255|same:passwordConfirmation',
             'passwordConfirmation' => 'required|string|min:8|max:255',
         ]);
 

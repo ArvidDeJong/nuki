@@ -1,0 +1,979 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#3 \$ttl of method Illuminate\\Contracts\\Cache\\Repository\:\:put\(\) expects DateInterval\|DateTimeInterface\|int\|null, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Auth/CacheTokenStore.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiAccount\:\:\$api_token\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Auth/DatabaseApiTokenResolver.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Auth\\OAuthAuthenticator\:\:__construct\(\) has parameter \$config with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Auth/OAuthAuthenticator.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Auth/Users/NukiPasswordResetService.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Auth/Users/NukiPasswordResetService.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$password\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Auth/Users/NukiPasswordResetService.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Console/Commands/NukiOAuthAuthorizeCommand.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Console/Commands/NukiUserCreateCommand.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Console/Commands/NukiWebhookRegisterCommand.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Console/Commands/NukiWebhookRegisterCommand.php
+
+		-
+			message: '#^Parameter \#2 \$events of method Darvis\\Nuki\\Resources\\Webhooks\:\:subscribe\(\) expects array, array\|float\|int\<min, \-1\>\|int\<1, max\>\|string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Commands/NukiWebhookRegisterCommand.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\AccountInfo\:\:__construct\(\) has parameter \$raw with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/AccountInfo.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\AccountInfo\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/AccountInfo.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\Authorization\:\:__construct\(\) has parameter \$raw with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/Authorization.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\Authorization\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/Authorization.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\LogEntry\:\:__construct\(\) has parameter \$raw with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/LogEntry.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\LogEntry\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/LogEntry.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\NukiToken\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/NukiToken.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\NukiToken\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/NukiToken.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\SmartLock\:\:__construct\(\) has parameter \$raw with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/SmartLock.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\SmartLock\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/SmartLock.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\WebhookSubscription\:\:__construct\(\) has parameter \$events with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/WebhookSubscription.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\WebhookSubscription\:\:__construct\(\) has parameter \$raw with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/WebhookSubscription.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\DTOs\\WebhookSubscription\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DTOs/WebhookSubscription.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Console\\Command\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: src/Database/Seeders/NukiDemoSeeder.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Events\\NukiWebhookReceived\:\:__construct\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Events/NukiWebhookReceived.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\Controllers\\WebhookController\:\:verifySignature\(\) has parameter \$config with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/Controllers/WebhookController.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:__construct\(\) has parameter \$httpConfig with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/HttpClient.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:delete\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/HttpClient.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:get\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/HttpClient.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:post\(\) has parameter \$body with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/HttpClient.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:put\(\) has parameter \$body with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/HttpClient.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Http\\HttpClient\:\:send\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Http/HttpClient.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\AccountSwitcher\:\:\$accounts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/AccountSwitcher.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\AccountSwitcher\:\:accounts\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/AccountSwitcher.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/AccountSwitcher.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiAccount\:\:\$account_key\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Livewire/AccountsIndex.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiAccount\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/AccountsIndex.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiAccount\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Livewire/AccountsIndex.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiAccount\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/AccountsIndex.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\AccountsIndex\:\:accounts\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/AccountsIndex.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/AccountsIndex.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\ActivityTimeline\:\:\$logs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/ActivityTimeline.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\ActivityTimeline\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/ActivityTimeline.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\ActivityTimeline\:\:smartlocks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/ActivityTimeline.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/ActivityTimeline.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Auth/ForgotPasswordPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/Auth/LoginOtpPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$last_login_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/Auth/LoginOtpPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/Auth/LoginOtpPage.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Auth/LoginOtpPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/Auth/LoginPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$last_login_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/Auth/LoginPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/Auth/LoginPage.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\StatefulGuard\:\:getProvider\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Livewire/Auth/LoginPage.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Auth/LoginPage.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Auth/RegisterPage.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Auth/ResetPasswordPage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/Auth/VerifyEmailNoticePage.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\Auth\\VerifyEmailNoticePage\:\:pendingUser\(\) should return Darvis\\Nuki\\Models\\NukiUser\|null but returns Darvis\\Nuki\\Models\\NukiUser\|Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Darvis\\Nuki\\Models\\NukiUser\>\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Livewire/Auth/VerifyEmailNoticePage.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Auth/VerifyEmailNoticePage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\Dashboard\:\:\$smartlocks\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/Dashboard.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\Dashboard\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/Dashboard.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\Dashboard\:\:recentLogs\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/Dashboard.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\Dashboard\:\:smartlocks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/Dashboard.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\Dashboard\:\:totals\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Livewire/Dashboard.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/Dashboard.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\OAuthConnect\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/OAuthConnect.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\OAuthConnect\:\:tokenInfo\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Livewire/OAuthConnect.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/OAuthConnect.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/ProfilePage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$locale\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/ProfilePage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/ProfilePage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$password\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/ProfilePage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$two_factor_enabled\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/ProfilePage.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/ProfilePage.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\SmartlockShow\:\:\$auths\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/SmartlockShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlockShow\:\:auths\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SmartlockShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlockShow\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SmartlockShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlockShow\:\:logs\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SmartlockShow.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/SmartlockShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlocksIndex\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SmartlocksIndex.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlocksIndex\:\:smartlocks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SmartlocksIndex.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/SmartlocksIndex.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\SubUserShow\:\:\$accessRows\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\SubUserShow\:\:\$accounts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Livewire\\SubUserShow\:\:\$sub\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiAccount\:\:\$account_key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SubUserShow\:\:accessRows\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SubUserShow\:\:accounts\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SubUserShow\:\:sub\(\) should return Darvis\\Nuki\\Models\\NukiUser\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/SubUserShow.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Livewire/SubUsersIndex.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Livewire/SubUsersIndex.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/SubUsersIndex.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$two_factor_enabled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Livewire/SubUsersIndex.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\SubUsersIndex\:\:subUsers\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/SubUsersIndex.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/SubUsersIndex.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\WebhooksIndex\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/WebhooksIndex.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Livewire\\WebhooksIndex\:\:webhooks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Livewire/WebhooksIndex.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Livewire/WebhooksIndex.php
+
+		-
+			message: '#^Parameter \$view of class Illuminate\\Mail\\Mailables\\Content constructor expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Mail/NukiLoginOtpMail.php
+
+		-
+			message: '#^Parameter \$view of class Illuminate\\Mail\\Mailables\\Content constructor expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Mail/NukiPasswordResetMail.php
+
+		-
+			message: '#^Parameter \$view of class Illuminate\\Mail\\Mailables\\Content constructor expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Mail/NukiVerifyEmailMail.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiAccount\:\:scopeActive\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Models/NukiAccount.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiAccount\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Models/NukiAccount.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiAccount\:\:users\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiAccount.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$email_verified_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUser\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:accounts\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasPermission\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isCurrentlyAllowed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUser\:\:accessibleAccounts\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUser\:\:accounts\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUser\:\:otpCodes\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUser\:\:parent\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUser\:\:smartlockAccess\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUser\:\:subUsers\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:filter\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Models/NukiUser.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserOtpCode\:\:\$code_hash\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserOtpCode.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserOtpCode\:\:\$consumed_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Models/NukiUserOtpCode.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserOtpCode\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserOtpCode.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUserOtpCode\:\:scopeActive\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUserOtpCode.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUserOtpCode\:\:scopeActive\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUserOtpCode.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUserOtpCode\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUserOtpCode.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$allowed_from\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$allowed_until\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$allowed_weekdays\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$can_lock\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$can_manage_auths\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$can_unlock\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$can_view_logs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Access to an undefined property Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:account\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Models\\NukiUserSmartlockAccess\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Models/NukiUserSmartlockAccess.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Nuki\:\:__construct\(\) has parameter \$oauthConfig with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Nuki.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Resources/Account.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\OAuth\:\:__construct\(\) has parameter \$config with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/OAuth.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\OAuth\:\:authorizationUrl\(\) has parameter \$scopes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/OAuth.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartLocks\:\:all\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartLocks.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: src/Resources/SmartLocks.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: src/Resources/SmartLocks.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Resources/SmartLocks.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartlockAuths\:\:all\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartlockAuths\:\:create\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartlockAuths\:\:forSmartlock\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartlockAuths\:\:update\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Resources/SmartlockAuths.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartlockLogs\:\:all\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartlockLogs.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\SmartlockLogs\:\:forSmartlock\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/SmartlockLogs.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/Resources/SmartlockLogs.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: src/Resources/SmartlockLogs.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Resources/SmartlockLogs.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Resources\\Webhooks\:\:subscribe\(\) has parameter \$events with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resources/Webhooks.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: src/Resources/Webhooks.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: src/Resources/Webhooks.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Resources/Webhooks.php
+
+		-
+			message: '#^Method Darvis\\Nuki\\Support\\DemoFixtures\:\:respondTo\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Support/DemoFixtures.php
+
+		-
+			message: '#^Offset 0\|1\|2\|3\|4 might not exist on array\{''Arvid \(iPhone\)'', ''Bezoeker'', ''Klant rondleiding'', ''Onderhoud HVAC''\}\|array\{''Arvid \(iPhone\)'', ''Magazijnmedewerker'', ''Storingsdienst'', ''DHL Express''\}\|array\{''Arvid \(iPhone\)'', ''Schoonmaak Janneke'', ''PostNL bezorger'', ''Auto\-unlock'', ''Bezoeker ASR''\}\|array\{''Arvid \(iPhone\)'', ''Tuinman'', ''Buurtwacht''\}\|array\{''Arvid \(iPhone\)''\}\|array\{''Werkplaats\-team'', ''Leverancier ABC'', ''Arvid \(iPhone\)'', ''Inkoop Mark''\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: src/Support/DemoFixtures.php

@@ -5,6 +5,30 @@ All notable changes to `darvis/nuki` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- The package now carries the same tooling as the other darvis packages: Pint, Larastan level 8
+  with a baseline for the existing code, the `test`, `lint`, `format` and `analyse` composer
+  scripts, a `.gitattributes` that keeps `docs/`, `tests/` and `.github/` out of the dist
+  archive, issue and pull request templates, a `CODE_OF_CONDUCT.md`, a `CONTRIBUTING.md`, and a
+  Laravel Boost guideline in `resources/boost/`.
+
+### Fixed
+- Registering, resetting a password and changing a password did nothing on Laravel 11.0 through
+  11.31: they used the `confirmed:otherField` validation rule, which only accepts a custom field
+  name from a later 11.x release. On an older 11.x the rule never matched, validation failed and
+  no account was created or changed, while `composer.json` promised `^11.0`. The three rules use
+  `same:` now, which every supported Laravel has.
+
+### Changed
+- CI calls the shared reusable workflow in `ArvidDeJong/.github` instead of its own copy. That
+  adds the `prefer-lowest` column, which tests whether the version constraints in
+  `composer.json` are actually true, and it keeps the PHP and Laravel matrix in one place for
+  every package.
+- `phpunit/phpunit` is a dev dependency instead of an implied one, and `SECURITY.md` moved from
+  `.github/` to the repository root, where the other packages keep it.
+
 ## [1.0.3] - 2026-05-15
 
 ### Added

@@ -177,7 +177,7 @@ class SmartlockShow extends Component
     public function openRename(): void
     {
         $this->assertCan($this->accountKey, $this->smartlockId, 'manage_auths');
-        $this->renameValue = $this->smartlock?->name ?? '';
+        $this->renameValue = $this->smartlock->name ?? '';
         $this->resetErrorBag('renameValue');
         $this->showRenameModal = true;
     }
