@@ -50,7 +50,7 @@ trait UsesNukiAccount
             ->where('account_key', $this->accountKey)
             ->first(['name']);
 
-        return $account?->name ?? $this->accountKey;
+        return $account->name ?? $this->accountKey;
     }
 
     protected function currentNukiUser(): ?NukiUser

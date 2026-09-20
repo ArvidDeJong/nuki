@@ -2,6 +2,10 @@
 composer.lock
 .phpunit.result.cache
 .phpunit.cache
+.pest
 .DS_Store
 .idea
 .vscode
+# Local overrides of the .dist files
+/phpstan.neon
+/phpunit.xml.local

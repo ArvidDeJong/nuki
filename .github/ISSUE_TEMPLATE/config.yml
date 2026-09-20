@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://github.com/ArvidDeJong/nuki/security/advisories/new
+    about: Report a leaked token, an unauthorised smartlock action or an account takeover privately.
+  - name: Documentation
+    url: https://arviddejong.github.io/nuki/
+    about: Installation, authentication, webhooks, the UI and the package's own users.
+  - name: NUKI Web API
+    url: https://developer.nuki.io/
+    about: Questions about the NUKI API itself rather than this package.

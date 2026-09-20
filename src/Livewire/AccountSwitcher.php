@@ -44,7 +44,7 @@ class AccountSwitcher extends Component
 
         $account = $this->accounts->firstWhere('account_key', $this->accountKey);
 
-        return $account?->name ?? $this->accountKey;
+        return $account->name ?? $this->accountKey;
     }
 
     public function nukiName(string $accountKey): ?string

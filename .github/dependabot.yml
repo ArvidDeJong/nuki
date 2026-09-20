@@ -1,26 +1,18 @@
 version: 2
-
 updates:
-  - package-ecosystem: composer
-    directory: "/"
-    schedule:
-      interval: weekly
-      day: monday
-      time: "06:00"
-      timezone: "Europe/Amsterdam"
-    open-pull-requests-limit: 5
-    labels:
-      - dependencies
-      - composer
-
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: /
     schedule:
-      interval: weekly
-      day: monday
-      time: "06:00"
-      timezone: "Europe/Amsterdam"
-    open-pull-requests-limit: 5
-    labels:
-      - dependencies
-      - github-actions
+      interval: monthly
+    commit-message:
+      prefix: chore
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: monthly
+    # Runtime constraints are widened by hand; only bump the dev tooling.
+    allow:
+      - dependency-type: development
+    versioning-strategy: widen
+    commit-message:
+      prefix: chore
