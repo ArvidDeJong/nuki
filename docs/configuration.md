@@ -9,7 +9,21 @@ anything you leave out.
 
 Each section below lists the env var, the config key, the default and what it
 does. Environment variables only override the config when the published file
-uses `env('…')`, so unpublished customisations stick.
+uses `env('…')`, so unpublished customisations stick. Keys are sorted
+alphabetically within every group.
+
+The package itself never calls `config('nuki.…')`. Every read goes through
+[NukiConfig](../src/Support/NukiConfig.php), which holds each default exactly
+once. Use it in your own code too, so a renamed key breaks in one place
+instead of silently falling back:
+
+```php
+use Darvis\Nuki\Support\NukiConfig;
+
+NukiConfig::uiPrefix();        // 'nuki'
+NukiConfig::webhookRoute();    // '/nuki/webhook'
+NukiConfig::apiToken();        // null when the token is empty or unset
+```
 
 ## Top-level keys
 
@@ -103,7 +117,7 @@ a redirect URL.
 | `oauth.client_id` | `NUKI_OAUTH_CLIENT_ID` | – | Your client id. |
 | `oauth.client_secret` | `NUKI_OAUTH_CLIENT_SECRET` | – | Your client secret. |
 | `oauth.redirect_url` | `NUKI_OAUTH_REDIRECT_URL` | – | The exact URL NUKI redirects to after consent. Must match the value registered on the developer portal. |
-| `oauth.scopes` | – | `['account', 'notification', 'smartlock', 'smartlock.readOnly', 'smartlock.action', 'smartlock.auth']` | Scopes requested at authorization time. |
+| `oauth.scopes` | – | `['account', 'notification', 'smartlock', 'smartlock.action', 'smartlock.auth', 'smartlock.readOnly']` | Scopes requested at authorization time. |
 | `oauth.token_store` | `NUKI_TOKEN_STORE` | `cache` | Where issued tokens are persisted: `cache` (Laravel cache) or `database` (dedicated [nuki_oauth_tokens](#nuki_oauth_tokens) table). |
 | `oauth.cache_store` | `NUKI_TOKEN_CACHE_STORE` | `null` | Name of the cache store when using the cache driver. `null` = default. |
 | `oauth.cache_prefix` | – | `nuki:oauth:` | Key prefix for the cache driver. |
@@ -120,8 +134,9 @@ that accepts NUKI callbacks, verifies the HMAC signature and dispatches the
 | `webhook.enabled` | `NUKI_WEBHOOK_ENABLED` | `false` | Master switch. When `true`, [routes/webhooks.php](../routes/webhooks.php) is loaded. |
 | `webhook.route` | `NUKI_WEBHOOK_ROUTE` | `/nuki/webhook` | URL path of the callback. |
 | `webhook.middleware` | – | `['api']` | Middleware group. Skip CSRF and session — webhooks are external POSTs. |
-| `webhook.secret` | `NUKI_WEBHOOK_SECRET` | `null` | HMAC-SHA256 shared secret. When empty, signature verification is skipped — only acceptable for local development. |
+| `webhook.secret` | `NUKI_WEBHOOK_SECRET` | `null` | HMAC-SHA256 shared secret. Without it every request is rejected with `401`. |
 | `webhook.signature_header` | `NUKI_WEBHOOK_SIGNATURE_HEADER` | `X-Nuki-Signature` | Header containing the signature. |
+| `webhook.verify_signature` | `NUKI_WEBHOOK_VERIFY_SIGNATURE` | `true` | Set to `false` to accept unsigned requests, for example behind a gateway that already authenticates the caller. Only an explicit `false` switches the check off. |
 | `webhook.dedup_ttl` | – | `600` | Seconds the dedup cache key (`nuki:webhook:{eventId}`) lives. |
 
 ## `ui.*` — Bundled Livewire UI
@@ -134,7 +149,7 @@ that accepts NUKI callbacks, verifies the HMAC signature and dispatches the
 | `ui.default_locale` | `NUKI_DEFAULT_LOCALE` | `en` | Fallback locale; see [UI and localization](ui-and-localization.md). |
 | `ui.footer.links` | – | `[]` | Array of `['label' => …, 'url' => …]` entries shown next to the copyright on the auth pages. Empty = no links. |
 | `ui.layout` | – | `nuki::layouts.app` | Blade layout the pages extend. Override to wrap the UI in your own chrome. |
-| `ui.locales` | – | `['en' => 'English', 'nl' => 'Nederlands', 'de' => 'Deutsch', 'es' => 'Español']` | Languages shown in the locale switcher. |
+| `ui.locales` | – | `['de' => 'Deutsch', 'en' => 'English', 'es' => 'Español', 'nl' => 'Nederlands']` | Languages shown in the locale switcher. |
 | `ui.logo.light` | `NUKI_UI_LOGO_LIGHT` | `null` | Path/URL to an SVG/PNG shown above the auth form in light mode. When both light/dark are empty, a neutral lock icon plus `ui.brand` is rendered. |
 | `ui.logo.dark` | `NUKI_UI_LOGO_DARK` | `null` | Dark-mode variant of the logo. Swapped via `dark:hidden` / `hidden dark:block`. |
 | `ui.middleware` | – | `['web']` | Middleware group for UI routes. `SetLocale` and (when `auth_users.enabled`) `auth:darvis-nuki` are appended automatically. |

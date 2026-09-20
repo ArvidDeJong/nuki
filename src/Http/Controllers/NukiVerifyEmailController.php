@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Http\Controllers;
 
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,7 +14,7 @@ class NukiVerifyEmailController extends Controller
 {
     public function __invoke(Request $request, int $id, string $hash): RedirectResponse
     {
-        if (config('nuki.auth_users.email_verification.enabled', true) === false) {
+        if (! NukiConfig::emailVerificationEnabled()) {
             abort(404);
         }
 

@@ -9,6 +9,7 @@ use Darvis\Nuki\Concerns\AuthorizesSmartlockAccess;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\DTOs\SmartLock;
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Darvis\Nuki\Support\WeekdayBitmask;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -74,7 +75,7 @@ class SmartlockShow extends Component
     public function render(): View
     {
         return view('nuki::livewire.smartlock-show')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]

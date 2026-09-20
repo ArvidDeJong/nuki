@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Models;
 
 use Darvis\Nuki\Mail\NukiPasswordResetMail;
 use Darvis\Nuki\Mail\NukiVerifyEmailMail;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -142,7 +143,7 @@ class NukiUser extends Authenticatable implements MustVerifyEmail
 
     public function sendPasswordResetNotification($token): void
     {
-        $expiry = (int) config('nuki.auth_users.password_reset.token_lifetime_minutes', 60);
+        $expiry = NukiConfig::passwordResetLifetimeMinutes();
         $url = url(route('nuki.auth.password.reset', ['token' => $token, 'email' => $this->email], false));
 
         $mail = new NukiPasswordResetMail(
@@ -151,7 +152,7 @@ class NukiUser extends Authenticatable implements MustVerifyEmail
             recipientName: $this->name,
         );
 
-        $locale = (string) ($this->locale ?? config('nuki.ui.default_locale', config('app.locale', 'en')));
+        $locale = (string) ($this->locale ?? NukiConfig::uiDefaultLocale());
         $mail->locale($locale);
 
         Mail::to($this->email)->send($mail);
@@ -176,7 +177,7 @@ class NukiUser extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification(): void
     {
-        $expiry = (int) config('nuki.auth_users.email_verification.link_lifetime_minutes', 60);
+        $expiry = NukiConfig::emailVerificationLifetimeMinutes();
 
         $url = URL::temporarySignedRoute(
             'nuki.auth.verify',
@@ -190,7 +191,7 @@ class NukiUser extends Authenticatable implements MustVerifyEmail
             recipientName: $this->name,
         );
 
-        $locale = (string) ($this->locale ?? config('nuki.ui.default_locale', config('app.locale', 'en')));
+        $locale = (string) ($this->locale ?? NukiConfig::uiDefaultLocale());
         $mail->locale($locale);
 
         Mail::to($this->email)->send($mail);

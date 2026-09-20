@@ -10,6 +10,7 @@ use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Models\NukiAccount;
 use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Models\NukiUserSmartlockAccess;
+use Darvis\Nuki\Support\NukiConfig;
 use Darvis\Nuki\Support\WeekdayBitmask;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -64,7 +65,7 @@ class SubUserShow extends Component
     public function render(): View
     {
         return view('nuki::livewire.sub-user-show')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]

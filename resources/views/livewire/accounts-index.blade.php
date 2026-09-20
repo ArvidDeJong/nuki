@@ -1,3 +1,4 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <div class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -17,16 +18,16 @@
         <flux:callout.text>{{ __('nuki::nuki.accounts.info.text') }}</flux:callout.text>
     </flux:callout>
 
-    @if (config('nuki.auth') !== 'token')
+    @if (NukiConfig::authMethod() !== 'token')
         <flux:callout variant="warning" icon="information-circle">
             <flux:callout.heading>{{ __('nuki::nuki.accounts.warn_token_off_heading') }}</flux:callout.heading>
             <flux:callout.text>
-                <code>NUKI_AUTH</code> {{ __('nuki::nuki.accounts.warn_token_off_text') }} <code>{{ config('nuki.auth') }}</code>. <code>NUKI_AUTH=token</code>.
+                <code>NUKI_AUTH</code> {{ __('nuki::nuki.accounts.warn_token_off_text') }} <code>{{ NukiConfig::authMethod() }}</code>. <code>NUKI_AUTH=token</code>.
             </flux:callout.text>
         </flux:callout>
     @endif
 
-    @if (config('nuki.token_resolver') !== 'database')
+    @if (NukiConfig::tokenResolver() !== 'database')
         <flux:callout variant="warning" icon="information-circle">
             <flux:callout.heading>{{ __('nuki::nuki.accounts.warn_resolver_off_heading') }}</flux:callout.heading>
             <flux:callout.text>
@@ -131,9 +132,9 @@
                 </flux:heading>
                 <flux:text class="mt-1">
                     {{ __('nuki::nuki.accounts.modal_description_before') }}
-                    <a href="{{ config('nuki.web_url') }}" target="_blank" rel="noopener"
+                    <a href="{{ NukiConfig::webUrl() }}" target="_blank" rel="noopener"
                        class="underline decoration-dotted hover:decoration-solid">
-                        {{ config('nuki.web_url') }}
+                        {{ NukiConfig::webUrl() }}
                     </a>
                     {{ __('nuki::nuki.accounts.modal_description_after') }} <code>API</code>.
                 </flux:text>

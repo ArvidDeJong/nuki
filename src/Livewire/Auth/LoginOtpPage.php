@@ -10,6 +10,7 @@ use Darvis\Nuki\Auth\Users\LoginThrottle;
 use Darvis\Nuki\Mail\NukiLoginOtpMail;
 use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Models\NukiUserOtpCode;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -94,7 +95,7 @@ class LoginOtpPage extends Component
         $this->clearPending();
 
         return $this->redirect(
-            (string) config('nuki.auth_users.redirect_after_login', '/nuki'),
+            NukiConfig::redirectAfterLogin(),
             navigate: false,
         );
     }
@@ -127,11 +128,11 @@ class LoginOtpPage extends Component
 
         $mail = (new NukiLoginOtpMail(
             code: $plain,
-            expiryMinutes: (int) config('nuki.auth_users.otp.expiry_minutes', 5),
+            expiryMinutes: NukiConfig::otpExpiryMinutes(),
             ip: request()->ip(),
             userAgent: request()->userAgent(),
             recipientName: $user->name,
-        ))->locale((string) ($user->locale ?? config('nuki.ui.default_locale', config('app.locale', 'en'))));
+        ))->locale((string) ($user->locale ?? NukiConfig::uiDefaultLocale()));
 
         Mail::to($user->email)->send($mail);
 

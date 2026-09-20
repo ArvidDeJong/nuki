@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire;
 
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Models\NukiAccount;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -37,7 +38,7 @@ class AccountsIndex extends Component
     public function render(): View
     {
         return view('nuki::livewire.accounts-index')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]

@@ -10,6 +10,7 @@ use Darvis\Nuki\Auth\Users\LoginThrottle;
 use Darvis\Nuki\Mail\NukiLoginOtpMail;
 use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Models\NukiUserOtpCode;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -53,7 +54,7 @@ class LoginPage extends Component
         // E-mailverificatie is verplicht: een onbevestigd account komt nooit
         // voorbij login. We sturen (gethrottled) een nieuwe link en gaan terug
         // naar de notice-pagina.
-        if (config('nuki.auth_users.email_verification.enabled', true) === true && ! $user->hasVerifiedEmail()) {
+        if (NukiConfig::emailVerificationEnabled() && ! $user->hasVerifiedEmail()) {
             if ($throttle->checkSend($this->email, request()->ip())) {
                 $user->sendEmailVerificationNotification();
             }
@@ -65,7 +66,7 @@ class LoginPage extends Component
 
         // OTP is verplicht voor iedereen zolang het globaal aanstaat — de
         // per-user `two_factor_enabled` kolom speelt hier bewust geen rol.
-        if (config('nuki.auth_users.otp.enabled', true) === false) {
+        if (! NukiConfig::otpEnabled()) {
             return $this->completeLogin($user);
         }
 
@@ -84,11 +85,11 @@ class LoginPage extends Component
 
         $mail = (new NukiLoginOtpMail(
             code: $plain,
-            expiryMinutes: (int) config('nuki.auth_users.otp.expiry_minutes', 5),
+            expiryMinutes: NukiConfig::otpExpiryMinutes(),
             ip: request()->ip(),
             userAgent: request()->userAgent(),
             recipientName: $user->name,
-        ))->locale((string) ($user->locale ?? config('nuki.ui.default_locale', config('app.locale', 'en'))));
+        ))->locale((string) ($user->locale ?? NukiConfig::uiDefaultLocale()));
 
         Mail::to($user->email)->send($mail);
 
@@ -109,7 +110,7 @@ class LoginPage extends Component
         $user->save();
 
         return $this->redirect(
-            (string) config('nuki.auth_users.redirect_after_login', '/nuki'),
+            NukiConfig::redirectAfterLogin(),
             navigate: false,
         );
     }

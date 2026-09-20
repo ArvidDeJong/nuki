@@ -47,3 +47,28 @@ it('deduplicates repeat events', function () {
 
     Event::assertDispatchedTimes(NukiWebhookReceived::class, 1);
 });
+
+it('rejects every request while no secret is configured', function () {
+    Event::fake();
+
+    config(['nuki.webhook.secret' => null]);
+
+    $this->postJson('/nuki/webhook', ['event' => 'DEVICE_STATUS', 'id' => 'evt-no-secret'])
+        ->assertStatus(401);
+
+    Event::assertNotDispatched(NukiWebhookReceived::class);
+});
+
+it('accepts an unsigned request once the check is switched off on purpose', function () {
+    Event::fake();
+
+    config([
+        'nuki.webhook.secret' => null,
+        'nuki.webhook.verify_signature' => false,
+    ]);
+
+    $this->postJson('/nuki/webhook', ['event' => 'DEVICE_STATUS', 'id' => 'evt-unsigned'])
+        ->assertOk();
+
+    Event::assertDispatched(NukiWebhookReceived::class);
+});

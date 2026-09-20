@@ -1,3 +1,4 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <div class="mx-auto w-full max-w-2xl space-y-6">
     <div>
         <flux:heading size="xl">{{ __('nuki::nuki.profile.heading') }}</flux:heading>
@@ -29,7 +30,7 @@
                 <flux:label>{{ __('nuki::nuki.profile.language') }}</flux:label>
                 <flux:select wire:model="locale">
                     <flux:select.option value="">—</flux:select.option>
-                    @foreach ((array) config('nuki.ui.locales', []) as $code => $label)
+                    @foreach (NukiConfig::uiLocales() as $code => $label)
                         <flux:select.option value="{{ $code }}">{{ $label }}</flux:select.option>
                     @endforeach
                 </flux:select>

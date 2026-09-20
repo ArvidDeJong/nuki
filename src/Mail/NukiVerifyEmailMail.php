@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Mail;
 
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -25,18 +26,18 @@ class NukiVerifyEmailMail extends Mailable
     public function envelope(): Envelope
     {
         $from = null;
-        $address = config('nuki.auth_users.mail.from.address');
+        $address = NukiConfig::mailFromAddress();
         if (! empty($address)) {
             $from = new Address(
                 address: (string) $address,
-                name: (string) (config('nuki.auth_users.mail.from.name') ?? config('nuki.ui.brand', 'NUKI')),
+                name: (string) (NukiConfig::mailFromName() ?? NukiConfig::uiBrand()),
             );
         }
 
         return new Envelope(
             from: $from,
             subject: (string) __('nuki::mail.verify_email.subject', [
-                'brand' => (string) config('nuki.ui.brand', 'NUKI'),
+                'brand' => NukiConfig::uiBrand(),
             ]),
         );
     }

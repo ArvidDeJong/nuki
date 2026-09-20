@@ -39,7 +39,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('nuki.webhook.secret', 'webhook-secret');
         $app['config']->set('nuki.webhook.route', '/nuki/webhook');
 
-        // Backwards-compat: bestaande tests draaien zonder user-auth.
+        // Existing tests run without package user auth.
         $app['config']->set('nuki.auth_users.enabled', false);
     }
 

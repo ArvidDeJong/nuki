@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire;
 
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
@@ -23,13 +24,13 @@ class OAuthConnect extends Component
     public function render(): View
     {
         return view('nuki::livewire.oauth-connect')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]
     public function authMode(): string
     {
-        return (string) config('nuki.auth', 'token');
+        return NukiConfig::authMethod();
     }
 
     #[Computed]

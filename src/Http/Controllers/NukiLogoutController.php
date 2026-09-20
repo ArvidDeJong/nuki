@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Http\Controllers;
 
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -18,6 +19,6 @@ class NukiLogoutController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect((string) config('nuki.auth_users.redirect_after_logout', '/nuki/login'));
+        return redirect(NukiConfig::redirectAfterLogout());
     }
 }

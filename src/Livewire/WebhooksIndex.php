@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire;
 
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -30,13 +31,13 @@ class WebhooksIndex extends Component
     public function mount(): void
     {
         $this->callbackUrl = rtrim((string) config('app.url'), '/').'/'
-            .ltrim((string) config('nuki.webhook.route', '/nuki/webhook'), '/');
+            .ltrim(NukiConfig::webhookRoute(), '/');
     }
 
     public function render(): View
     {
         return view('nuki::livewire.webhooks-index')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]

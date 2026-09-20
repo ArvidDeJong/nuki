@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 use Darvis\Nuki\Http\Controllers\WebhookController;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Support\Facades\Route;
 
-$config = config('nuki.webhook');
-
-Route::middleware($config['middleware'] ?? ['api'])
-    ->post($config['route'] ?? '/nuki/webhook', WebhookController::class)
+Route::middleware(NukiConfig::webhookMiddleware())
+    ->post(NukiConfig::webhookRoute(), WebhookController::class)
     ->name('nuki.webhook');

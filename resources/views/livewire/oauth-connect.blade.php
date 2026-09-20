@@ -1,3 +1,4 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <div class="space-y-6">
     <div>
         <flux:heading size="xl">{{ __('nuki::nuki.oauth.heading') }}</flux:heading>
@@ -25,8 +26,8 @@
                 <flux:heading size="lg">{{ __('nuki::nuki.oauth.token_heading') }}</flux:heading>
                 <flux:text class="mt-1">
                     {{ __('nuki::nuki.oauth.token_description_before') }}
-                    <a href="{{ config('nuki.web_url') }}" target="_blank" rel="noopener" class="underline">
-                        {{ config('nuki.web_url') }}
+                    <a href="{{ NukiConfig::webUrl() }}" target="_blank" rel="noopener" class="underline">
+                        {{ NukiConfig::webUrl() }}
                     </a>
                     {!! __('nuki::nuki.oauth.token_description_after', [
                         'env' => '<code>NUKI_API_TOKEN</code>',
@@ -37,7 +38,7 @@
 
             <flux:field>
                 <flux:label>{{ __('nuki::nuki.oauth.token_status') }}</flux:label>
-                @if (filled(config('nuki.token')))
+                @if (NukiConfig::apiToken() !== null)
                     <flux:badge color="emerald">{{ __('nuki::nuki.oauth.configured') }}</flux:badge>
                 @else
                     <flux:badge color="red">{{ __('nuki::nuki.oauth.missing') }}</flux:badge>

@@ -1,6 +1,7 @@
+@use('Darvis\Nuki\Support\NukiConfig')
 <div>
     <flux:heading size="lg">{{ __('nuki::nuki.auth.login_heading') }}</flux:heading>
-    <flux:subheading class="mt-1">{{ __('nuki::nuki.auth.login_subheading', ['brand' => config('nuki.ui.brand', 'NUKI')]) }}</flux:subheading>
+    <flux:subheading class="mt-1">{{ __('nuki::nuki.auth.login_subheading', ['brand' => NukiConfig::uiBrand()]) }}</flux:subheading>
 
     @if (session('status'))
         <flux:callout variant="success" icon="check-circle" class="mt-6">
@@ -35,14 +36,14 @@
         <div class="flex items-center justify-between gap-3 pt-2">
             <flux:button type="submit" variant="primary">{{ __('nuki::nuki.auth.login') }}</flux:button>
 
-            @if (config('nuki.auth_users.password_reset.enabled', true))
+            @if (NukiConfig::passwordResetEnabled())
                 <flux:link href="{{ route('nuki.auth.password.forgot') }}" variant="ghost">
                     {{ __('nuki::nuki.auth.forgot_password') }}
                 </flux:link>
             @endif
         </div>
 
-        @if (config('nuki.auth_users.register_enabled', true))
+        @if (NukiConfig::registerEnabled())
             <flux:separator class="my-6" />
             <p class="text-sm text-zinc-600 dark:text-zinc-400">
                 {{ __('nuki::nuki.auth.no_account') }}

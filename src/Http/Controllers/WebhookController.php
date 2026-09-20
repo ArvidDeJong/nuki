@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Http\Controllers;
 
 use Darvis\Nuki\Events\NukiWebhookReceived;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -14,9 +15,7 @@ class WebhookController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $config = config('nuki.webhook');
-
-        if (! $this->verifySignature($request, $config)) {
+        if (! $this->verifySignature($request)) {
             return response()->json(['error' => 'invalid signature'], 401);
         }
 
@@ -26,9 +25,8 @@ class WebhookController extends Controller
         $accountKey = $request->query('account');
 
         $dedupKey = 'nuki:webhook:'.$eventId;
-        $ttl = (int) ($config['dedup_ttl'] ?? 600);
 
-        if (! Cache::add($dedupKey, true, $ttl)) {
+        if (! Cache::add($dedupKey, true, NukiConfig::webhookDedupTtl())) {
             return response()->json(['status' => 'duplicate'], 200);
         }
 
@@ -37,16 +35,23 @@ class WebhookController extends Controller
         return response()->json(['status' => 'ok'], 200);
     }
 
-    private function verifySignature(Request $request, array $config): bool
+    /**
+     * Requests are rejected until a secret is configured. Set nuki.webhook.verify_signature
+     * to false to accept unsigned requests, for example behind a trusted proxy.
+     */
+    private function verifySignature(Request $request): bool
     {
-        $secret = $config['secret'] ?? null;
-
-        if (empty($secret)) {
+        if (! NukiConfig::webhookVerifySignature()) {
             return true;
         }
 
-        $header = (string) $config['signature_header'];
-        $provided = $request->header($header);
+        $secret = NukiConfig::webhookSecret();
+
+        if ($secret === null) {
+            return false;
+        }
+
+        $provided = $request->header(NukiConfig::webhookSignatureHeader());
 
         if (! is_string($provided) || $provided === '') {
             return false;

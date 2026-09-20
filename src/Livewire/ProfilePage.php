@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire;
 
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,13 +42,13 @@ class ProfilePage extends Component
     public function render(): View
     {
         return view('nuki::livewire.profile')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     public function saveProfile(): void
     {
         $user = $this->user();
-        $allowedLocales = array_keys((array) config('nuki.ui.locales', ['en' => 'English']));
+        $allowedLocales = array_keys(NukiConfig::uiLocales());
 
         $validated = $this->validate([
             'name' => 'required|string|max:120',

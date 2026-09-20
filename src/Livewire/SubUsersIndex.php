@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire;
 
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
 use Darvis\Nuki\Models\NukiUser;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,7 @@ class SubUsersIndex extends Component
     public function render(): View
     {
         return view('nuki::livewire.sub-users-index')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]

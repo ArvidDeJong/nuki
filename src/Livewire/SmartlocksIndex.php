@@ -7,6 +7,7 @@ namespace Darvis\Nuki\Livewire;
 use Darvis\Nuki\Concerns\AuthorizesSmartlockAccess;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\Facades\Nuki;
+use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -23,7 +24,7 @@ class SmartlocksIndex extends Component
     public function render(): View
     {
         return view('nuki::livewire.smartlocks-index')
-            ->layout(config('nuki.ui.layout', 'nuki::layouts.app'));
+            ->layout(NukiConfig::uiLayout());
     }
 
     #[Computed]
