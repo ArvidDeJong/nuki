@@ -1,6 +1,10 @@
-# Webhooks
+---
+title: Webhooks
+nav_order: 8
+description: "Registering a callback with NUKI, the HMAC signature check, deduplication by event id and the NukiWebhookReceived event."
+---
 
-[← Documentation index](README.md)
+# Webhooks
 
 The package can both receive NUKI webhook callbacks and register subscriptions
 on the NUKI side. Both halves are disabled until you flip the env switch.
@@ -16,8 +20,8 @@ The secret is the HMAC-SHA256 key NUKI signs the body with. Treat it like a
 password; store it in `.env`, not in source. Without a secret the receiver
 rejects every request, so the route is never open by accident.
 
-With the flag on, [NukiServiceProvider](../src/NukiServiceProvider.php) loads
-[routes/webhooks.php](../routes/webhooks.php):
+With the flag on, [NukiServiceProvider](https://github.com/ArvidDeJong/nuki/blob/main/src/NukiServiceProvider.php) loads
+[routes/webhooks.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/webhooks.php):
 
 | Method | Path | Name | Middleware |
 |---|---|---|---|
@@ -28,7 +32,7 @@ POSTs from NUKI's servers.
 
 ## 2. The signature flow
 
-[WebhookController](../src/Http/Controllers/WebhookController.php) does, in
+[WebhookController](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Controllers/WebhookController.php) does, in
 order:
 
 1. **Signature check.** Reads the header from `nuki.webhook.signature_header`
@@ -44,7 +48,7 @@ order:
 3. **Dedup.** `Cache::add('nuki:webhook:'.$eventId, true, $dedup_ttl)`. If the
    key was already there, returns `200 {"status":"duplicate"}` without
    dispatching anything. TTL is `nuki.webhook.dedup_ttl` (default 600s).
-4. **Dispatch.** Fires [NukiWebhookReceived](../src/Events/NukiWebhookReceived.php)
+4. **Dispatch.** Fires [NukiWebhookReceived](https://github.com/ArvidDeJong/nuki/blob/main/src/Events/NukiWebhookReceived.php)
    with `type`, the raw payload array and the optional `accountKey` from the
    query string. Returns `200 {"status":"ok"}`.
 
@@ -102,7 +106,7 @@ php artisan nuki:webhook-register https://example.com/nuki/webhook?account=tenan
     --events=DEVICE_LOGS --events=ACCOUNT_USER
 ```
 
-Source: [NukiWebhookRegisterCommand](../src/Console/Commands/NukiWebhookRegisterCommand.php).
+Source: [NukiWebhookRegisterCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiWebhookRegisterCommand.php).
 
 Listing and removing subscriptions:
 

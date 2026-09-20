@@ -1,6 +1,10 @@
-# Users and permissions
+---
+title: Users and permissions
+nav_order: 6
+description: "The optional darvis-nuki guard, main and sub users, the per smartlock permission matrix, validity windows and the weekday bitmask."
+---
 
-[← Documentation index](README.md)
+# Users and permissions
 
 This page covers the package's **own** end-user login system: the
 `darvis-nuki` auth guard, the `NukiUser` model, main/sub-user hierarchy,
@@ -43,9 +47,9 @@ NUKI_AUTH_USERS_MAIL_FROM_ADDRESS=noreply@yourapp.example
 NUKI_AUTH_USERS_MAIL_FROM_NAME="Your App"
 ```
 
-When this flag is on, [NukiServiceProvider](../src/NukiServiceProvider.php):
+When this flag is on, [NukiServiceProvider](https://github.com/ArvidDeJong/nuki/blob/main/src/NukiServiceProvider.php):
 
-1. Calls [AuthConfigRegistrar::register()](../src/Auth/Users/AuthConfigRegistrar.php),
+1. Calls [AuthConfigRegistrar::register()](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/Users/AuthConfigRegistrar.php),
    which merges into `auth.guards` / `auth.providers` at runtime:
 
    ```php
@@ -63,9 +67,9 @@ When this flag is on, [NukiServiceProvider](../src/NukiServiceProvider.php):
    `NukiServiceProvider::register()` runs — in that case, define them
    explicitly in `config/auth.php` and the runtime merge becomes a no-op.
 
-2. Loads [routes/auth.php](../routes/auth.php) — see [Auth routes](auth-routes.md).
+2. Loads [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) — see [Auth routes](auth-routes.md).
 
-3. Wraps every UI route from [routes/web.php](../routes/web.php) in the
+3. Wraps every UI route from [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) in the
    `auth:darvis-nuki` middleware so unauthenticated visitors are redirected to
    `/nuki/login`.
 
@@ -85,8 +89,8 @@ AuthConfigRegistrar::PROVIDER; // 'darvis-nuki-users'
 
 ## 2. The `NukiUser` model
 
-Source: [src/Models/NukiUser.php](../src/Models/NukiUser.php). Table:
-[nuki_users](../database/migrations/2026_05_12_000000_create_nuki_users_table.php).
+Source: [src/Models/NukiUser.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Models/NukiUser.php). Table:
+[nuki_users](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000000_create_nuki_users_table.php).
 
 ### Columns
 
@@ -139,8 +143,8 @@ $user->canAccessSmartlock(int $accountId, int $smartlockId, string $permission):
 
 ## 3. The permission matrix
 
-Source: [NukiUserSmartlockAccess](../src/Models/NukiUserSmartlockAccess.php).
-Table: [nuki_user_smartlock](../database/migrations/2026_05_12_000400_create_nuki_user_smartlock_table.php).
+Source: [NukiUserSmartlockAccess](https://github.com/ArvidDeJong/nuki/blob/main/src/Models/NukiUserSmartlockAccess.php).
+Table: [nuki_user_smartlock](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000400_create_nuki_user_smartlock_table.php).
 
 Unique on `(nuki_user_id, nuki_account_id, smartlock_id)` — a sub user has at
 most one pivot per (account, lock) combination.
@@ -170,7 +174,7 @@ Returns `true` only when all of:
 2. `allowed_from` is null **or** in the past.
 3. `allowed_until` is null **or** in the future.
 4. `allowed_weekdays` is null/0 **or** matches today via
-   [WeekdayBitmask::matchesDate()](../src/Support/WeekdayBitmask.php).
+   [WeekdayBitmask::matchesDate()](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/WeekdayBitmask.php).
 
 ### `hasPermission(string $permission): bool`
 
@@ -181,7 +185,7 @@ values returns `false`.
 
 ### Weekday bitmask
 
-Source: [WeekdayBitmask](../src/Support/WeekdayBitmask.php). Follows the NUKI
+Source: [WeekdayBitmask](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/WeekdayBitmask.php). Follows the NUKI
 Web API convention (the same field is named `allowedWeekDays` there):
 
 | Day | Bit |
@@ -209,7 +213,7 @@ encoded with NUKI's wire format so the two stay aligned.
 
 ## 4. Authorizing access in your code
 
-The trait [AuthorizesSmartlockAccess](../src/Concerns/AuthorizesSmartlockAccess.php)
+The trait [AuthorizesSmartlockAccess](https://github.com/ArvidDeJong/nuki/blob/main/src/Concerns/AuthorizesSmartlockAccess.php)
 is mixed into the bundled Livewire components and is the canonical way to
 gate access. Use it from your own controllers / components too.
 
@@ -246,7 +250,7 @@ UI is a hint; the server is the line of defence.
 
 ## 5. Email OTP (2FA)
 
-[LoginPage](../src/Livewire/Auth/LoginPage.php) handles the password step. On
+[LoginPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginPage.php) handles the password step. On
 a valid password it:
 
 1. Checks `nuki.auth_users.otp.enabled` (global) AND `$user->two_factor_enabled`
@@ -254,11 +258,11 @@ a valid password it:
 2. Throttles via `LoginThrottle` (`auth_users.otp.rate_limit.*`).
 3. Generates a code through `NukiUserOtpCode::generate(...)`. The plain code
    is mailed; only the hash is stored on `nuki_user_otp_codes`.
-4. Mails [NukiLoginOtpMail](../src/Mail/NukiLoginOtpMail.php) in the user's
+4. Mails [NukiLoginOtpMail](https://github.com/ArvidDeJong/nuki/blob/main/src/Mail/NukiLoginOtpMail.php) in the user's
    `locale`.
 5. Stashes pending state in the session and redirects to `/nuki/login/otp`.
 
-[LoginOtpPage](../src/Livewire/Auth/LoginOtpPage.php) validates the code
+[LoginOtpPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginOtpPage.php) validates the code
 against the stored hash, checks `expires_at`, marks `consumed_at`, and
 finishes the login on success. Throttles further attempts.
 
@@ -268,19 +272,19 @@ Relevant config: `auth_users.otp.enabled`, `auth_users.otp.expiry_minutes`,
 
 ### Storage
 
-[nuki_user_otp_codes](../database/migrations/2026_05_12_000100_create_nuki_user_otp_codes_table.php):
+[nuki_user_otp_codes](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000100_create_nuki_user_otp_codes_table.php):
 `code_hash`, `purpose` (default `'login'`), `expires_at`, `consumed_at`,
 `ip`, `user_agent`. Indexed on `(nuki_user_id, consumed_at)` and
 `expires_at`.
 
 ## 6. Password reset
 
-[NukiPasswordResetService](../src/Auth/Users/NukiPasswordResetService.php)
+[NukiPasswordResetService](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/Users/NukiPasswordResetService.php)
 runs the flow:
 
 - `sendResetLink(string $email)` — finds the active user, generates a
   64-char token, hashes it into `nuki_password_resets`, mails
-  [NukiPasswordResetMail](../src/Mail/NukiPasswordResetMail.php).
+  [NukiPasswordResetMail](https://github.com/ArvidDeJong/nuki/blob/main/src/Mail/NukiPasswordResetMail.php).
 - `findUserForToken(string $email, string $token)` — used by the reset page
   to validate the link before showing the form.
 - `reset(string $email, string $token, string $newPassword)` — updates the
@@ -292,7 +296,7 @@ lifetime is controlled by `auth_users.password_reset.token_lifetime_minutes`
 (default 60).
 
 Table:
-[nuki_password_resets](../database/migrations/2026_05_12_000200_create_nuki_password_resets_table.php).
+[nuki_password_resets](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000200_create_nuki_password_resets_table.php).
 Primary key is `email` (one outstanding reset per address).
 
 ## 7. Creating and managing users
@@ -308,7 +312,7 @@ php artisan nuki:user-create \
 
 Add `--no-2fa` to disable email OTP for this user.
 
-Source: [NukiUserCreateCommand](../src/Console/Commands/NukiUserCreateCommand.php).
+Source: [NukiUserCreateCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiUserCreateCommand.php).
 Always creates a **main** user (`parent_id = null`, `is_active = true`).
 
 ### Sub-users — UI
@@ -316,8 +320,8 @@ Always creates a **main** user (`parent_id = null`, `is_active = true`).
 Once the main user logs in, `/nuki/sub-users` lists their subs and
 `/nuki/sub-users/{id}` is the per-sub editor (account assignments,
 smartlock pivots, weekday grid). Components:
-[SubUsersIndex](../src/Livewire/SubUsersIndex.php),
-[SubUserShow](../src/Livewire/SubUserShow.php).
+[SubUsersIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUsersIndex.php),
+[SubUserShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUserShow.php).
 
 ### Sub-users — programmatic
 
@@ -365,7 +369,7 @@ of this month, and only on Mondays, Wednesdays and Fridays.
 ## 8. Account binding (`nuki_user_account`)
 
 Pivot for user ↔ account, with a free-form `role` column (default `member`).
-Source: [migration](../database/migrations/2026_05_12_000300_create_nuki_user_account_table.php).
+Source: [migration](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000300_create_nuki_user_account_table.php).
 
 Use the relation to attach:
 
@@ -381,8 +385,8 @@ to mains. Direct sub assignments are still respected if you create them.
 
 ## 9. Account switching at runtime
 
-[UsesNukiAccount](../src/Concerns/UsesNukiAccount.php) trait, used by
-[AccountSwitcher](../src/Livewire/AccountSwitcher.php) and every account-aware
+[UsesNukiAccount](https://github.com/ArvidDeJong/nuki/blob/main/src/Concerns/UsesNukiAccount.php) trait, used by
+[AccountSwitcher](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountSwitcher.php) and every account-aware
 component:
 
 - Stores the active account key in `session('nuki.current_account')`.

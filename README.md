@@ -21,7 +21,7 @@ callbacks.
 
 ## Documentation
 
-Full developer documentation lives in [docs/](docs/README.md). Quick links:
+Full developer documentation lives on the [documentation site](https://arviddejong.github.io/nuki/). Quick links:
 
 - [Getting started](docs/getting-started.md) — install, publish, "hello world".
 - [Configuration reference](docs/configuration.md) — every `NUKI_*` env var and
@@ -85,7 +85,7 @@ Nuki::auths()->create($id, [
 
 For everything else — every method on every resource, the DTO shapes,
 multi-account, OAuth, webhooks, the bundled UI, the optional user-auth — see
-[docs/](docs/README.md).
+the [documentation site](https://arviddejong.github.io/nuki/).
 
 ## Webhooks
 

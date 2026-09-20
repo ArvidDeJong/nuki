@@ -1,6 +1,10 @@
-# Demo mode
+---
+title: Demo mode
+nav_order: 10
+description: "Running the whole package on canned fixtures instead of a real NUKI account, for screenshots and walk-through videos."
+---
 
-[← Documentation index](README.md)
+# Demo mode
 
 Demo mode lets you exercise the entire bundled UI — dashboard, smartlocks,
 activity timeline, authorizations, webhooks — without a real NUKI account.
@@ -16,11 +20,11 @@ NUKI_DEMO=true
 ```
 
 This flips `nuki.demo.enabled` and triggers two things at boot in
-[NukiServiceProvider](../src/NukiServiceProvider.php):
+[NukiServiceProvider](https://github.com/ArvidDeJong/nuki/blob/main/src/NukiServiceProvider.php):
 
 1. If `nuki.token` is empty, it's stubbed to `'demo-token'` so the bearer
    authenticator does not throw before the HTTP fake intercepts.
-2. [DemoFixtures::register()](../src/Support/DemoFixtures.php) installs
+2. [DemoFixtures::register()](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php) installs
    `Http::fake(['api.nuki.io/*' => closure])` returning canned responses.
 
 ## What gets faked
@@ -73,7 +77,7 @@ showcase the full permission model.
 ## Disabling for tests
 
 Tests rely on `Http::fake()` themselves (see
-[tests/TestCase.php](../tests/TestCase.php)). The demo flag should always be
+[tests/TestCase.php](https://github.com/ArvidDeJong/nuki/blob/main/tests/TestCase.php)). The demo flag should always be
 `false` in `phpunit.xml` (it is). Don't toggle it on inside test setup — the
 two fakes will collide.
 
@@ -81,6 +85,6 @@ two fakes will collide.
 
 When you add a new method to a resource (see [API reference](api-reference.md)),
 also add a matching branch to
-[`DemoFixtures::respondTo()`](../src/Support/DemoFixtures.php). Otherwise the
+[`DemoFixtures::respondTo()`](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php). Otherwise the
 demo dashboard silently returns `[]` for that resource and your reviewers
 spend an hour looking for the bug.

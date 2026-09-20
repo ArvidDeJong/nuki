@@ -1,6 +1,10 @@
-# Getting started
+---
+title: Getting started
+nav_order: 2
+description: "Requirements, installing darvis/nuki, publishing the config and the first call against the NUKI Web API."
+---
 
-[← Documentation index](README.md)
+# Getting started
 
 ## Requirements
 
@@ -80,7 +84,7 @@ That's all the wiring you need. The facade resolves a singleton `Nuki` manager
 that hands out [resource objects](api-reference.md) — `smartlocks()`, `logs()`,
 `auths()`, `webhooks()`, `oauth()`, `account()`. Each resource talks to the
 NUKI Web API through a single retry-aware
-[HttpClient](../src/Http/HttpClient.php).
+[HttpClient](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/HttpClient.php).
 
 ## Verify your installation works (no network required)
 
@@ -90,7 +94,7 @@ NUKI_DEMO=true php artisan tinker
 ```
 
 With `NUKI_DEMO=true`, all HTTP calls to `api.nuki.io/*` are intercepted by
-[DemoFixtures](../src/Support/DemoFixtures.php) and answered with realistic
+[DemoFixtures](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php) and answered with realistic
 canned data. See [Demo mode](demo-mode.md). Disable this in production.
 
 ## Where to next

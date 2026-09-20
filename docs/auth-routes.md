@@ -1,23 +1,27 @@
+---
+title: Auth routes
+nav_order: 7
+description: "Every route the package registers for login, OTP, registration, password reset and email verification, and how the middleware is wired."
+---
+
 # Auth routes
 
-[← Documentation index](README.md)
-
-When `NUKI_AUTH_USERS_ENABLED=true`, [routes/auth.php](../routes/auth.php) is
+When `NUKI_AUTH_USERS_ENABLED=true`, [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) is
 loaded by the service provider and the bundled UI routes from
-[routes/web.php](../routes/web.php) are wrapped in `auth:darvis-nuki`. This
+[routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) are wrapped in `auth:darvis-nuki`. This
 page is the canonical list.
 
 ## Common middleware
 
-All routes registered under [routes/auth.php](../routes/auth.php) use:
+All routes registered under [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) use:
 
 - The middleware group from `nuki.auth_users.routes.middleware` (default `['web']`).
-- [SetLocale](../src/Http/Middleware/SetLocale.php), always appended.
+- [SetLocale](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/SetLocale.php), always appended.
 
 URL prefix: `nuki.auth_users.routes.prefix` (default `nuki`).
 Route name prefix: `nuki.` (declared by the route group).
 
-UI routes from [routes/web.php](../routes/web.php) use
+UI routes from [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) use
 `nuki.ui.middleware` (default `['web']`) and — when `auth_users.enabled` is on
 — also get `auth:darvis-nuki` and `SetLocale` appended.
 
@@ -28,13 +32,13 @@ user hits them.
 
 | Method | Path | Name | Component | Conditional on |
 |---|---|---|---|---|
-| GET | `/login` | `nuki.auth.login` | [LoginPage](../src/Livewire/Auth/LoginPage.php) | — |
-| GET | `/login/otp` | `nuki.auth.otp` | [LoginOtpPage](../src/Livewire/Auth/LoginOtpPage.php) | — |
-| GET | `/register` | `nuki.auth.register` | [RegisterPage](../src/Livewire/Auth/RegisterPage.php) | `auth_users.register_enabled = true` |
-| GET | `/password/forgot` | `nuki.auth.password.forgot` | [ForgotPasswordPage](../src/Livewire/Auth/ForgotPasswordPage.php) | `auth_users.password_reset.enabled = true` |
-| GET | `/password/reset/{token}` | `nuki.auth.password.reset` | [ResetPasswordPage](../src/Livewire/Auth/ResetPasswordPage.php) | `auth_users.password_reset.enabled = true` |
-| GET | `/email/verify` | `nuki.auth.verify.notice` | [VerifyEmailNoticePage](../src/Livewire/Auth/VerifyEmailNoticePage.php) | `auth_users.email_verification.enabled = true` |
-| GET | `/email/verify/{id}/{hash}` | `nuki.auth.verify` | [NukiVerifyEmailController](../src/Http/Controllers/NukiVerifyEmailController.php) (extra `signed` middleware) | `auth_users.email_verification.enabled = true` |
+| GET | `/login` | `nuki.auth.login` | [LoginPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginPage.php) | — |
+| GET | `/login/otp` | `nuki.auth.otp` | [LoginOtpPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginOtpPage.php) | — |
+| GET | `/register` | `nuki.auth.register` | [RegisterPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/RegisterPage.php) | `auth_users.register_enabled = true` |
+| GET | `/password/forgot` | `nuki.auth.password.forgot` | [ForgotPasswordPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/ForgotPasswordPage.php) | `auth_users.password_reset.enabled = true` |
+| GET | `/password/reset/{token}` | `nuki.auth.password.reset` | [ResetPasswordPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/ResetPasswordPage.php) | `auth_users.password_reset.enabled = true` |
+| GET | `/email/verify` | `nuki.auth.verify.notice` | [VerifyEmailNoticePage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/VerifyEmailNoticePage.php) | `auth_users.email_verification.enabled = true` |
+| GET | `/email/verify/{id}/{hash}` | `nuki.auth.verify` | [NukiVerifyEmailController](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Controllers/NukiVerifyEmailController.php) (extra `signed` middleware) | `auth_users.email_verification.enabled = true` |
 
 The notice page reads `session('nuki.pending_verification_user_id')` (set on
 registration / a login attempt by an unverified account) and offers a
@@ -46,29 +50,29 @@ login: they are bounced back to the notice page.
 
 | Method | Path | Name | Component |
 |---|---|---|---|
-| POST | `/logout` | `nuki.auth.logout` | [NukiLogoutController](../src/Http/Controllers/NukiLogoutController.php) |
-| GET | `/profile` | `nuki.profile` | [ProfilePage](../src/Livewire/ProfilePage.php) |
-| GET | `/sub-users` | `nuki.sub-users.index` | [SubUsersIndex](../src/Livewire/SubUsersIndex.php) |
-| GET | `/sub-users/{id}` (numeric) | `nuki.sub-users.show` | [SubUserShow](../src/Livewire/SubUserShow.php) |
+| POST | `/logout` | `nuki.auth.logout` | [NukiLogoutController](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Controllers/NukiLogoutController.php) |
+| GET | `/profile` | `nuki.profile` | [ProfilePage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ProfilePage.php) |
+| GET | `/sub-users` | `nuki.sub-users.index` | [SubUsersIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUsersIndex.php) |
+| GET | `/sub-users/{id}` (numeric) | `nuki.sub-users.show` | [SubUserShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUserShow.php) |
 
 The logout endpoint redirects to `auth_users.redirect_after_logout`
 (default `/nuki/login`).
 
 ## UI routes (auto-wrapped)
 
-These live in [routes/web.php](../routes/web.php). When `auth_users.enabled`
+These live in [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php). When `auth_users.enabled`
 is `true`, they are appended with `auth:darvis-nuki` automatically, so an
 anonymous visitor is redirected to `/nuki/login`.
 
 | Method | Path | Name | Component |
 |---|---|---|---|
-| GET | `/` | `nuki.smartlocks.index` | [SmartlocksIndex](../src/Livewire/SmartlocksIndex.php) |
-| GET | `/dashboard` | `nuki.dashboard` | [Dashboard](../src/Livewire/Dashboard.php) |
-| GET | `/activity` | `nuki.activity.index` | [ActivityTimeline](../src/Livewire/ActivityTimeline.php) |
-| GET | `/smartlocks/{smartlockId}` (numeric) | `nuki.smartlocks.show` | [SmartlockShow](../src/Livewire/SmartlockShow.php) |
-| GET | `/webhooks` | `nuki.webhooks.index` | [WebhooksIndex](../src/Livewire/WebhooksIndex.php) |
-| GET | `/oauth/connect` | `nuki.oauth.connect` | [OAuthConnect](../src/Livewire/OAuthConnect.php) |
-| GET | `/accounts` | `nuki.accounts.index` | [AccountsIndex](../src/Livewire/AccountsIndex.php) |
+| GET | `/` | `nuki.smartlocks.index` | [SmartlocksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlocksIndex.php) |
+| GET | `/dashboard` | `nuki.dashboard` | [Dashboard](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Dashboard.php) |
+| GET | `/activity` | `nuki.activity.index` | [ActivityTimeline](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ActivityTimeline.php) |
+| GET | `/smartlocks/{smartlockId}` (numeric) | `nuki.smartlocks.show` | [SmartlockShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlockShow.php) |
+| GET | `/webhooks` | `nuki.webhooks.index` | [WebhooksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/WebhooksIndex.php) |
+| GET | `/oauth/connect` | `nuki.oauth.connect` | [OAuthConnect](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/OAuthConnect.php) |
+| GET | `/accounts` | `nuki.accounts.index` | [AccountsIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountsIndex.php) |
 
 URL prefix: `nuki.ui.prefix` (default `nuki`). Route name prefix: `nuki.`.
 

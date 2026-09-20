@@ -1,8 +1,12 @@
+---
+title: Configuration
+nav_order: 3
+description: "Every config/nuki.php key and NUKI_* environment variable, with its default, its effect and the NukiConfig accessor that reads it."
+---
+
 # Configuration reference
 
-[← Documentation index](README.md)
-
-Every setting lives in [config/nuki.php](../config/nuki.php). Publish it once
+Every setting lives in [config/nuki.php](https://github.com/ArvidDeJong/nuki/blob/main/config/nuki.php). Publish it once
 with `php artisan vendor:publish --tag=nuki-config` and edit the resulting
 `config/nuki.php` in your application — the package merges in defaults for
 anything you leave out.
@@ -13,7 +17,7 @@ uses `env('…')`, so unpublished customisations stick. Keys are sorted
 alphabetically within every group.
 
 The package itself never calls `config('nuki.…')`. Every read goes through
-[NukiConfig](../src/Support/NukiConfig.php), which holds each default exactly
+[NukiConfig](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/NukiConfig.php), which holds each default exactly
 once. Use it in your own code too, so a renamed key breaks in one place
 instead of silently falling back:
 
@@ -86,7 +90,7 @@ model and [Auth routes](auth-routes.md) for the registered URLs.
 
 | Key | Env | Default | Effect |
 |---|---|---|---|
-| `auth_users.enabled` | `NUKI_AUTH_USERS_ENABLED` | `false` | Master switch. When `true`, [AuthConfigRegistrar](../src/Auth/Users/AuthConfigRegistrar.php) registers the guard and provider; [routes/auth.php](../routes/auth.php) is loaded; UI routes get `auth:darvis-nuki` appended. |
+| `auth_users.enabled` | `NUKI_AUTH_USERS_ENABLED` | `false` | Master switch. When `true`, [AuthConfigRegistrar](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/Users/AuthConfigRegistrar.php) registers the guard and provider; [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) is loaded; UI routes get `auth:darvis-nuki` appended. |
 | `auth_users.mail.from.address` | `NUKI_AUTH_USERS_MAIL_FROM_ADDRESS` | `null` | From-address for OTP, password-reset and email-verification mails. Falls back to Laravel's `mail.from.address`. |
 | `auth_users.mail.from.name` | `NUKI_AUTH_USERS_MAIL_FROM_NAME` | `null` | From-name for the same mails. |
 | `auth_users.email_verification.enabled` | – | `true` | When `true`, new registrations are not auto-logged-in: a signed link is mailed and login is blocked until the address is confirmed. Set to `false` to disable verification entirely (registration logs in directly). |
@@ -126,12 +130,12 @@ a redirect URL.
 
 Disabled by default. When enabled, the package registers a single POST route
 that accepts NUKI callbacks, verifies the HMAC signature and dispatches the
-[NukiWebhookReceived](../src/Events/NukiWebhookReceived.php) event. See
+[NukiWebhookReceived](https://github.com/ArvidDeJong/nuki/blob/main/src/Events/NukiWebhookReceived.php) event. See
 [Webhooks](webhooks.md) for the full flow.
 
 | Key | Env | Default | Effect |
 |---|---|---|---|
-| `webhook.enabled` | `NUKI_WEBHOOK_ENABLED` | `false` | Master switch. When `true`, [routes/webhooks.php](../routes/webhooks.php) is loaded. |
+| `webhook.enabled` | `NUKI_WEBHOOK_ENABLED` | `false` | Master switch. When `true`, [routes/webhooks.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/webhooks.php) is loaded. |
 | `webhook.route` | `NUKI_WEBHOOK_ROUTE` | `/nuki/webhook` | URL path of the callback. |
 | `webhook.middleware` | – | `['api']` | Middleware group. Skip CSRF and session — webhooks are external POSTs. |
 | `webhook.secret` | `NUKI_WEBHOOK_SECRET` | `null` | HMAC-SHA256 shared secret. Without it every request is rejected with `401`. |
@@ -158,7 +162,7 @@ that accepts NUKI callbacks, verifies the HMAC signature and dispatches the
 
 ## `http.*` — Outbound HTTP tuning
 
-Applies to every call made through [HttpClient](../src/Http/HttpClient.php).
+Applies to every call made through [HttpClient](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/HttpClient.php).
 
 | Key | Default | Effect |
 |---|---|---|
@@ -170,20 +174,20 @@ Applies to every call made through [HttpClient](../src/Http/HttpClient.php).
 
 | Key | Env | Default | Effect |
 |---|---|---|---|
-| `demo.enabled` | `NUKI_DEMO` | `false` | When `true`, every call to `api.nuki.io` is intercepted by [DemoFixtures](../src/Support/DemoFixtures.php) and answered with canned data. The package also stubs `nuki.token` to `demo-token` so the bearer authenticator stops complaining. **Never enable in production.** See [Demo mode](demo-mode.md). |
+| `demo.enabled` | `NUKI_DEMO` | `false` | When `true`, every call to `api.nuki.io` is intercepted by [DemoFixtures](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php) and answered with canned data. The package also stubs `nuki.token` to `demo-token` so the bearer authenticator stops complaining. **Never enable in production.** See [Demo mode](demo-mode.md). |
 
 ## Swappable contracts
 
 Three strategies are selected by config and bound in
-[NukiServiceProvider::register()](../src/NukiServiceProvider.php). They are the
+[NukiServiceProvider::register()](https://github.com/ArvidDeJong/nuki/blob/main/src/NukiServiceProvider.php). They are the
 **only** place strategies are picked — do not instantiate alternatives anywhere
 else.
 
 | Contract | Config key | Drivers |
 |---|---|---|
-| [Contracts\TokenStore](../src/Contracts/TokenStore.php) | `oauth.token_store` | `cache` → [CacheTokenStore](../src/Auth/CacheTokenStore.php), `database` → [DatabaseTokenStore](../src/Auth/DatabaseTokenStore.php) |
-| [Contracts\ApiTokenResolver](../src/Contracts/ApiTokenResolver.php) | `token_resolver` | `config` → [ConfigApiTokenResolver](../src/Auth/ConfigApiTokenResolver.php), `database` → [DatabaseApiTokenResolver](../src/Auth/DatabaseApiTokenResolver.php) |
-| [Contracts\Authenticator](../src/Contracts/Authenticator.php) | `auth` | `token` → [TokenAuthenticator](../src/Auth/TokenAuthenticator.php), `oauth` → [OAuthAuthenticator](../src/Auth/OAuthAuthenticator.php) |
+| [Contracts\TokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/TokenStore.php) | `oauth.token_store` | `cache` → [CacheTokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/CacheTokenStore.php), `database` → [DatabaseTokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/DatabaseTokenStore.php) |
+| [Contracts\ApiTokenResolver](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/ApiTokenResolver.php) | `token_resolver` | `config` → [ConfigApiTokenResolver](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/ConfigApiTokenResolver.php), `database` → [DatabaseApiTokenResolver](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/DatabaseApiTokenResolver.php) |
+| [Contracts\Authenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/Authenticator.php) | `auth` | `token` → [TokenAuthenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/TokenAuthenticator.php), `oauth` → [OAuthAuthenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/OAuthAuthenticator.php) |
 
 To add your own driver, bind it in a service provider that runs **after**
 `NukiServiceProvider`, e.g.:
@@ -200,13 +204,13 @@ which the package picks up the copies in `database/migrations/`.
 
 | Table | Created by | Used when |
 |---|---|---|
-| <a id="nuki_accounts"></a>`nuki_accounts` | [2026_05_11_000100_create_nuki_accounts_table](../database/migrations/2026_05_11_000100_create_nuki_accounts_table.php) | `token_resolver = database`. Columns: `account_key` (unique), `name`, `api_token` (text, encrypted), `description`, `is_active`. |
-| <a id="nuki_oauth_tokens"></a>`nuki_oauth_tokens` | [2026_05_11_000000_create_nuki_oauth_tokens_table](../database/migrations/2026_05_11_000000_create_nuki_oauth_tokens_table.php) | `oauth.token_store = database`. Columns: `account_key` (unique), `access_token` (text), `refresh_token` (text, nullable), `expires_at`, `token_type`, `scope`. |
-| `nuki_users` | [2026_05_12_000000_create_nuki_users_table](../database/migrations/2026_05_12_000000_create_nuki_users_table.php) | `auth_users.enabled = true`. Columns: `parent_id` (self-FK, nullable), `name`, `email` (unique), `email_verified_at` (nullable; set by the email-verification flow), `password`, `two_factor_enabled`, `is_active`, `last_login_at`, `locale`. |
-| `nuki_user_otp_codes` | [2026_05_12_000100_create_nuki_user_otp_codes_table](../database/migrations/2026_05_12_000100_create_nuki_user_otp_codes_table.php) | `auth_users.enabled = true`. Columns: `nuki_user_id`, `code_hash`, `purpose`, `expires_at`, `consumed_at`, `ip`, `user_agent`. |
-| `nuki_password_resets` | [2026_05_12_000200_create_nuki_password_resets_table](../database/migrations/2026_05_12_000200_create_nuki_password_resets_table.php) | `auth_users.enabled = true`. Columns: `email` (primary key), `token_hash`, `created_at`. |
-| `nuki_user_account` | [2026_05_12_000300_create_nuki_user_account_table](../database/migrations/2026_05_12_000300_create_nuki_user_account_table.php) | `auth_users.enabled = true`. Pivot. Columns: `nuki_user_id`, `nuki_account_id`, `role` (default `member`). Unique on the pair. |
-| `nuki_user_smartlock` | [2026_05_12_000400_create_nuki_user_smartlock_table](../database/migrations/2026_05_12_000400_create_nuki_user_smartlock_table.php) | `auth_users.enabled = true`. Pivot with permissions. Columns: `nuki_user_id`, `nuki_account_id`, `smartlock_id`, `can_lock`, `can_unlock`, `can_view_logs`, `can_manage_auths`, `allowed_from`, `allowed_until`, `allowed_weekdays` (tinyint, NUKI bitmask), `is_active`. |
+| <a id="nuki_accounts"></a>`nuki_accounts` | [2026_05_11_000100_create_nuki_accounts_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_11_000100_create_nuki_accounts_table.php) | `token_resolver = database`. Columns: `account_key` (unique), `name`, `api_token` (text, encrypted), `description`, `is_active`. |
+| <a id="nuki_oauth_tokens"></a>`nuki_oauth_tokens` | [2026_05_11_000000_create_nuki_oauth_tokens_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_11_000000_create_nuki_oauth_tokens_table.php) | `oauth.token_store = database`. Columns: `account_key` (unique), `access_token` (text), `refresh_token` (text, nullable), `expires_at`, `token_type`, `scope`. |
+| `nuki_users` | [2026_05_12_000000_create_nuki_users_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000000_create_nuki_users_table.php) | `auth_users.enabled = true`. Columns: `parent_id` (self-FK, nullable), `name`, `email` (unique), `email_verified_at` (nullable; set by the email-verification flow), `password`, `two_factor_enabled`, `is_active`, `last_login_at`, `locale`. |
+| `nuki_user_otp_codes` | [2026_05_12_000100_create_nuki_user_otp_codes_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000100_create_nuki_user_otp_codes_table.php) | `auth_users.enabled = true`. Columns: `nuki_user_id`, `code_hash`, `purpose`, `expires_at`, `consumed_at`, `ip`, `user_agent`. |
+| `nuki_password_resets` | [2026_05_12_000200_create_nuki_password_resets_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000200_create_nuki_password_resets_table.php) | `auth_users.enabled = true`. Columns: `email` (primary key), `token_hash`, `created_at`. |
+| `nuki_user_account` | [2026_05_12_000300_create_nuki_user_account_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000300_create_nuki_user_account_table.php) | `auth_users.enabled = true`. Pivot. Columns: `nuki_user_id`, `nuki_account_id`, `role` (default `member`). Unique on the pair. |
+| `nuki_user_smartlock` | [2026_05_12_000400_create_nuki_user_smartlock_table](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000400_create_nuki_user_smartlock_table.php) | `auth_users.enabled = true`. Pivot with permissions. Columns: `nuki_user_id`, `nuki_account_id`, `smartlock_id`, `can_lock`, `can_unlock`, `can_view_logs`, `can_manage_auths`, `allowed_from`, `allowed_until`, `allowed_weekdays` (tinyint, NUKI bitmask), `is_active`. |
 
 ## Publish tags
 
