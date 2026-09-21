@@ -123,7 +123,7 @@ class ActivityTimeline extends Component
     #[On('nuki-account-changed')]
     public function handleAccountChanged(string $accountKey): void
     {
-        $this->accountKey = $accountKey;
+        $this->accountKey = $this->authorizedAccountKey($accountKey);
         $this->error = null;
         $this->smartlockId = null;
         unset($this->logs, $this->smartlocks);

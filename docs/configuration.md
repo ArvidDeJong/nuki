@@ -104,7 +104,7 @@ model and [Auth routes](auth-routes.md) for the registered URLs.
 | `auth_users.password_reset.token_lifetime_minutes` | – | `60` | Reset-link lifetime. |
 | `auth_users.redirect_after_login` | – | `/nuki` | Where the login flow sends the user after success. |
 | `auth_users.redirect_after_logout` | – | `/nuki/login` | Where logout sends the user. |
-| `auth_users.register_enabled` | – | `true` | When `false`, the `/nuki/register` route returns 404. |
+| `auth_users.register_enabled` | `NUKI_AUTH_USERS_REGISTER_ENABLED` | `false` | Self registration. Off by default, because whoever registers becomes a main user, and a main user may operate every lock. While it is off `/nuki/register` answers 404 and the login page has no link to it. Create users with `php artisan nuki:user-create` instead. |
 | `auth_users.routes.middleware` | – | `['web']` | Middleware group for the auth routes. `SetLocale` is always appended automatically. |
 | `auth_users.routes.prefix` | – | `nuki` | URL prefix; shared with the rest of the UI. |
 
@@ -156,7 +156,7 @@ that accepts NUKI callbacks, verifies the HMAC signature and dispatches the
 | `ui.locales` | – | `['de' => 'Deutsch', 'en' => 'English', 'es' => 'Español', 'nl' => 'Nederlands']` | Languages shown in the locale switcher. |
 | `ui.logo.light` | `NUKI_UI_LOGO_LIGHT` | `null` | Path/URL to an SVG/PNG shown above the auth form in light mode. When both light/dark are empty, a neutral lock icon plus `ui.brand` is rendered. |
 | `ui.logo.dark` | `NUKI_UI_LOGO_DARK` | `null` | Dark-mode variant of the logo. Swapped via `dark:hidden` / `hidden dark:block`. |
-| `ui.middleware` | – | `['web']` | Middleware group for UI routes. `SetLocale` and (when `auth_users.enabled`) `auth:darvis-nuki` are appended automatically. |
+| `ui.middleware` | – | `['web']` | Middleware group for UI routes. `AuthorizeUi`, `SetLocale` and (when `auth_users.enabled`) `auth:darvis-nuki` are appended automatically. While `auth_users.enabled` is `false`, `AuthorizeUi` answers `403` unless the `viewNuki` gate allows the visitor; the default gate only allows the `local` environment. See [Who may open the UI](ui-and-localization.md#who-may-open-the-ui). |
 | `ui.prefix` | `NUKI_UI_PREFIX` | `nuki` | URL prefix for all UI routes. |
 | `ui.tagline` | `NUKI_UI_TAGLINE` | `null` | Optional one-line tagline shown on the auth brand panel. Falls back to the localised `nuki::nuki.auth.panel.subheading` string. |
 

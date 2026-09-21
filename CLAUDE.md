@@ -93,11 +93,13 @@ Disabled by default. When `NUKI_WEBHOOK_ENABLED=true`:
 
 ## UI (Livewire + Flux)
 
-When `nuki.ui.enabled=true`, [routes/web.php](routes/web.php) registers pages under the `nuki.ui.prefix` (default `nuki`) with middleware from `nuki.ui.middleware`. All pages are Livewire components in [src/Livewire/](src/Livewire/), auto-registered with `nuki.*` aliases (e.g. `nuki.smartlocks-index`).
+When `nuki.ui.enabled=true`, [routes/web.php](routes/web.php) registers pages under the `nuki.ui.prefix` (default `nuki`) with middleware from `nuki.ui.middleware`, followed by [AuthorizeUi](src/Http/Middleware/AuthorizeUi.php). While `auth_users.enabled` is off that middleware aborts 403 unless the `viewNuki` gate allows the visitor; the provider defines the gate only when the host app has not, and the default allows the `local` environment only (the Horizon/Telescope model). With `auth_users.enabled` it steps aside, the `darvis-nuki` guard decides. It is also Livewire persistent middleware, because update requests do not run route middleware. Never add a UI route outside that group: the pages operate locks and hold API tokens, and a route without the middleware is public on every install. All pages are Livewire components in [src/Livewire/](src/Livewire/), auto-registered with `nuki.*` aliases (e.g. `nuki.smartlocks-index`).
 
 Views in [resources/views/livewire/](resources/views/livewire/) use **Flux components exclusively** (`<flux:card>`, `<flux:button>`, `<flux:badge>`, `<flux:callout>`, etc.) — keep it that way; no hand-rolled Tailwind buttons or form controls when a Flux equivalent exists. The layout is [resources/views/layouts/app.blade.php](resources/views/layouts/app.blade.php), overridable via `nuki.ui.layout`.
 
 Account-aware components use the [UsesNukiAccount](src/Concerns/UsesNukiAccount.php) trait, which reads `session('nuki.current_account', 'default')`. [AccountSwitcher](src/Livewire/AccountSwitcher.php) dispatches `nuki-account-changed`; other components listen with `#[On('nuki-account-changed')]` and reset their state.
+
+Identifiers the permission checks hang on are `#[Locked]`: `accountKey` in the trait and `smartlockId` in `SmartlockShow`. Never leave such a property writable, because the browser can set any public property and the checks made in `mount()` then say nothing about what is loaded next. A handler for `nuki-account-changed` assigns through `authorizedAccountKey()`, never the raw argument: the browser can dispatch that event itself, so the key is only trusted after it is checked against `accessibleAccounts()`. (`AccountsIndex::$accountKey` is a form field, the key being edited, and stays writable.) An authorization check in a computed property goes before the `try`, because `abort()` throws and the `catch (\Throwable)` there would swallow it.
 
 ## Package user authentication
 
@@ -110,10 +112,12 @@ Optional, enabled with `NUKI_AUTH_USERS_ENABLED=true`. Completely separate from 
 - Main users: `accessibleSmartlockIds()` returns `null` (= wildcard, all locks). Subs: returns explicit ID list.
 - The guard and provider are registered at runtime by [AuthConfigRegistrar](src/Auth/Users/AuthConfigRegistrar.php) — no consumer changes to `config/auth.php` required.
 - Password reset uses [NukiPasswordResetService](src/Auth/Users/NukiPasswordResetService.php) with its own `nuki_password_resets` table — deliberately not Laravel's `PasswordBroker`, so we avoid `auth.passwords` config merging across Laravel versions.
-- The trait [AuthorizesSmartlockAccess](src/Concerns/AuthorizesSmartlockAccess.php) (used in `SmartlocksIndex` / `SmartlockShow`) gates list-filtering and `assertCan()` checks. The action handlers re-check permissions even if the UI hides the button.
+- The trait [AuthorizesSmartlockAccess](src/Concerns/AuthorizesSmartlockAccess.php) (used in `SmartlocksIndex` / `SmartlockShow`) gates list-filtering and `assertCan()` checks. The action handlers re-check permissions even if the UI hides the button, and `SmartlockShow` checks again where it loads data: plain access for the lock, `view_logs` for the logs, `manage_auths` for the authorizations (they contain keypad codes). For an account key without a `nuki_accounts` row a sub user gets `[]`, only a main user keeps the wildcard; never return `null` for a sub user, `null` means "every lock".
+- [AuthorizesMainUser](src/Concerns/AuthorizesMainUser.php) (used in `AccountsIndex` / `WebhooksIndex`) aborts 403 in the Livewire `boot` hook unless the user is a main user. It is the boot hook because that runs on every request, so it covers `mount()` and every public action in one place; a check in `mount()` alone leaves the actions open.
+- Self registration (`auth_users.register_enabled`) is off by default in the config and in `NukiConfig::registerEnabled()`. Never default it to on: `RegisterPage` creates a main user, and a main user may operate every lock.
 - Weekday bitmask conventie (ma=64..zo=1) is shared via [Support/WeekdayBitmask](src/Support/WeekdayBitmask.php).
 - CLI: `php artisan nuki:user-create` creates the first main user.
-- Bundled UI routes (`/nuki/*`) get `auth:darvis-nuki` middleware appended in [routes/web.php](routes/web.php) when this feature is on.
+- Bundled UI routes (`/nuki/*`) get `auth:darvis-nuki` middleware appended in [routes/web.php](routes/web.php) when this feature is on. A guest is sent to the host app's `login` route by Laravel's auth middleware, not to `/nuki/login`.
 
 ## Demo mode
 

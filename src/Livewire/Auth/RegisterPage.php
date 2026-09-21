@@ -39,6 +39,11 @@ class RegisterPage extends Component
 
     public function submit(): mixed
     {
+        // Again, not only in mount(): a page that was open when registration was turned off can still post.
+        if (! NukiConfig::registerEnabled()) {
+            abort(404);
+        }
+
         $this->error = null;
         $validated = $this->validate([
             'name' => 'required|string|max:120',

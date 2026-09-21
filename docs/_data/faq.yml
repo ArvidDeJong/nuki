@@ -37,7 +37,7 @@
 - q: Can I give my own users access to one specific lock without touching the NUKI account?
   a: >-
     Yes. Switch on `NUKI_AUTH_USERS_ENABLED` and the package registers its own `darvis-nuki` auth
-    guard with login, OTP, registration and password reset. A main user can add sub users and give
+    guard with login, OTP and password reset (self registration is there too, off by default). A main user can add sub users and give
     each of them lock, unlock, log and authorization rights per smartlock, with a validity window
     and a weekday pattern. Those permissions live in your database only; nothing is written back
     to NUKI.

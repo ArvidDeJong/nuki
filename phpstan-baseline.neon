@@ -253,12 +253,6 @@ parameters:
 			path: src/Livewire/ActivityTimeline.php
 
 		-
-			message: '#^Method Darvis\\Nuki\\Livewire\\ActivityTimeline\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Livewire/ActivityTimeline.php
-
-		-
 			message: '#^Method Darvis\\Nuki\\Livewire\\ActivityTimeline\:\:smartlocks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -367,12 +361,6 @@ parameters:
 			path: src/Livewire/Dashboard.php
 
 		-
-			message: '#^Method Darvis\\Nuki\\Livewire\\Dashboard\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Livewire/Dashboard.php
-
-		-
 			message: '#^Method Darvis\\Nuki\\Livewire\\Dashboard\:\:recentLogs\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -395,12 +383,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Livewire/Dashboard.php
-
-		-
-			message: '#^Method Darvis\\Nuki\\Livewire\\OAuthConnect\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Livewire/OAuthConnect.php
 
 		-
 			message: '#^Method Darvis\\Nuki\\Livewire\\OAuthConnect\:\:tokenInfo\(\) return type has no value type specified in iterable type array\.$#'
@@ -463,12 +445,6 @@ parameters:
 			path: src/Livewire/SmartlockShow.php
 
 		-
-			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlockShow\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Livewire/SmartlockShow.php
-
-		-
 			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlockShow\:\:logs\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -479,12 +455,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Livewire/SmartlockShow.php
-
-		-
-			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlocksIndex\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Livewire/SmartlocksIndex.php
 
 		-
 			message: '#^Method Darvis\\Nuki\\Livewire\\SmartlocksIndex\:\:smartlocks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -581,12 +551,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Livewire/SubUsersIndex.php
-
-		-
-			message: '#^Method Darvis\\Nuki\\Livewire\\WebhooksIndex\:\:getAvailableAccountsProperty\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Livewire/WebhooksIndex.php
 
 		-
 			message: '#^Method Darvis\\Nuki\\Livewire\\WebhooksIndex\:\:webhooks\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'

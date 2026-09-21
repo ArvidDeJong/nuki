@@ -27,25 +27,33 @@
                               :current="request()->routeIs('nuki.activity.*')">
                 {{ __('nuki::nuki.nav.activity') }}
             </flux:navbar.item>
-            <flux:navbar.item icon="users" href="{{ route('nuki.accounts.index') }}"
-                              :current="request()->routeIs('nuki.accounts.*')">
-                {{ __('nuki::nuki.nav.accounts') }}
-            </flux:navbar.item>
             @php($navUser = NukiConfig::authUsersEnabled() ? auth('darvis-nuki')->user() : null)
+            {{-- Accounts and webhooks are for a main user only; without package users there is no sub user. --}}
+            @php($navManage = ! NukiConfig::authUsersEnabled() || ($navUser && $navUser->isMain()))
+            @if ($navManage)
+                <flux:navbar.item icon="users" href="{{ route('nuki.accounts.index') }}"
+                                  :current="request()->routeIs('nuki.accounts.*')">
+                    {{ __('nuki::nuki.nav.accounts') }}
+                </flux:navbar.item>
+            @endif
             @if ($navUser && $navUser->isMain())
                 <flux:navbar.item icon="user-group" href="{{ route('nuki.sub-users.index') }}"
                                   :current="request()->routeIs('nuki.sub-users.*')">
                     {{ __('nuki::nuki.nav.sub_users') }}
                 </flux:navbar.item>
             @endif
-            <flux:navbar.item icon="bell" href="{{ route('nuki.webhooks.index') }}"
-                              :current="request()->routeIs('nuki.webhooks.*')">
-                {{ __('nuki::nuki.nav.webhooks') }}
-            </flux:navbar.item>
-            <flux:navbar.item icon="key" href="{{ route('nuki.oauth.connect') }}"
-                              :current="request()->routeIs('nuki.oauth.*')">
-                {{ __('nuki::nuki.nav.connection') }}
-            </flux:navbar.item>
+            @if ($navManage)
+                <flux:navbar.item icon="bell" href="{{ route('nuki.webhooks.index') }}"
+                                  :current="request()->routeIs('nuki.webhooks.*')">
+                    {{ __('nuki::nuki.nav.webhooks') }}
+                </flux:navbar.item>
+            @endif
+            @if ($navManage)
+                <flux:navbar.item icon="key" href="{{ route('nuki.oauth.connect') }}"
+                                  :current="request()->routeIs('nuki.oauth.*')">
+                    {{ __('nuki::nuki.nav.connection') }}
+                </flux:navbar.item>
+            @endif
         </flux:navbar>
 
         <flux:spacer />

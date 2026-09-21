@@ -70,7 +70,8 @@ return [
         ],
         'redirect_after_login' => '/nuki',
         'redirect_after_logout' => '/nuki/login',
-        'register_enabled' => true,
+        // Off by default: whoever registers becomes a main user, who may operate every lock.
+        'register_enabled' => env('NUKI_AUTH_USERS_REGISTER_ENABLED', false),
         'routes' => [
             'middleware' => ['web'],
             'prefix' => 'nuki',

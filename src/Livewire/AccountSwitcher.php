@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Livewire;
 
+use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\Facades\Nuki;
-use Darvis\Nuki\Models\NukiAccount;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -14,11 +14,11 @@ use Livewire\Component;
 
 class AccountSwitcher extends Component
 {
-    public string $accountKey = 'default';
+    use UsesNukiAccount;
 
     public function mount(): void
     {
-        $this->accountKey = (string) session('nuki.current_account', 'default');
+        $this->mountUsesNukiAccount();
     }
 
     public function render(): View
@@ -29,10 +29,18 @@ class AccountSwitcher extends Component
     #[Computed]
     public function accounts(): Collection
     {
-        return NukiAccount::query()
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get(['account_key', 'name']);
+        // Every active account without package users, the user's own accounts with them.
+        return $this->getAvailableAccountsProperty();
+    }
+
+    /**
+     * Whether the "manage accounts" link is shown: that page is for a main user only.
+     */
+    public function canManageAccounts(): bool
+    {
+        $user = $this->currentNukiUser();
+
+        return $user === null || $user->isMain();
     }
 
     #[Computed]
@@ -49,6 +57,10 @@ class AccountSwitcher extends Component
 
     public function nukiName(string $accountKey): ?string
     {
+        if (! $this->canUseAccountKey($accountKey)) {
+            return null;
+        }
+
         try {
             return Nuki::as($accountKey)->account()->info()?->displayName();
         } catch (\Throwable) {
@@ -58,6 +70,8 @@ class AccountSwitcher extends Component
 
     public function switchTo(string $accountKey): void
     {
+        $accountKey = $this->authorizedAccountKey($accountKey);
+
         $this->accountKey = $accountKey;
         session(['nuki.current_account' => $accountKey]);
         $this->dispatch('nuki-account-changed', accountKey: $accountKey);
@@ -66,7 +80,7 @@ class AccountSwitcher extends Component
     #[On('nuki-account-changed')]
     public function syncAccount(string $accountKey): void
     {
-        $this->accountKey = $accountKey;
+        $this->accountKey = $this->authorizedAccountKey($accountKey);
         unset($this->currentLabel);
     }
 }

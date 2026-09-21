@@ -78,7 +78,7 @@ class Dashboard extends Component
     #[On('nuki-account-changed')]
     public function handleAccountChanged(string $accountKey): void
     {
-        $this->accountKey = $accountKey;
+        $this->accountKey = $this->authorizedAccountKey($accountKey);
         $this->error = null;
         unset($this->smartlocks, $this->recentLogs);
     }

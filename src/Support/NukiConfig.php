@@ -277,11 +277,12 @@ final class NukiConfig
     }
 
     /**
-     * Whether visitors may register an account themselves.
+     * Whether visitors may register an account themselves. Off unless it is switched on, because
+     * a registered account is a main user, and a main user may operate every lock.
      */
     public static function registerEnabled(): bool
     {
-        return config('nuki.auth_users.register_enabled', true) === true;
+        return config('nuki.auth_users.register_enabled', false) === true;
     }
 
     /**

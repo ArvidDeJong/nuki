@@ -129,12 +129,52 @@ sometimes a different worker processes the same event). Use `redis`,
 `database`, `memcached` or `file`. See
 [Webhooks → Cache driver matters for dedup](webhooks.md#5-cache-driver-matters-for-dedup).
 
+## `/nuki` answers 403
+
+Expected outside the `local` environment while `auth_users.enabled` is `false`: the `viewNuki`
+gate decides who may open the bundled UI, and the package default only allows `local`. Define the
+gate in your application, for example in `AppServiceProvider::boot()`:
+
+```php
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+
+public function boot(): void
+{
+    Gate::define('viewNuki', fn (?User $user) => $user?->is_admin === true);
+}
+```
+
+Still 403 for a guest? The gate parameter has to be nullable (`?User $user`), otherwise Laravel
+never calls the gate without a signed in user. See
+[Who may open the UI](ui-and-localization.md#who-may-open-the-ui).
+
+With `auth_users.enabled`, a `403` on `/nuki/accounts` or `/nuki/webhooks` means the signed in
+user is a sub user; those pages are for a main user. A `403` on a smartlock page means the sub
+user has no active `nuki_user_smartlock` row for that lock in the current account.
+
+## `/nuki/register` answers 404
+
+Self registration is off by default, because a registered account is a main user who
+may operate every lock. Create users with `php artisan nuki:user-create`, or switch it back on:
+
+```dotenv
+NUKI_AUTH_USERS_REGISTER_ENABLED=true
+```
+
+With a published config file, also check that `auth_users.register_enabled` there is not a
+hard coded `false` or `true`.
+
 ## Sub user sees no smartlocks
 
 Expected — sub users start with **zero** smartlock access. Add rows in
 `nuki_user_smartlock` (use the bundled `/nuki/sub-users/{id}` UI or insert
 directly; see
 [Users and permissions → Sub-users — programmatic](users-and-permissions.md#sub-users--programmatic)).
+
+A sub user on an account key that has no `nuki_accounts` row (the `default` key in single
+account mode, for example) sees no locks at all: a permission row points at an account row, so
+without one nothing can have been assigned.
 
 If the rows exist but the lock is still hidden, check:
 

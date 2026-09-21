@@ -22,8 +22,10 @@ URL prefix: `nuki.auth_users.routes.prefix` (default `nuki`).
 Route name prefix: `nuki.` (declared by the route group).
 
 UI routes from [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) use
-`nuki.ui.middleware` (default `['web']`) and — when `auth_users.enabled` is on
-— also get `auth:darvis-nuki` and `SetLocale` appended.
+`nuki.ui.middleware` (default `['web']`), then — when `auth_users.enabled` is on
+— `auth:darvis-nuki`, then [AuthorizeUi](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/AuthorizeUi.php)
+and `SetLocale`. `AuthorizeUi` steps aside when `auth_users.enabled` is on; otherwise it asks the
+`viewNuki` gate, see [Who may open the UI](ui-and-localization.md#who-may-open-the-ui).
 
 ## Guest routes (`guest:darvis-nuki`)
 
@@ -34,7 +36,7 @@ user hits them.
 |---|---|---|---|---|
 | GET | `/login` | `nuki.auth.login` | [LoginPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginPage.php) | — |
 | GET | `/login/otp` | `nuki.auth.otp` | [LoginOtpPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginOtpPage.php) | — |
-| GET | `/register` | `nuki.auth.register` | [RegisterPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/RegisterPage.php) | `auth_users.register_enabled = true` |
+| GET | `/register` | `nuki.auth.register` | [RegisterPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/RegisterPage.php) | `auth_users.register_enabled = true` (default `false`) |
 | GET | `/password/forgot` | `nuki.auth.password.forgot` | [ForgotPasswordPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/ForgotPasswordPage.php) | `auth_users.password_reset.enabled = true` |
 | GET | `/password/reset/{token}` | `nuki.auth.password.reset` | [ResetPasswordPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/ResetPasswordPage.php) | `auth_users.password_reset.enabled = true` |
 | GET | `/email/verify` | `nuki.auth.verify.notice` | [VerifyEmailNoticePage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/VerifyEmailNoticePage.php) | `auth_users.email_verification.enabled = true` |
@@ -75,6 +77,9 @@ anonymous visitor is redirected to `/nuki/login`.
 | GET | `/accounts` | `nuki.accounts.index` | [AccountsIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountsIndex.php) |
 
 URL prefix: `nuki.ui.prefix` (default `nuki`). Route name prefix: `nuki.`.
+
+With `auth_users.enabled`, `/webhooks` and `/accounts` are for a main user only: a sub user gets
+`403` and does not see the links.
 
 ## Redirect targets
 

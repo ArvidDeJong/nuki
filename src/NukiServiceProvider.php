@@ -19,6 +19,7 @@ use Darvis\Nuki\Contracts\Authenticator;
 use Darvis\Nuki\Contracts\TokenStore;
 use Darvis\Nuki\Exceptions\NukiException;
 use Darvis\Nuki\Http\HttpClient;
+use Darvis\Nuki\Http\Middleware\AuthorizeUi;
 use Darvis\Nuki\Livewire\AccountsIndex;
 use Darvis\Nuki\Livewire\AccountSwitcher;
 use Darvis\Nuki\Livewire\ActivityTimeline;
@@ -38,10 +39,12 @@ use Darvis\Nuki\Livewire\SubUsersIndex;
 use Darvis\Nuki\Livewire\WebhooksIndex;
 use Darvis\Nuki\Support\DemoFixtures;
 use Darvis\Nuki\Support\NukiConfig;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -157,6 +160,7 @@ class NukiServiceProvider extends ServiceProvider
         }
 
         if (NukiConfig::uiEnabled()) {
+            $this->registerUiGate();
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
             $this->registerLivewireComponents();
         }
@@ -171,11 +175,31 @@ class NukiServiceProvider extends ServiceProvider
         }
     }
 
+    /**
+     * The default answer to "who may open the bundled UI": only the local environment, the way
+     * Horizon, Telescope and Pulse do it. A host app that defines `viewNuki` itself wins, whether
+     * its provider boots before this one or after it (a later define replaces this one).
+     */
+    private function registerUiGate(): void
+    {
+        if (Gate::has(AuthorizeUi::GATE)) {
+            return;
+        }
+
+        Gate::define(
+            AuthorizeUi::GATE,
+            fn (?Authenticatable $user = null): bool => $this->app->environment('local'),
+        );
+    }
+
     private function registerLivewireComponents(): void
     {
         if (! $this->app->bound('livewire')) {
             return;
         }
+
+        // Livewire update requests do not run the page's route middleware, unless it is listed here.
+        Livewire::addPersistentMiddleware([AuthorizeUi::class]);
 
         Livewire::component('nuki.dashboard', Dashboard::class);
         Livewire::component('nuki.activity-timeline', ActivityTimeline::class);

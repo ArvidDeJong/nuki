@@ -107,6 +107,21 @@ Event::listen(NukiWebhookReceived::class, function (NukiWebhookReceived $event) 
 See [docs/webhooks.md](docs/webhooks.md) for signature verification,
 deduplication and registering the callback with NUKI.
 
+## Who may open the bundled UI
+
+Outside the `local` environment `/nuki/*` answers `403` until you say who may
+open it, the way Horizon and Telescope work. Define the `viewNuki` gate, for
+example in `AppServiceProvider::boot()`:
+
+```php
+Gate::define('viewNuki', fn (?User $user) => $user?->is_admin === true);
+```
+
+Keep the parameter nullable, or a guest never reaches the gate. With
+`NUKI_AUTH_USERS_ENABLED=true` the package's own login protects the pages and
+the gate is not asked. `NUKI_UI_ENABLED=false` removes the pages altogether.
+See [docs/ui-and-localization.md](docs/ui-and-localization.md#who-may-open-the-ui).
+
 ## Demo mode
 
 ```dotenv
@@ -127,7 +142,9 @@ php artisan nuki:user-create --email=admin@example.com --name=Admin --password=s
 ```
 
 Registers a `darvis-nuki` auth guard, gates `/nuki/*` behind it, and ships
-login / OTP / register / password-reset Livewire screens. Main users can
+login / OTP / password-reset Livewire screens. Self registration is off by
+default (`NUKI_AUTH_USERS_REGISTER_ENABLED=true` switches it on), because a
+registered account is a main user who may operate every lock. Main users can
 create sub-users with per-smartlock permissions, a validity window and a
 weekday bitmask. See [docs/users-and-permissions.md](docs/users-and-permissions.md).
 

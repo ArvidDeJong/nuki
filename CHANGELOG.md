@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **The bundled UI was open to everyone after `composer require`.** With the defaults
+  (`ui.enabled` on, `ui.middleware` `['web']`, package users off) anyone who knew the URL could
+  open `/nuki`, lock and unlock doors and manage API tokens. The UI routes now run an
+  `AuthorizeUi` middleware that asks a `viewNuki` gate, the way Horizon, Telescope and Pulse do.
+  The package defines that gate only when your application has not, and its default allows the
+  `local` environment and nothing else. **What you have to do:** to keep the UI reachable outside
+  `local`, define the gate in your application, for example in `AppServiceProvider::boot()`:
+
+  ```php
+  use App\Models\User;
+  use Illuminate\Support\Facades\Gate;
+
+  Gate::define('viewNuki', fn (?User $user) => $user?->is_admin === true);
+  ```
+
+  Keep the parameter nullable (`?User $user`), otherwise Laravel never calls the gate for a guest.
+  Nothing to do when `NUKI_AUTH_USERS_ENABLED=true`: the package's own login already protects the
+  pages and the gate is not asked. `ui.enabled` and `ui.middleware` work as before.
+- **Self registration created a main user, who may operate every lock.** With package users on,
+  `/nuki/register` was open by default, so any visitor with a mailbox could make an account with
+  full access. `auth_users.register_enabled` is now `false` by default: the route answers 404, the
+  login page has no link to it, and a registration posted from a page that was still open is
+  refused. **What you have to do:** nothing, unless you relied on self registration. Create users
+  with `php artisan nuki:user-create`, or switch it back on in `.env`:
+
+  ```dotenv
+  NUKI_AUTH_USERS_REGISTER_ENABLED=true
+  ```
+
+  A published `config/nuki.php` keeps the value it has; set `'register_enabled' => false` there,
+  or replace it with `env('NUKI_AUTH_USERS_REGISTER_ENABLED', false)`.
+- **A sub user could manage accounts, API tokens, webhooks and the OAuth connection.** The
+  accounts, webhooks and connection pages did not look at who was signed in, so a sub user could
+  also disconnect the account's OAuth token. With package users on they are now for a main user
+  only: a sub user gets a 403 on the page and on every action, and no longer sees the three
+  links. Nothing to do. Without package users nothing changes here; the `viewNuki` gate guards the pages.
+- **A sub user could read the activity log and the keypad codes of a lock that was not theirs.**
+  The smartlock page trusted a lock id and an account key that the browser could change, and loaded
+  logs and authorizations without looking at the permissions. Both are locked now, the lock itself
+  needs an active permission row, the activity tab needs `view_logs` and the authorizations tab
+  needs `manage_auths`; anything else is a 403 and the tab is not offered. The account switcher
+  lists only the accounts a package user has access to, and switching to any other account, from
+  the menu or with a hand made event, is a 403. Nothing to do, but check that every main user is
+  attached to the accounts they work in (`$user->accounts()->syncWithoutDetaching([...])`): an
+  account nobody is attached to no longer shows up in their switcher.
+- **A sub user saw every lock on an account without a row in `nuki_accounts`**, for example the
+  `default` account in single account mode. Such a sub user now sees no locks there; a main user
+  still sees them all. Nothing to do.
+
+### Changed
+- The bundled UI answers 403 outside the `local` environment until the application defines the
+  `viewNuki` gate (only while `auth_users.enabled` is `false`). See Security above for the snippet.
+- `auth_users.register_enabled` defaults to `false` and reads `NUKI_AUTH_USERS_REGISTER_ENABLED`.
+- With package users on, a sub user no longer sees the accounts, webhooks and connection links, the account
+  switcher only lists accessible accounts, and the smartlock page only offers the tabs the user
+  has the permission for.
+- If you published the views (`nuki-views`), compare `layouts/app.blade.php`,
+  `livewire/account-switcher.blade.php` and `livewire/smartlock-show.blade.php` with the package
+  versions. An older `smartlock-show` view still asks for the logs of a sub user without
+  `view_logs`, which now ends in a 403 for the whole page.
+
 ## [1.1.2] - 2026-09-21
 
 ### Security
