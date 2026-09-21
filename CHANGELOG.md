@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-09-21
+
 ### Security
 - **Editing an account in the bundled UI stored a new API token as plain text.** The accounts
   screen saved the change with a query builder update, which skips the `encrypted` cast on
