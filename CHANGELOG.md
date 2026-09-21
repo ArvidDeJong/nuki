@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-21
+
 ### Added
 - A Laravel Boost skill, `nuki-development`, in `resources/boost/skills/`. It covers how a call
   runs and what every failure gives you (exception class and message), smartlock actions, logs and
