@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-21
+
 ### Security
 - **A sub user saw every lock of an account on the dashboard and the whole activity log.** The
   dashboard listed and counted all locks with their battery and door state, and both the dashboard
