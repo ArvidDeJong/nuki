@@ -97,6 +97,14 @@ With `NUKI_DEMO=true`, all HTTP calls to `api.nuki.io/*` are intercepted by
 [DemoFixtures](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php) and answered with realistic
 canned data. See [Demo mode](demo-mode.md). Disable this in production.
 
+## Laravel Boost
+
+The package ships [Laravel Boost](https://laravel.com/docs/boost) resources: a guideline with the
+rules of the package and a `nuki-development` skill that covers the call flow and what every
+failure gives you, multi account and OAuth, the webhook receiver, closing off the bundled UI and
+testing without the NUKI Web API. Run `php artisan boost:install`, or
+`php artisan boost:update --discover` in a project that already uses Boost.
+
 ## Where to next
 
 - Single account, just want to read/write smartlocks → [API reference](api-reference.md).
