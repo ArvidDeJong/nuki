@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-21
+
 ### Security
 - **The bundled UI was open to everyone after `composer require`.** With the defaults
   (`ui.enabled` on, `ui.middleware` `['web']`, package users off) anyone who knew the URL could
