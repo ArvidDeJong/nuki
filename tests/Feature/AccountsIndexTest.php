@@ -23,6 +23,9 @@ it('encrypts the api token when an account is created', function () {
 
     expect($stored)->not->toContain('first-secret-token')
         ->and(NukiAccount::findByKey('office')->api_token)->toBe('first-secret-token');
+
+    // Without package users there is nobody to attach.
+    expect(DB::table('nuki_user_account')->count())->toBe(0);
 });
 
 it('encrypts the api token when an account is edited', function () {

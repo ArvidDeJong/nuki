@@ -65,10 +65,10 @@ Auto-registered with `nuki.*` aliases by
 
 | Alias | Class | Route | Purpose |
 |---|---|---|---|
-| `nuki.dashboard` | [Dashboard](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Dashboard.php) | `/dashboard` | KPI cards (total locks, locked, critical battery, open doors), recent activity feed, per-lock battery bars. |
+| `nuki.dashboard` | [Dashboard](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Dashboard.php) | `/dashboard` | KPI cards (total locks, locked, critical battery, open doors), recent activity feed, per-lock battery bars. For a sub user: only their own locks, and activity only of locks with `view_logs`. |
 | `nuki.smartlocks-index` | [SmartlocksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlocksIndex.php) | `/` | List of smartlocks; filtered for sub users. Quick lock/unlock actions. |
 | `nuki.smartlock-show` | [SmartlockShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlockShow.php) | `/smartlocks/{smartlockId}` | Single-lock detail: state, recent logs, authorizations, rename + sync buttons. |
-| `nuki.activity-timeline` | [ActivityTimeline](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ActivityTimeline.php) | `/activity` | Visual timeline grouped per day; filter by lock or period. |
+| `nuki.activity-timeline` | [ActivityTimeline](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ActivityTimeline.php) | `/activity` | Visual timeline grouped per day; filter by lock or period. For a sub user: only locks with `view_logs`; a filter on another lock is a `403`. |
 | `nuki.webhooks-index` | [WebhooksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/WebhooksIndex.php) | `/webhooks` | List + manage NUKI webhook subscriptions. |
 | `nuki.oauth-connect` | [OAuthConnect](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/OAuthConnect.php) | `/oauth/connect` | Shows the stored OAuth token of the current account, generates an authorization URL and disconnects. It does not receive the redirect from NUKI; [that route is yours](nuki-api-authentication.md#the-callback-route-is-yours-to-build). Only meaningful when `NUKI_AUTH=oauth`. |
 | `nuki.accounts-index` | [AccountsIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountsIndex.php) | `/accounts` | CRUD for `nuki_accounts` (token mode, multi-account). |

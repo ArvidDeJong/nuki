@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Darvis\Nuki\Http\Middleware\AuthenticateNukiUser;
 use Darvis\Nuki\Http\Middleware\AuthorizeUi;
 use Darvis\Nuki\Http\Middleware\SetLocale;
 use Darvis\Nuki\Livewire\AccountsIndex;
@@ -17,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 $middleware = NukiConfig::uiMiddleware();
 
 if (NukiConfig::authUsersEnabled()) {
-    $middleware[] = 'auth:darvis-nuki';
+    // Not the bare `auth:darvis-nuki`: that sends a guest to the host application's login route.
+    $middleware[] = AuthenticateNukiUser::class;
 }
 
 // After the host app's own middleware, so a session and a signed in user exist when the gate is asked.

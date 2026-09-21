@@ -8,7 +8,7 @@ description: "Every route darvis/nuki registers for login, OTP, registration, pa
 
 When `NUKI_AUTH_USERS_ENABLED=true`, [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) is
 loaded by the service provider and the bundled UI routes from
-[routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) are wrapped in `auth:darvis-nuki`. This
+[routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) are put behind the `darvis-nuki` guard. This
 page is the canonical list.
 
 ## Common middleware
@@ -23,16 +23,16 @@ Route name prefix: `nuki.` (declared by the route group).
 
 UI routes from [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) use
 `nuki.ui.middleware` (default `['web']`), then — when `auth_users.enabled` is on
-— `auth:darvis-nuki`, then [AuthorizeUi](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/AuthorizeUi.php)
+— [AuthenticateNukiUser](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/AuthenticateNukiUser.php) (Laravel's `auth` middleware for the `darvis-nuki` guard), then [AuthorizeUi](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/AuthorizeUi.php)
 and `SetLocale`. `AuthorizeUi` steps aside when `auth_users.enabled` is on; otherwise it asks the
 `viewNuki` gate, see [Who may open the UI](ui-and-localization.md#who-may-open-the-ui).
 
-## Guest routes (`guest:darvis-nuki`)
+## Guest routes
 
-`guest:darvis-nuki` is Laravel's own `guest` middleware. A package user who is already signed in
-and opens one of these pages is redirected by Laravel, to the route named `dashboard` or `home`
-of your application when it has one, otherwise to `/`. That is not
-`auth_users.redirect_after_login`; change it with `redirectUsersTo()` in `bootstrap/app.php`.
+These routes run [RedirectIfNukiUser](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/RedirectIfNukiUser.php), Laravel's `guest` middleware for the `darvis-nuki`
+guard. A package user who is already signed in and opens one of these pages is redirected to
+`auth_users.redirect_after_login`. Before version 1.3.0 Laravel decided, and the user landed on
+the `dashboard` or `home` route of your application, or on `/`.
 
 | Method | Path | Name | Component | Conditional on |
 |---|---|---|---|---|
@@ -50,7 +50,7 @@ throttled resend. The signed link marks the account verified and redirects to
 `nuki.auth.login` with a `status` flash. Unverified accounts cannot complete
 login: they are bounced back to the notice page.
 
-## Authenticated routes (`auth:darvis-nuki`)
+## Authenticated routes
 
 | Method | Path | Name | Component |
 |---|---|---|---|
@@ -65,7 +65,7 @@ The logout endpoint redirects to `auth_users.redirect_after_logout`
 ## UI routes (auto-wrapped)
 
 These live in [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php). When `auth_users.enabled`
-is `true`, they get `auth:darvis-nuki` automatically. See
+is `true`, they get `AuthenticateNukiUser` automatically. See
 [Where a guest is sent](#where-a-guest-is-sent) for what that does to a visitor who is not signed
 in.
 
@@ -86,27 +86,19 @@ only: a sub user gets `403` and does not see the links.
 
 ## Where a guest is sent
 
-`auth:darvis-nuki` is Laravel's own `auth` middleware. For a visitor who is not signed in it
-redirects to the route named `login` of **your application**, not to `/nuki/login`. Without such a
-route the visitor gets the error `Route [login] not defined.`
+A visitor who is not signed in and opens a page of the package is redirected to the package's
+login page, `/nuki/login` (route `nuki.auth.login`). [AuthenticateNukiUser](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/AuthenticateNukiUser.php) does that: it is
+Laravel's `auth` middleware for the `darvis-nuki` guard with its own redirect target. Your
+application's `redirectGuestsTo()` is not touched and keeps working for your own pages.
 
-To send guests of the package pages to the package's login page, tell Laravel in
-`bootstrap/app.php`:
+Laravel remembers the page the guest asked for, and the package's login ignores it: after signing
+in, the user always goes to `auth_users.redirect_after_login`.
 
-```php
-use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
-
-->withMiddleware(function (Middleware $middleware): void {
-    $middleware->redirectGuestsTo(fn (Request $request) => $request->is('nuki', 'nuki/*')
-        ? route('nuki.auth.login')
-        : route('login'));
-})
-```
-
-Use your own prefix in place of `nuki` when you changed `ui.prefix`, and leave out the
-`route('login')` half when your application has no login of its own (return
-`route('nuki.auth.login')` for everything).
+**Before version 1.3.0** the routes used the bare `auth:darvis-nuki`, which sends a guest to the
+route named `login` of your application, or fails with `Route [login] not defined.` when there is
+none. Earlier versions of this page showed a `redirectGuestsTo()` closure for `bootstrap/app.php`
+to work around that. From 1.3.0 on you do not need it; remove it, or leave it, it no longer sees
+the package pages.
 
 ## Redirect targets
 
@@ -140,16 +132,23 @@ something app-specific):
 You can use the `darvis-nuki` guard from your own routes:
 
 ```php
-Route::middleware('auth:darvis-nuki')->group(function () {
+use Darvis\Nuki\Http\Middleware\AuthenticateNukiUser;
+
+Route::middleware(['web', AuthenticateNukiUser::class])->group(function () {
     Route::get('/my/dashboard', MyDashboard::class);
 });
 ```
+
+`AuthenticateNukiUser` sends a guest to the package login. The bare `auth:darvis-nuki` works too,
+and sends a guest to your application's `login` route.
 
 Or switch the bundled pages off (`NUKI_UI_ENABLED=false`) and keep the auth routes. The guard and
 the login pages stay, and you write your own screens against the `NukiUser` model. Two things to
 set then:
 
 - `auth_users.redirect_after_login`, because `/nuki` no longer exists.
-- `ui.layout`, to a layout of your own. `/profile`, `/sub-users` and `/sub-users/{id}` render in
-  `ui.layout`, and the package's `nuki::layouts.app` links to the pages you switched off, so with
-  the default layout those three pages fail with `Route [nuki.dashboard] not defined.`
+- Optionally `ui.layout`, to a layout of your own. `/profile`, `/sub-users` and
+  `/sub-users/{id}` render in `ui.layout`. Since version 1.3.0 the package's layout works without
+  the UI routes: it leaves out the links and the account switcher, and the brand links to
+  `auth_users.redirect_after_login`. Before 1.3.0 those three pages failed with
+  `Route [nuki.dashboard] not defined.`

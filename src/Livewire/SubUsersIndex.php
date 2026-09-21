@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Livewire;
 
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
+use Darvis\Nuki\Concerns\AuthorizesMainUser;
 use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
@@ -16,6 +17,9 @@ use Livewire\Component;
 
 class SubUsersIndex extends Component
 {
+    // Checked on every request, not only in mount(): the actions create and change users.
+    use AuthorizesMainUser;
+
     public bool $showModal = false;
 
     public ?int $editingId = null;

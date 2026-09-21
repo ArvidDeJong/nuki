@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Support\DemoFixtures;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Route;
 
 beforeEach(function () {
     $this->withoutVite();
@@ -30,10 +29,8 @@ it('leaves the UI to the package guard when package users are on', function () {
 });
 
 it('lets the package guard turn a guest away, not the viewNuki gate', function () {
-    // Laravel's auth middleware sends a guest to the host app's `login` route.
-    Route::get('/host-login', fn () => 'login')->name('login');
-
-    $this->get('/nuki/dashboard')->assertRedirect('/host-login');
+    // A redirect to the package login, not the 403 the viewNuki gate would give outside local.
+    $this->get('/nuki/dashboard')->assertRedirect(route('nuki.auth.login'));
 });
 
 it('keeps the login page reachable outside local', function () {

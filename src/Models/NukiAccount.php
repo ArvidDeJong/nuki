@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class NukiAccount extends Model
 {
+    /**
+     * Pivot roles on nuki_user_account. The package writes `owner` for the user who makes an
+     * account and reads neither; they are there for the host application.
+     */
+    public const ROLE_OWNER = 'owner';
+
+    public const ROLE_MEMBER = 'member';
+
     protected $table = 'nuki_accounts';
 
     protected $fillable = [

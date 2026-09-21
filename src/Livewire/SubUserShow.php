@@ -6,6 +6,7 @@ namespace Darvis\Nuki\Livewire;
 
 use Carbon\CarbonImmutable;
 use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
+use Darvis\Nuki\Concerns\AuthorizesMainUser;
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Models\NukiAccount;
 use Darvis\Nuki\Models\NukiUser;
@@ -16,10 +17,18 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class SubUserShow extends Component
 {
+    use AuthorizesMainUser;
+
+    /**
+     * Locked: the sub user comes from the route. Every lookup below is scoped to the signed in
+     * main user's own sub users as well, so another id would find nothing.
+     */
+    #[Locked]
     public int $id;
 
     public bool $showModal = false;
@@ -88,16 +97,14 @@ class SubUserShow extends Component
     #[Computed]
     public function accounts(): Collection
     {
-        return NukiAccount::query()->where('is_active', true)->orderBy('name')->get();
+        // Only the accounts of the signed in main user: a sub user cannot be given more than that.
+        return $this->parent()?->accessibleAccounts()->sortBy('name')->values() ?? collect();
     }
 
     /** @return Collection<int, array{id: int, name: string}> */
     public function smartlocksForAccount(int $accountId): Collection
     {
-        $account = NukiAccount::find($accountId);
-        if ($account === null) {
-            return collect();
-        }
+        $account = $this->ownAccount($accountId);
 
         try {
             return Nuki::as($account->account_key)->smartlocks()->all()
@@ -151,6 +158,8 @@ class SubUserShow extends Component
             'weekdays.*' => 'string|in:ma,di,wo,do,vr,za,zo',
         ]);
 
+        $this->ownAccount((int) $this->accountId);
+
         $attributes = [
             'nuki_user_id' => $sub->id,
             'nuki_account_id' => $this->accountId,
@@ -176,7 +185,9 @@ class SubUserShow extends Component
             );
             session()->flash('status', __('nuki::nuki.flash.access_added'));
         } else {
-            NukiUserSmartlockAccess::where('id', $this->editingAccessId)->update($attributes);
+            // Through the sub user's own rows: editingAccessId comes from the browser, and an
+            // unscoped update would rewrite the row of somebody else's sub user.
+            $sub->smartlockAccess()->where('id', $this->editingAccessId)->update($attributes);
             session()->flash('status', __('nuki::nuki.flash.access_updated'));
         }
 
@@ -195,6 +206,21 @@ class SubUserShow extends Component
         $sub->smartlockAccess()->where('id', $accessId)->delete();
         session()->flash('status', __('nuki::nuki.flash.access_deleted'));
         unset($this->accessRows);
+    }
+
+    /**
+     * The account, when the signed in main user is attached to it. Anything else is a 403: the
+     * id comes from the browser.
+     */
+    private function ownAccount(int $accountId): NukiAccount
+    {
+        $account = $this->accounts()->firstWhere('id', $accountId);
+
+        if (! $account instanceof NukiAccount) {
+            abort(403);
+        }
+
+        return $account;
     }
 
     private function parent(): ?NukiUser

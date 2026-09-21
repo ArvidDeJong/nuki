@@ -480,6 +480,7 @@ return [
             'name' => 'Naam',
             'password' => 'Wachtwoord (min 8 tekens)',
             'created' => 'Hoofdgebruiker :email aangemaakt (id :id).',
+            'unknown_account' => 'Onbekende accountsleutel: :keys. Er is niets aangemaakt.',
         ],
         'oauth_authorize' => [
             'open_url' => 'Open de volgende URL in je browser:',

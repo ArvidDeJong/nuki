@@ -19,6 +19,7 @@ use Darvis\Nuki\Contracts\Authenticator;
 use Darvis\Nuki\Contracts\TokenStore;
 use Darvis\Nuki\Exceptions\NukiException;
 use Darvis\Nuki\Http\HttpClient;
+use Darvis\Nuki\Http\Middleware\AuthenticateNukiUser;
 use Darvis\Nuki\Http\Middleware\AuthorizeUi;
 use Darvis\Nuki\Livewire\AccountsIndex;
 use Darvis\Nuki\Livewire\AccountSwitcher;
@@ -216,6 +217,10 @@ class NukiServiceProvider extends ServiceProvider
         if (! $this->app->bound('livewire')) {
             return;
         }
+
+        // Livewire keeps Laravel's own Authenticate on its update requests, not a subclass of it.
+        // Without this line a page that was loaded by a signed in user keeps working after logout.
+        Livewire::addPersistentMiddleware([AuthenticateNukiUser::class]);
 
         Livewire::component('nuki.auth.login', LoginPage::class);
         Livewire::component('nuki.auth.otp', LoginOtpPage::class);

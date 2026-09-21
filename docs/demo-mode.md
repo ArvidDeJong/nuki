@@ -72,9 +72,10 @@ php artisan vendor:publish --tag=nuki-seeders
 ## Auth users in demo mode
 
 Demo mode seeds no users. With `NUKI_AUTH_USERS_ENABLED=true`, create a main user with
-`php artisan nuki:user-create` and
-[attach it to the seeded accounts](users-and-permissions.md#attach-a-main-user-to-an-account);
-without that the user only has `default`. Then add sub users on `/nuki/sub-users`.
+`php artisan nuki:user-create --account=werkplaats --account=vakantiehuis --account=klant-bakkerij`
+after the seeder has run; the `--account` option
+[attaches the user to the seeded accounts](users-and-permissions.md#attach-a-main-user-to-an-account).
+Without it the user only has `default`. Then add sub users on `/nuki/sub-users`.
 
 ## Who may open the demo
 

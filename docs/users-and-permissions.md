@@ -27,10 +27,12 @@ The package's guard is separate from your application's users: a `NukiUser` is n
 2. Make sure your application can send mail. Signing in needs two mails: a confirmation link the
    first time, and a login code every time.
 3. Create the user: `php artisan nuki:user-create --email=admin@example.com --name=Admin`. The
-   command asks for the password.
+   command asks for the password. Add `--account=<account_key>` for every existing account the
+   user works in.
 4. Open `/nuki/login` and sign in. The first attempt sends a confirmation link and shows "Confirm
    your email address"; open the link, sign in again and enter the emailed code.
-5. [Attach the user to the NUKI accounts](#attach-a-main-user-to-an-account) they work in.
+5. Create the NUKI accounts on `/nuki/accounts`; the user who creates one is attached to it. For
+   accounts that already exist, see [Attach a main user to an account](#attach-a-main-user-to-an-account).
 
 ## The model in one picture
 
@@ -86,11 +88,9 @@ When this flag is on, [NukiServiceProvider](https://github.com/ArvidDeJong/nuki/
 
 2. Loads [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) — see [Auth routes](auth-routes.md).
 
-3. Adds the `auth:darvis-nuki` middleware to every UI route from
-   [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php). A visitor who is not signed in is
-   then redirected by Laravel to the `login` route of **your application**, not to `/nuki/login`;
-   see [Where a guest is sent](auth-routes.md#where-a-guest-is-sent) for the three lines that
-   change that.
+3. Puts every UI route from [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) behind the
+   `darvis-nuki` guard. A visitor who is not signed in is redirected to `/nuki/login`; see
+   [Where a guest is sent](auth-routes.md#where-a-guest-is-sent) for versions before 1.3.0.
 
 4. Registers the auth Livewire components (`nuki.auth.login`,
    `nuki.auth.otp`, `nuki.auth.register`, `nuki.auth.forgot-password`,
@@ -280,8 +280,15 @@ What the bundled pages enforce for a package user:
 - The account switcher lists the user's accessible accounts only, and switching to any other key
   than `default` or one of those is a `403`. The same check runs in every
   `nuki-account-changed` handler, because the browser can send that event too.
-- `AccountsIndex` (API tokens) and `WebhooksIndex` are for a main user: a sub user gets a `403`
-  on the page and on every action, and the navigation hides both links.
+- `AccountsIndex` (API tokens), `WebhooksIndex` and `OAuthConnect` are for a main user: a sub user
+  gets a `403` on the page and on every action, and the navigation hides the links.
+- `Dashboard` counts and lists only the locks a sub user has an active row for, and its recent
+  activity only has entries of locks with `view_logs`.
+- `ActivityTimeline` only shows entries of locks with `view_logs`, only offers those locks in its
+  filter, and answers `403` for a `?lock=` filter on any other lock.
+- `SubUsersIndex` and `SubUserShow` are for a main user, on every request. The sub user editor
+  only offers the accounts the main user is attached to, and giving access on another account, or
+  changing a row of somebody else's sub user, is refused.
 
 ## The emailed login code (OTP)
 
@@ -369,7 +376,8 @@ Always creates a **main** user (`parent_id = null`, `is_active = true`).
 
 Once the main user logs in, `/nuki/sub-users` lists their sub users and
 `/nuki/sub-users/{id}` is the editor for one of them: a row per smartlock with the account it is
-on, the four permissions, the period and the weekday grid. Components:
+on, the four permissions, the period and the weekday grid. The editor offers the accounts the
+main user is attached to, so attach the main user first. Components:
 [SubUsersIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUsersIndex.php),
 [SubUserShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUserShow.php).
 
@@ -426,13 +434,18 @@ The table `nuki_user_account` links a user to a NUKI account, with a free-form `
 (default `member`; the package does not read the role). Source:
 [migration](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000300_create_nuki_user_account_table.php).
 
-**Nothing in the package fills this table.** Creating an account on the `/nuki/accounts` page does
-not attach the main user who created it, and `nuki:user-create` attaches nothing either. Until you
-attach one, a package user has no accessible accounts: the account switcher lists only `default`,
-and switching to any other account answers `403`.
+A package user only sees, and can only switch to, the accounts they are attached to (plus
+`default`). Since version 1.3.0 the package attaches in two places, both with the role `owner`
+(`NukiAccount::ROLE_OWNER`):
 
-So after you create an account or a main user, attach them yourself, for example in
-`php artisan tinker` or in a seeder:
+- A main user who creates an account on the `/nuki/accounts` page is attached to it.
+- `php artisan nuki:user-create --account=office --account=workshop` attaches the new main user
+  to existing accounts. An unknown key is an error, and nothing is created then.
+
+Everything else is still yours to attach: an account made before 1.3.0 or in code, a second main
+user on an existing account, a sub user who needs an account their parent does not have. **If you
+attached users by hand before 1.3.0, nothing changes for you**; those rows are left as they are.
+In `php artisan tinker` or in a seeder:
 
 ```php
 use Darvis\Nuki\Models\NukiAccount;

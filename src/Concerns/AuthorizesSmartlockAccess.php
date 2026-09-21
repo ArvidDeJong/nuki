@@ -36,6 +36,26 @@ trait AuthorizesSmartlockAccess
         return $user->accessibleSmartlockIds($accountId);
     }
 
+    /**
+     * Smartlock ids the current user holds the given permission on, within the given account.
+     * Null is the wildcard, as in userAccessibleSmartlockIds().
+     *
+     * @return array<int, int>|null
+     */
+    protected function userSmartlockIdsWithPermission(string $accountKey, string $permission): ?array
+    {
+        $accessible = $this->userAccessibleSmartlockIds($accountKey);
+
+        if ($accessible === null) {
+            return null;
+        }
+
+        return array_values(array_filter(
+            $accessible,
+            fn (int $smartlockId): bool => $this->userCanAccessSmartlock($accountKey, $smartlockId, $permission),
+        ));
+    }
+
     protected function userCanAccessSmartlock(string $accountKey, int $smartlockId, string $permission): bool
     {
         $user = $this->currentNukiAuthUser();

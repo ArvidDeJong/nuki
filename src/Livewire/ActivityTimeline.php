@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Darvis\Nuki\Livewire;
 
 use Carbon\CarbonImmutable;
+use Darvis\Nuki\Concerns\AuthorizesSmartlockAccess;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\DTOs\LogEntry;
+use Darvis\Nuki\DTOs\SmartLock;
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
@@ -18,6 +20,7 @@ use Livewire\Component;
 
 class ActivityTimeline extends Component
 {
+    use AuthorizesSmartlockAccess;
     use UsesNukiAccount;
 
     #[Url(as: 'lock')]
@@ -49,12 +52,23 @@ class ActivityTimeline extends Component
     public function smartlocks(): Collection
     {
         try {
-            return Nuki::as($this->accountKey)->smartlocks()->all();
+            $locks = Nuki::as($this->accountKey)->smartlocks()->all();
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
 
             return collect();
         }
+
+        // The filter only offers locks whose log the user may read.
+        $readable = $this->userSmartlockIdsWithPermission($this->accountKey, 'view_logs');
+
+        if ($readable === null) {
+            return $locks;
+        }
+
+        return $locks
+            ->filter(fn (SmartLock $lock): bool => in_array($lock->smartlockId, $readable, true))
+            ->values();
     }
 
     /**
@@ -63,6 +77,18 @@ class ActivityTimeline extends Component
     #[Computed]
     public function logs(): Collection
     {
+        // The filter comes from the address bar, so it is checked, not trusted. Outside the try:
+        // abort() throws, and the catch below would swallow it.
+        if ($this->smartlockId !== null) {
+            $this->assertCan($this->accountKey, $this->smartlockId, 'view_logs');
+        }
+
+        $readable = $this->userSmartlockIdsWithPermission($this->accountKey, 'view_logs');
+
+        if ($readable === []) {
+            return collect();
+        }
+
         try {
             $filters = ['limit' => 100];
             if ($this->smartlockId !== null) {
@@ -80,6 +106,8 @@ class ActivityTimeline extends Component
 
         return $logs
             ->filter(fn (LogEntry $log) => $log->date === null || $log->date->greaterThanOrEqualTo($cutoff))
+            // One call for the whole account; a sub user's entries are picked out here.
+            ->filter(fn (LogEntry $log) => $readable === null || in_array($log->smartlockId, $readable, true))
             ->values();
     }
 
