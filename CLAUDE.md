@@ -136,6 +136,7 @@ When adding a new NUKI endpoint, also add a corresponding branch in `DemoFixture
 - Resources are stateless; create via the manager, don't cache instances on long-lived objects.
 - Config keys are sorted alphabetically at every level in [config/nuki.php](config/nuki.php).
 - [NukiConfig](src/Support/NukiConfig.php) is the only place in the package that reads the config. Add an accessor there instead of calling `config('nuki.…')` anywhere else; a test in [tests/Feature/ConfigAccessorTest.php](tests/Feature/ConfigAccessorTest.php) walks `src/`, `resources/`, `routes/` and `database/` and fails the build on a direct read.
+- [docs/](docs/) is the GitHub Pages site, served from `main` and `/docs`. Every page needs front matter with a unique `description` and `nav_order`, facts live once in [docs/_config.yml](docs/_config.yml) and [docs/_data/faq.yml](docs/_data/faq.yml), and a link to a source file is an absolute GitHub URL, because a relative `../` path leaves the site. [tests/DocsSiteTest.php](tests/DocsSiteTest.php) checks all of that.
 - [README.md](README.md) and [CHANGELOG.md](CHANGELOG.md) are written in English. Update `CHANGELOG.md` for any behavioural change.
 
 ## Caveats

@@ -1,6 +1,10 @@
-# NUKI API authentication
+---
+title: API authentication
+nav_order: 4
+description: "Personal API token against OAuth 2.0, the swappable Authenticator, TokenStore and ApiTokenResolver contracts, and scoping calls to one account."
+---
 
-[← Documentation index](README.md)
+# NUKI API authentication
 
 This page is about authenticating **the package against the NUKI Web API**. For
 the package's own end-user login system, see
@@ -14,22 +18,22 @@ The package supports two strategies, selected by the `NUKI_AUTH` env var (the
 | `token` | Single account, or a fixed list of accounts you manage internally. You generate one personal API token per customer on [web.nuki.io](https://web.nuki.io/). Simplest setup. |
 | `oauth` | Multi-account SaaS. Customers consent through NUKI's OAuth Authorization Code flow and your app stores access + refresh tokens per account. |
 
-Both modes go through the same surface: [Contracts\Authenticator](../src/Contracts/Authenticator.php),
+Both modes go through the same surface: [Contracts\Authenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/Authenticator.php),
 which gets a fresh `PendingRequest` and an `accountKey` and attaches whatever
 header is appropriate. Every outbound call from a [resource](api-reference.md)
-goes through [HttpClient](../src/Http/HttpClient.php), which calls the
+goes through [HttpClient](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/HttpClient.php), which calls the
 authenticator before sending.
 
 ## Token mode (`NUKI_AUTH=token`)
 
-[TokenAuthenticator](../src/Auth/TokenAuthenticator.php) attaches
+[TokenAuthenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/TokenAuthenticator.php) attaches
 `Authorization: Bearer …` on every request. The token comes from an
-[ApiTokenResolver](../src/Contracts/ApiTokenResolver.php) keyed by
+[ApiTokenResolver](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/ApiTokenResolver.php) keyed by
 `accountKey`. Two resolvers ship:
 
 ### Config resolver (`NUKI_TOKEN_RESOLVER=config`)
 
-[ConfigApiTokenResolver](../src/Auth/ConfigApiTokenResolver.php) returns
+[ConfigApiTokenResolver](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/ConfigApiTokenResolver.php) returns
 `NukiConfig::apiToken()` for **every** account key. Use this when you only
 manage one NUKI account — there is no database table, nothing to seed, nothing
 to encrypt.
@@ -42,10 +46,10 @@ NUKI_API_TOKEN=abc123def456
 
 ### Database resolver (`NUKI_TOKEN_RESOLVER=database`)
 
-[DatabaseApiTokenResolver](../src/Auth/DatabaseApiTokenResolver.php) looks the
+[DatabaseApiTokenResolver](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/DatabaseApiTokenResolver.php) looks the
 token up on `nuki_accounts.api_token` by `account_key`. The column is encrypted
 via Eloquent's `encrypted` cast (see
-[NukiAccount](../src/Models/NukiAccount.php)), so your `APP_KEY` is required to
+[NukiAccount](https://github.com/ArvidDeJong/nuki/blob/main/src/Models/NukiAccount.php)), so your `APP_KEY` is required to
 decrypt it.
 
 It falls back to `NukiConfig::apiToken()` for the literal `default` account key
@@ -74,10 +78,10 @@ See [`Nuki::as()`](#multi-account-scoping-with-nukias) below.
 
 ## OAuth mode (`NUKI_AUTH=oauth`)
 
-[OAuthAuthenticator](../src/Auth/OAuthAuthenticator.php) reads a stored
-[NukiToken](../src/DTOs/NukiToken.php) for the given `accountKey` from a
-[TokenStore](../src/Contracts/TokenStore.php), refreshes it when expired (with
-a **30-second leeway** — see [NukiToken::isExpired()](../src/DTOs/NukiToken.php))
+[OAuthAuthenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/OAuthAuthenticator.php) reads a stored
+[NukiToken](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/NukiToken.php) for the given `accountKey` from a
+[TokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/TokenStore.php), refreshes it when expired (with
+a **30-second leeway** — see [NukiToken::isExpired()](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/NukiToken.php))
 and attaches `Authorization: Bearer …`. If no token is stored and you call a
 resource, `AuthenticationException` is thrown with a helpful message pointing
 at `nuki:oauth-authorize`.
@@ -103,7 +107,7 @@ Default scopes (override in `config/nuki.php`):
 
 ### CLI flow — `php artisan nuki:oauth-authorize`
 
-[NukiOAuthAuthorizeCommand](../src/Console/Commands/NukiOAuthAuthorizeCommand.php)
+[NukiOAuthAuthorizeCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiOAuthAuthorizeCommand.php)
 walks you through the authorization-code dance from the terminal:
 
 ```bash
@@ -119,7 +123,7 @@ captured.
 
 ### In-app flow
 
-For end-user consent in your app's UI, use [OAuth](../src/Resources/OAuth.php)
+For end-user consent in your app's UI, use [OAuth](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/OAuth.php)
 directly:
 
 ```php
@@ -152,9 +156,9 @@ Selected by `nuki.oauth.token_store`:
 | `database` | `nuki_oauth_tokens` table — one row per `account_key` with encrypted `access_token` / `refresh_token` columns | Multi-account SaaS. Survives cache flushes. |
 
 The implementations are
-[CacheTokenStore](../src/Auth/CacheTokenStore.php) and
-[DatabaseTokenStore](../src/Auth/DatabaseTokenStore.php). Both implement
-[TokenStore](../src/Contracts/TokenStore.php) (`get`, `put`, `forget`).
+[CacheTokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/CacheTokenStore.php) and
+[DatabaseTokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/DatabaseTokenStore.php). Both implement
+[TokenStore](https://github.com/ArvidDeJong/nuki/blob/main/src/Contracts/TokenStore.php) (`get`, `put`, `forget`).
 
 ## Multi-account scoping with `Nuki::as()`
 
@@ -189,11 +193,11 @@ useful when you pass the manager into a helper.
 
 ## Errors
 
-All exceptions inherit from [NukiException](../src/Exceptions/NukiException.php):
+All exceptions inherit from [NukiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/NukiException.php):
 
-- [AuthenticationException](../src/Exceptions/AuthenticationException.php) —
+- [AuthenticationException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/AuthenticationException.php) —
   no token configured, OAuth refresh failed, expired token cannot be refreshed.
-- [ApiException](../src/Exceptions/ApiException.php) — non-success HTTP
+- [ApiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/ApiException.php) — non-success HTTP
   response from NUKI; carries the status code and parsed body.
 
 `HttpClient` already retries connection failures, HTTP 429 and 5xx responses

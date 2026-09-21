@@ -1,12 +1,16 @@
-# Troubleshooting
+---
+title: Troubleshooting
+nav_order: 11
+description: "What the common errors mean, from a missing token to a webhook that never arrives, and how to resolve them."
+---
 
-[← Documentation index](README.md)
+# Troubleshooting
 
 Common errors with the root cause and the fix.
 
 ## `AuthenticationException: No NUKI API token configured for account [default]`
 
-Thrown by [TokenAuthenticator](../src/Auth/TokenAuthenticator.php) when the
+Thrown by [TokenAuthenticator](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/TokenAuthenticator.php) when the
 resolver returns an empty string.
 
 - **`token_resolver=config`** — set `NUKI_API_TOKEN` in `.env`.
@@ -57,7 +61,7 @@ NUKI rejected the credentials.
 
 You're trying to redirect to the auth UI but haven't enabled the feature.
 Set `NUKI_AUTH_USERS_ENABLED=true` and run `php artisan migrate`. The
-service provider only loads [routes/auth.php](../routes/auth.php) when this
+service provider only loads [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) when this
 flag is on.
 
 ## `Auth guard [darvis-nuki] is not defined`
@@ -139,7 +143,7 @@ If the rows exist but the lock is still hidden, check:
 - `allowed_until` is null or in the future.
 - `allowed_weekdays` is null/0, **or** today's bit is set
   (e.g. Wednesday = bit 16; check
-  [WeekdayBitmask](../src/Support/WeekdayBitmask.php)).
+  [WeekdayBitmask](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/WeekdayBitmask.php)).
 
 ## Demo mode UI is empty
 
@@ -173,7 +177,7 @@ combo, and divergence will cause flakes.
 
 ## Still stuck
 
-- Check [CHANGELOG.md](../CHANGELOG.md) — the symptom may be a known
+- Check [CHANGELOG.md](https://github.com/ArvidDeJong/nuki/blob/main/CHANGELOG.md) — the symptom may be a known
   regression with a fix in a newer minor.
 - Read the file mentioned in the exception's trace — the source is the
   source of truth, this documentation can lag.

@@ -1,6 +1,10 @@
-# UI and localization
+---
+title: UI and localization
+nav_order: 9
+description: "The bundled Livewire pages, the four shipped languages, swapping the layout and scoping a page to one account."
+---
 
-[← Documentation index](README.md)
+# UI and localization
 
 ## Toggling the bundled UI
 
@@ -11,7 +15,7 @@ client:
 NUKI_UI_ENABLED=false
 ```
 
-When enabled, [routes/web.php](../routes/web.php) is loaded and Livewire
+When enabled, [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) is loaded and Livewire
 components are registered under `nuki.*` aliases.
 
 URL prefix: `nuki.ui.prefix` (default `nuki`). Layout: `nuki.ui.layout`
@@ -21,33 +25,33 @@ URL prefix: `nuki.ui.prefix` (default `nuki`). Layout: `nuki.ui.layout`
 ## Bundled Livewire components
 
 Auto-registered with `nuki.*` aliases by
-[NukiServiceProvider](../src/NukiServiceProvider.php).
+[NukiServiceProvider](https://github.com/ArvidDeJong/nuki/blob/main/src/NukiServiceProvider.php).
 
 ### Main UI
 
 | Alias | Class | Route | Purpose |
 |---|---|---|---|
-| `nuki.dashboard` | [Dashboard](../src/Livewire/Dashboard.php) | `/dashboard` | KPI cards (total locks, locked, critical battery, open doors), recent activity feed, per-lock battery bars. |
-| `nuki.smartlocks-index` | [SmartlocksIndex](../src/Livewire/SmartlocksIndex.php) | `/` | List of smartlocks; filtered for sub users. Quick lock/unlock actions. |
-| `nuki.smartlock-show` | [SmartlockShow](../src/Livewire/SmartlockShow.php) | `/smartlocks/{id}` | Single-lock detail: state, recent logs, authorizations, rename + sync buttons. |
-| `nuki.activity-timeline` | [ActivityTimeline](../src/Livewire/ActivityTimeline.php) | `/activity` | Visual timeline grouped per day; filter by lock or period. |
-| `nuki.webhooks-index` | [WebhooksIndex](../src/Livewire/WebhooksIndex.php) | `/webhooks` | List + manage NUKI webhook subscriptions. |
-| `nuki.oauth-connect` | [OAuthConnect](../src/Livewire/OAuthConnect.php) | `/oauth/connect` | UI entry point for the OAuth dance (only meaningful when `NUKI_AUTH=oauth`). |
-| `nuki.accounts-index` | [AccountsIndex](../src/Livewire/AccountsIndex.php) | `/accounts` | CRUD for `nuki_accounts` (token mode, multi-account). |
-| `nuki.account-switcher` | [AccountSwitcher](../src/Livewire/AccountSwitcher.php) | — | Dropdown used in the top navigation; dispatches the `nuki-account-changed` Livewire event. |
+| `nuki.dashboard` | [Dashboard](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Dashboard.php) | `/dashboard` | KPI cards (total locks, locked, critical battery, open doors), recent activity feed, per-lock battery bars. |
+| `nuki.smartlocks-index` | [SmartlocksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlocksIndex.php) | `/` | List of smartlocks; filtered for sub users. Quick lock/unlock actions. |
+| `nuki.smartlock-show` | [SmartlockShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlockShow.php) | `/smartlocks/{id}` | Single-lock detail: state, recent logs, authorizations, rename + sync buttons. |
+| `nuki.activity-timeline` | [ActivityTimeline](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ActivityTimeline.php) | `/activity` | Visual timeline grouped per day; filter by lock or period. |
+| `nuki.webhooks-index` | [WebhooksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/WebhooksIndex.php) | `/webhooks` | List + manage NUKI webhook subscriptions. |
+| `nuki.oauth-connect` | [OAuthConnect](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/OAuthConnect.php) | `/oauth/connect` | UI entry point for the OAuth dance (only meaningful when `NUKI_AUTH=oauth`). |
+| `nuki.accounts-index` | [AccountsIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountsIndex.php) | `/accounts` | CRUD for `nuki_accounts` (token mode, multi-account). |
+| `nuki.account-switcher` | [AccountSwitcher](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountSwitcher.php) | — | Dropdown used in the top navigation; dispatches the `nuki-account-changed` Livewire event. |
 
 ### Auth UI (only when `NUKI_AUTH_USERS_ENABLED=true`)
 
 | Alias | Class | Route |
 |---|---|---|
-| `nuki.auth.login` | [LoginPage](../src/Livewire/Auth/LoginPage.php) | `/login` |
-| `nuki.auth.otp` | [LoginOtpPage](../src/Livewire/Auth/LoginOtpPage.php) | `/login/otp` |
-| `nuki.auth.register` | [RegisterPage](../src/Livewire/Auth/RegisterPage.php) | `/register` |
-| `nuki.auth.forgot-password` | [ForgotPasswordPage](../src/Livewire/Auth/ForgotPasswordPage.php) | `/password/forgot` |
-| `nuki.auth.reset-password` | [ResetPasswordPage](../src/Livewire/Auth/ResetPasswordPage.php) | `/password/reset/{token}` |
-| `nuki.profile` | [ProfilePage](../src/Livewire/ProfilePage.php) | `/profile` |
-| `nuki.sub-users-index` | [SubUsersIndex](../src/Livewire/SubUsersIndex.php) | `/sub-users` |
-| `nuki.sub-user-show` | [SubUserShow](../src/Livewire/SubUserShow.php) | `/sub-users/{id}` |
+| `nuki.auth.login` | [LoginPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginPage.php) | `/login` |
+| `nuki.auth.otp` | [LoginOtpPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginOtpPage.php) | `/login/otp` |
+| `nuki.auth.register` | [RegisterPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/RegisterPage.php) | `/register` |
+| `nuki.auth.forgot-password` | [ForgotPasswordPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/ForgotPasswordPage.php) | `/password/forgot` |
+| `nuki.auth.reset-password` | [ResetPasswordPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/ResetPasswordPage.php) | `/password/reset/{token}` |
+| `nuki.profile` | [ProfilePage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ProfilePage.php) | `/profile` |
+| `nuki.sub-users-index` | [SubUsersIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUsersIndex.php) | `/sub-users` |
+| `nuki.sub-user-show` | [SubUserShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUserShow.php) | `/sub-users/{id}` |
 
 You can embed any of these in your own Blade files:
 
@@ -57,7 +61,7 @@ You can embed any of these in your own Blade files:
 
 ## Account-aware components
 
-Use the [UsesNukiAccount](../src/Concerns/UsesNukiAccount.php) trait:
+Use the [UsesNukiAccount](https://github.com/ArvidDeJong/nuki/blob/main/src/Concerns/UsesNukiAccount.php) trait:
 
 ```php
 use Livewire\Attributes\On;
@@ -112,7 +116,7 @@ somewhere before `</body>`.
 ## Localization
 
 Four locales ship: `en`, `nl`, `de`, `es`. Resolution happens per request
-inside [SetLocale](../src/Http/Middleware/SetLocale.php), in this order:
+inside [SetLocale](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/SetLocale.php), in this order:
 
 1. The authenticated `NukiUser->locale` (when `NUKI_AUTH_USERS_ENABLED=true`).
 2. `session('nuki.locale')` for guests and anonymous flows.

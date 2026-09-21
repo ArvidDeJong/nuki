@@ -1,0 +1,54 @@
+# Questions as people ask them to an assistant. Short, factual answers.
+# Rendered on faq.md, in the FAQPage structured data and in llms.txt.
+- q: How do I open or close a NUKI smart lock from a Laravel application?
+  a: >-
+    Install `darvis/nuki`, put a personal API token in `NUKI_API_TOKEN`, and call the facade.
+    `Nuki::smartlocks()->all()` lists the locks on the account as `SmartLock` objects, and
+    `Nuki::smartlocks()->unlock($id)` and `lock($id)` send the action. Everything goes through the
+    NUKI Web API, so the lock needs a NUKI Bridge or a Smart Lock Pro that is online.
+
+- q: Where do I get the NUKI API token the package asks for?
+  a: >-
+    In the NUKI Web account of the customer, on web.nuki.io, under API. The token is personal and
+    gives access to every lock on that account, so treat it as a password and keep it in `.env`.
+    For more than one customer, store a token per account instead of one in the config.
+
+- q: Can one Laravel application manage the locks of several NUKI accounts?
+  a: >-
+    Yes. Set `NUKI_TOKEN_RESOLVER=database` and put a row per customer in the `nuki_accounts`
+    table, where the token is stored encrypted. `Nuki::as('tenant-42')` then scopes every call to
+    that account. OAuth 2.0 is the other multi account route, where each customer grants access
+    instead of pasting a token.
+
+- q: How do I receive NUKI webhooks in Laravel?
+  a: >-
+    Set `NUKI_WEBHOOK_ENABLED=true` and `NUKI_WEBHOOK_SECRET`, register the callback URL with
+    `php artisan nuki:webhook-register`, and listen for the `NukiWebhookReceived` event. The
+    receiver checks the HMAC signature, ignores a repeat delivery of the same event id and then
+    dispatches. Without a secret it rejects every request, so the route is never open by accident.
+
+- q: Does the package come with a user interface?
+  a: >-
+    Yes, a set of Livewire pages built with Flux, under `/nuki` by default. There is a dashboard,
+    a smartlock list and detail page, an activity timeline, a webhook subscription page and an
+    account page. They are ordinary Livewire components, so you can render them in your own layout
+    or switch the whole UI off and use only the API.
+
+- q: Can I give my own users access to one specific lock without touching the NUKI account?
+  a: >-
+    Yes. Switch on `NUKI_AUTH_USERS_ENABLED` and the package registers its own `darvis-nuki` auth
+    guard with login, OTP, registration and password reset. A main user can add sub users and give
+    each of them lock, unlock, log and authorization rights per smartlock, with a validity window
+    and a weekday pattern. Those permissions live in your database only; nothing is written back
+    to NUKI.
+
+- q: Can I try the package without owning a NUKI lock?
+  a: >-
+    Yes. With `NUKI_DEMO=true` every call to the NUKI Web API is answered by the bundled fixtures
+    with plausible locks, logs and authorizations, and the seeder fills the database to match. It
+    is meant for screenshots and demos, never for production.
+
+- q: Which PHP and Laravel versions does darvis/nuki support?
+  a: >-
+    PHP 8.2 or higher, Laravel 11, 12 and 13, Livewire 3 and 4, and Flux 2. Every combination runs
+    in CI, including the lowest versions the constraints allow.

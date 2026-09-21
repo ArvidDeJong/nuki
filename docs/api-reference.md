@@ -1,10 +1,14 @@
+---
+title: API reference
+nav_order: 5
+description: "Every public method on the smartlock, log, authorization, webhook, OAuth and account resources, and the DTOs they return."
+---
+
 # API reference
 
-[← Documentation index](README.md)
-
 Every interaction with the NUKI Web API runs through the
-[Nuki facade](../src/Facades/Nuki.php), which resolves a singleton
-[Nuki manager](../src/Nuki.php). The manager exposes six resource factories.
+[Nuki facade](https://github.com/ArvidDeJong/nuki/blob/main/src/Facades/Nuki.php), which resolves a singleton
+[Nuki manager](https://github.com/ArvidDeJong/nuki/blob/main/src/Nuki.php). The manager exposes six resource factories.
 Each resource is stateless — instantiate them via the manager, do not cache.
 
 ```php
@@ -33,7 +37,7 @@ Nuki::account();      // Account
 
 ## `SmartLocks`
 
-Source: [src/Resources/SmartLocks.php](../src/Resources/SmartLocks.php).
+Source: [src/Resources/SmartLocks.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/SmartLocks.php).
 
 | Method | Returns | Description |
 |---|---|---|
@@ -73,7 +77,7 @@ Nuki::smartlocks()->sync($lockId);
 
 ## `SmartlockLogs`
 
-Source: [src/Resources/SmartlockLogs.php](../src/Resources/SmartlockLogs.php).
+Source: [src/Resources/SmartlockLogs.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/SmartlockLogs.php).
 
 | Method | Returns | Description |
 |---|---|---|
@@ -89,7 +93,7 @@ $recent = Nuki::logs()->forSmartlock($id, [
 
 ## `SmartlockAuths`
 
-Source: [src/Resources/SmartlockAuths.php](../src/Resources/SmartlockAuths.php).
+Source: [src/Resources/SmartlockAuths.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/SmartlockAuths.php).
 
 | Method | Returns | Description |
 |---|---|---|
@@ -128,7 +132,7 @@ Nuki::auths()->create($lockId, [
 
 ## `Webhooks`
 
-Source: [src/Resources/Webhooks.php](../src/Resources/Webhooks.php). For the
+Source: [src/Resources/Webhooks.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/Webhooks.php). For the
 inbound side (receiving callbacks from NUKI) see [Webhooks](webhooks.md).
 
 | Method | Returns | Description |
@@ -143,7 +147,7 @@ docs for the authoritative list.
 
 ## `OAuth`
 
-Source: [src/Resources/OAuth.php](../src/Resources/OAuth.php). Only relevant
+Source: [src/Resources/OAuth.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/OAuth.php). Only relevant
 when `NUKI_AUTH=oauth`.
 
 | Method | Returns | Description |
@@ -156,7 +160,7 @@ when `NUKI_AUTH=oauth`.
 
 ## `Account`
 
-Source: [src/Resources/Account.php](../src/Resources/Account.php).
+Source: [src/Resources/Account.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/Account.php).
 
 | Method | Returns | Description |
 |---|---|---|
@@ -165,13 +169,13 @@ Source: [src/Resources/Account.php](../src/Resources/Account.php).
 ## DTOs
 
 All response shapes map onto readonly classes under
-[src/DTOs/](../src/DTOs/). Every DTO has a static `fromArray(array $data)`
+[src/DTOs/](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/). Every DTO has a static `fromArray(array $data)`
 factory and exposes the raw NUKI payload under `$raw` for fields the typed
 properties don't cover yet.
 
 ### `SmartLock`
 
-[src/DTOs/SmartLock.php](../src/DTOs/SmartLock.php)
+[src/DTOs/SmartLock.php](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/SmartLock.php)
 
 Main fields: `smartlockId`, `accountId`, `type`, `authId`, `name`,
 `favourite`, `state`, `stateName`, `batteryCharge`, `batteryCritical`,
@@ -186,14 +190,14 @@ Device-type constants: `TYPE_SMARTLOCK` (0), `TYPE_OPENER` (2),
 
 ### `LogEntry`
 
-[src/DTOs/LogEntry.php](../src/DTOs/LogEntry.php)
+[src/DTOs/LogEntry.php](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/LogEntry.php)
 
 Main fields: `id`, `smartlockId`, `accountUserId`, `authId`, `authType`,
 `name`, `action`, `trigger`, `state`, `autoUnlock`, `date`, `source`, `raw`.
 
 ### `Authorization`
 
-[src/DTOs/Authorization.php](../src/DTOs/Authorization.php)
+[src/DTOs/Authorization.php](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/Authorization.php)
 
 Main fields: `id`, `smartlockId`, `authId`, `code`, `type`, `name`,
 `enabled`, `remoteAllowed`, `allowedFromDate`, `allowedUntilDate`,
@@ -202,13 +206,13 @@ Main fields: `id`, `smartlockId`, `authId`, `code`, `type`, `name`,
 
 ### `WebhookSubscription`
 
-[src/DTOs/WebhookSubscription.php](../src/DTOs/WebhookSubscription.php)
+[src/DTOs/WebhookSubscription.php](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/WebhookSubscription.php)
 
 Fields: `id`, `callbackUrl`, `events`, `creationDate`, `raw`.
 
 ### `NukiToken`
 
-[src/DTOs/NukiToken.php](../src/DTOs/NukiToken.php)
+[src/DTOs/NukiToken.php](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/NukiToken.php)
 
 Fields: `accessToken`, `refreshToken`, `expiresAt` (CarbonImmutable),
 `tokenType`, `scope`.
@@ -217,7 +221,7 @@ Helpers: `isExpired(int $leewaySeconds = 30)`, `toArray()`.
 
 ### `AccountInfo`
 
-[src/DTOs/AccountInfo.php](../src/DTOs/AccountInfo.php)
+[src/DTOs/AccountInfo.php](https://github.com/ArvidDeJong/nuki/blob/main/src/DTOs/AccountInfo.php)
 
 Fields: `accountId`, `email`, `name`, `language`, `creationDate`, `raw`.
 
@@ -229,18 +233,18 @@ Three commands ship with the package:
 
 | Command | Description |
 |---|---|
-| `nuki:oauth-authorize` | Interactive OAuth authorization-code dance from the terminal. Options: `--account=<key>` (default `default`), `--code=<code>` (skip prompt). See [NukiOAuthAuthorizeCommand](../src/Console/Commands/NukiOAuthAuthorizeCommand.php). |
-| `nuki:user-create` | Create the first main `NukiUser` for the package's own auth guard. Options: `--email`, `--name`, `--password`, `--no-2fa`. See [NukiUserCreateCommand](../src/Console/Commands/NukiUserCreateCommand.php) and [Users and permissions](users-and-permissions.md). |
-| `nuki:webhook-register` | Register a callback URL with NUKI. Argument: optional `url` (defaults to `APP_URL` + `nuki.webhook.route`). Options: `--account=<key>`, `--events=<list>` (default `DEVICE_STATUS`, `DEVICE_CONFIG`, `DEVICE_LOGS`, `ACCOUNT_USER`). See [NukiWebhookRegisterCommand](../src/Console/Commands/NukiWebhookRegisterCommand.php). |
+| `nuki:oauth-authorize` | Interactive OAuth authorization-code dance from the terminal. Options: `--account=<key>` (default `default`), `--code=<code>` (skip prompt). See [NukiOAuthAuthorizeCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiOAuthAuthorizeCommand.php). |
+| `nuki:user-create` | Create the first main `NukiUser` for the package's own auth guard. Options: `--email`, `--name`, `--password`, `--no-2fa`. See [NukiUserCreateCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiUserCreateCommand.php) and [Users and permissions](users-and-permissions.md). |
+| `nuki:webhook-register` | Register a callback URL with NUKI. Argument: optional `url` (defaults to `APP_URL` + `nuki.webhook.route`). Options: `--account=<key>`, `--events=<list>` (default `DEVICE_STATUS`, `DEVICE_CONFIG`, `DEVICE_LOGS`, `ACCOUNT_USER`). See [NukiWebhookRegisterCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiWebhookRegisterCommand.php). |
 
 ## Errors
 
-Hierarchy under [src/Exceptions/](../src/Exceptions/):
+Hierarchy under [src/Exceptions/](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/):
 
-- [NukiException](../src/Exceptions/NukiException.php) — base class.
-- [AuthenticationException](../src/Exceptions/AuthenticationException.php) —
+- [NukiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/NukiException.php) — base class.
+- [AuthenticationException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/AuthenticationException.php) —
   missing/expired token, failed OAuth exchange, invalid config.
-- [ApiException](../src/Exceptions/ApiException.php) — non-success HTTP from
+- [ApiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/ApiException.php) — non-success HTTP from
   NUKI; carries status and parsed body. Constructed via
   `ApiException::fromResponse($response)` inside `HttpClient`.
 

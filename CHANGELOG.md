@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `nuki.webhook.verify_signature` (default `true`). Set it to `false` to accept unsigned webhook
   requests, for example behind a gateway that already authenticates the caller. Only an explicit
   `false` switches the check off, so a typo leaves it on.
+- `docs/` is a GitHub Pages site (Just the Docs) instead of ten Markdown files with a hand written
+  index. The pages carry front matter with a title, a description and a navigation order, there is
+  an FAQ and an `llms.txt` generated from one `_data/faq.yml`, and links to the source now point at
+  GitHub so they keep working off the repository. A test guards the front matter, the YAML and the
+  single source facts, because an invalid value makes Jekyll abort the build while GitHub keeps
+  serving the last version that did build.
 
 ### Fixed
 - **The webhook receiver accepted every request while no secret was configured.** With
