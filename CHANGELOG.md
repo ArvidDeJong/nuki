@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-21
+
 ### Added
 - The package now carries the same tooling as the other darvis packages: Pint, Larastan level 8
   with a baseline for the existing code, the `test`, `lint`, `format` and `analyse` composer
