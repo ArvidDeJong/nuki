@@ -86,7 +86,8 @@ it('does not let the browser change the smartlock id', function () {
 })->throws(CannotUpdateLockedPropertyException::class);
 
 it('does not let the browser change the account key', function (string $component, array $parameters) {
-    Livewire::actingAs($this->sub, 'darvis-nuki')
+    // The connection page is for a main user only; the others are tried as the sub user.
+    Livewire::actingAs($component === OAuthConnect::class ? $this->main : $this->sub, 'darvis-nuki')
         ->test($component, $parameters)
         ->set('accountKey', 'customer-b');
 })->with([
@@ -120,7 +121,8 @@ it('shows logs and keypad codes to a sub user with that permission', function ()
 });
 
 it('refuses an account change event for an account the user has no access to', function (string $component, array $parameters) {
-    Livewire::actingAs($this->sub, 'darvis-nuki')
+    // Neither user is attached to customer-b. The connection page is for a main user only.
+    Livewire::actingAs($component === OAuthConnect::class ? $this->main : $this->sub, 'darvis-nuki')
         ->test($component, $parameters)
         ->dispatch('nuki-account-changed', accountKey: 'customer-b')
         ->assertForbidden();

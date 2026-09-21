@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Darvis\Nuki\Livewire\AccountsIndex;
+use Darvis\Nuki\Livewire\OAuthConnect;
 use Darvis\Nuki\Livewire\WebhooksIndex;
 use Darvis\Nuki\Models\NukiAccount;
 use Darvis\Nuki\Models\NukiUser;
@@ -116,4 +117,28 @@ it('hides the accounts and webhooks links from a sub user', function () {
         ->assertOk()
         ->assertSee(route('nuki.accounts.index'))
         ->assertSee(route('nuki.webhooks.index'));
+});
+
+it('refuses a sub user on the connection page, and opens it for a main user', function () {
+    Livewire::actingAs($this->sub, 'darvis-nuki')
+        ->test(OAuthConnect::class)
+        ->assertForbidden();
+
+    Livewire::actingAs($this->main, 'darvis-nuki')
+        ->test(OAuthConnect::class)
+        ->assertOk();
+});
+
+it('hides the connection link from a sub user', function () {
+    $this->withoutVite();
+
+    $this->actingAs($this->sub, 'darvis-nuki')
+        ->get(route('nuki.dashboard'))
+        ->assertOk()
+        ->assertDontSee(route('nuki.oauth.connect'));
+
+    $this->actingAs($this->main, 'darvis-nuki')
+        ->get(route('nuki.dashboard'))
+        ->assertOk()
+        ->assertSee(route('nuki.oauth.connect'));
 });

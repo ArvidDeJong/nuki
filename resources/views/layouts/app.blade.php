@@ -48,10 +48,12 @@
                     {{ __('nuki::nuki.nav.webhooks') }}
                 </flux:navbar.item>
             @endif
-            <flux:navbar.item icon="key" href="{{ route('nuki.oauth.connect') }}"
-                              :current="request()->routeIs('nuki.oauth.*')">
-                {{ __('nuki::nuki.nav.connection') }}
-            </flux:navbar.item>
+            @if ($navManage)
+                <flux:navbar.item icon="key" href="{{ route('nuki.oauth.connect') }}"
+                                  :current="request()->routeIs('nuki.oauth.*')">
+                    {{ __('nuki::nuki.nav.connection') }}
+                </flux:navbar.item>
+            @endif
         </flux:navbar>
 
         <flux:spacer />

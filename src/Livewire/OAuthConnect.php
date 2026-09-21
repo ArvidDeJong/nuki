@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Livewire;
 
+use Darvis\Nuki\Concerns\AuthorizesMainUser;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Support\NukiConfig;
@@ -15,6 +16,7 @@ use Livewire\Component;
 
 class OAuthConnect extends Component
 {
+    use AuthorizesMainUser;
     use UsesNukiAccount;
 
     public ?string $authorizeUrl = null;

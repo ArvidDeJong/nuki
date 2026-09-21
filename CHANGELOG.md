@@ -39,10 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   A published `config/nuki.php` keeps the value it has; set `'register_enabled' => false` there,
   or replace it with `env('NUKI_AUTH_USERS_REGISTER_ENABLED', false)`.
-- **A sub user could manage accounts, API tokens and webhooks.** The accounts and webhooks pages
-  did not look at who was signed in. With package users on they are now for a main user only: a
-  sub user gets a 403 on the page and on every action, and no longer sees the two links. Nothing
-  to do. Without package users nothing changes here; the `viewNuki` gate guards the pages.
+- **A sub user could manage accounts, API tokens, webhooks and the OAuth connection.** The
+  accounts, webhooks and connection pages did not look at who was signed in, so a sub user could
+  also disconnect the account's OAuth token. With package users on they are now for a main user
+  only: a sub user gets a 403 on the page and on every action, and no longer sees the three
+  links. Nothing to do. Without package users nothing changes here; the `viewNuki` gate guards the pages.
 - **A sub user could read the activity log and the keypad codes of a lock that was not theirs.**
   The smartlock page trusted a lock id and an account key that the browser could change, and loaded
   logs and authorizations without looking at the permissions. Both are locked now, the lock itself
@@ -60,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The bundled UI answers 403 outside the `local` environment until the application defines the
   `viewNuki` gate (only while `auth_users.enabled` is `false`). See Security above for the snippet.
 - `auth_users.register_enabled` defaults to `false` and reads `NUKI_AUTH_USERS_REGISTER_ENABLED`.
-- With package users on, a sub user no longer sees the accounts and webhooks links, the account
+- With package users on, a sub user no longer sees the accounts, webhooks and connection links, the account
   switcher only lists accessible accounts, and the smartlock page only offers the tabs the user
   has the permission for.
 - If you published the views (`nuki-views`), compare `layouts/app.blade.php`,
