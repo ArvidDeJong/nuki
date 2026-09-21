@@ -116,30 +116,35 @@
         </flux:card>
 
         {{-- Tab strip — no flux:tabs (Pro) — own Tailwind segmented control --}}
+        {{-- A tab is offered, and its data loaded, only with the permission for it; the component checks again. --}}
         <div class="inline-flex rounded-lg border border-zinc-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900">
-            <button
-                type="button"
-                wire:click="setTab('logs')"
-                class="rounded-md px-4 py-1.5 text-sm font-medium transition
-                    {{ $tab === 'logs'
-                        ? 'bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white'
-                        : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white' }}"
-            >
-                {{ __('nuki::nuki.smartlocks.tab_activity') }}
-            </button>
-            <button
-                type="button"
-                wire:click="setTab('auths')"
-                class="rounded-md px-4 py-1.5 text-sm font-medium transition
-                    {{ $tab === 'auths'
-                        ? 'bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white'
-                        : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white' }}"
-            >
-                {{ __('nuki::nuki.smartlocks.tab_auths') }}
-            </button>
+            @if ($this->canPerform('view_logs'))
+                <button
+                    type="button"
+                    wire:click="setTab('logs')"
+                    class="rounded-md px-4 py-1.5 text-sm font-medium transition
+                        {{ $tab === 'logs'
+                            ? 'bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white'
+                            : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white' }}"
+                >
+                    {{ __('nuki::nuki.smartlocks.tab_activity') }}
+                </button>
+            @endif
+            @if ($this->canPerform('manage_auths'))
+                <button
+                    type="button"
+                    wire:click="setTab('auths')"
+                    class="rounded-md px-4 py-1.5 text-sm font-medium transition
+                        {{ $tab === 'auths'
+                            ? 'bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white'
+                            : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white' }}"
+                >
+                    {{ __('nuki::nuki.smartlocks.tab_auths') }}
+                </button>
+            @endif
         </div>
 
-        @if ($tab === 'logs')
+        @if ($tab === 'logs' && $this->canPerform('view_logs'))
             <flux:card class="overflow-hidden p-0">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -176,7 +181,7 @@
                     </table>
                 </div>
             </flux:card>
-        @else
+        @elseif ($tab === 'auths' && $this->canPerform('manage_auths'))
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <flux:heading size="lg">{{ __('nuki::nuki.smartlocks.auths.heading') }}</flux:heading>

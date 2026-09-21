@@ -22,6 +22,40 @@ URL prefix: `nuki.ui.prefix` (default `nuki`). Layout: `nuki.ui.layout`
 (default `nuki::layouts.app`). See
 [Configuration → ui.\*](configuration.md#ui--bundled-livewire-ui).
 
+## Who may open the UI
+
+The pages lock and unlock doors and hold API tokens, so they are closed unless you open them,
+the same way Horizon, Telescope and Pulse are. Which rule applies depends on
+`auth_users.enabled`:
+
+- **`auth_users.enabled = false` (default).** Every UI route runs the
+  [AuthorizeUi](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/AuthorizeUi.php) middleware, which
+  asks the `viewNuki` gate and answers `403` when it says no. The package defines that gate only
+  when your application has not, and its default allows the `local` environment and nothing
+  else. To reach the UI anywhere else, define the gate yourself, for example in
+  `AppServiceProvider::boot()`:
+
+  ```php
+  use App\Models\User;
+  use Illuminate\Support\Facades\Gate;
+  
+  public function boot(): void
+  {
+      Gate::define('viewNuki', fn (?User $user) => $user?->is_admin === true);
+  }
+  ```
+
+  The gate receives the user of your application's default guard, or `null` for a guest. Keep
+  the parameter nullable (`?User $user`): Laravel does not call a gate for a guest otherwise, and
+  the answer is then always no. Put your own `auth` middleware in `ui.middleware` when a guest
+  should be sent to your login page instead of getting a `403`.
+- **`auth_users.enabled = true`.** The package's own `darvis-nuki` guard protects the pages and
+  the `viewNuki` gate is not asked. See [Users and permissions](users-and-permissions.md).
+
+The middleware is also registered as Livewire persistent middleware, so the requests a page sends
+after it was loaded are checked the same way. `ui.enabled` and `ui.middleware` work as before;
+`AuthorizeUi` runs after the middleware you list there.
+
 ## Bundled Livewire components
 
 Auto-registered with `nuki.*` aliases by
@@ -87,7 +121,8 @@ The trait:
   accessible account for the authenticated user).
 - Exposes `$availableAccounts` and `$currentAccountLabel` computed properties
   for use in Blade.
-- `AccountSwitcher` writes the new value to the session and broadcasts
+- `AccountSwitcher` writes the new value to the session (for a package user only when the account
+  is `default` or one of the user's accessible accounts, otherwise `403`) and broadcasts
   `nuki-account-changed`; any component listening with the attribute above
   re-renders.
 

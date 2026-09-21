@@ -239,7 +239,7 @@ The trait's surface:
 
 | Method | What it does |
 |---|---|
-| `userAccessibleSmartlockIds(string $accountKey): ?array` | `null` = no auth user / main user / unknown account (caller trusts the full list); array of ints = explicit allow-list. Use this to filter `Nuki::smartlocks()->all()` for sub users. |
+| `userAccessibleSmartlockIds(string $accountKey): ?array` | `null` = no auth user or a main user (caller trusts the full list); array of ints = explicit allow-list for a sub user, empty when the account key has no `nuki_accounts` row. Use this to filter `Nuki::smartlocks()->all()` for sub users. |
 | `userCanAccessSmartlock(string $accountKey, int $smartlockId, string $permission): bool` | `true` when no auth user is active, or the user is a main, or the sub has a matching active pivot row. |
 | `assertCan(string $accountKey, int $smartlockId, string $permission): void` | Calls `userCanAccessSmartlock`; `abort(403)` on `false`. |
 | `currentNukiAuthUser(): ?NukiUser` | The user behind the `darvis-nuki` guard, or `null` when the feature is off. |
@@ -247,6 +247,18 @@ The trait's surface:
 **Always re-check in the action handler**, even if the UI hides the button —
 the trait does this for `SmartlocksIndex`, `SmartlockShow` and others. The
 UI is a hint; the server is the line of defence.
+
+What the bundled pages enforce for a package user:
+
+- `SmartlockShow` loads the lock only with an active row for it, the activity tab only with
+  `view_logs` and the authorizations tab (keypad codes included) only with `manage_auths`;
+  anything else is a `403`. The `smartlockId` and `accountKey` properties are `#[Locked]`, so the
+  browser cannot point a mounted page at another lock or account.
+- The account switcher lists the user's accessible accounts only, and switching to any other key
+  than `default` or one of those is a `403`. The same check runs in every
+  `nuki-account-changed` handler, because the browser can send that event too.
+- `AccountsIndex` (API tokens) and `WebhooksIndex` are for a main user: a sub user gets a `403`
+  on the page and on every action, and the navigation hides both links.
 
 ## 5. Email OTP (2FA)
 
@@ -311,6 +323,10 @@ php artisan nuki:user-create \
 ```
 
 Add `--no-2fa` to disable email OTP for this user.
+
+The command is the way to create a main user. The `/nuki/register` page does the same for any
+visitor, which is why it is off by default: a main user may operate every lock. Switch it on with
+`NUKI_AUTH_USERS_REGISTER_ENABLED=true` only when every visitor with a mailbox may do that.
 
 Source: [NukiUserCreateCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiUserCreateCommand.php).
 Always creates a **main** user (`parent_id = null`, `is_active = true`).

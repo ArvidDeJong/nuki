@@ -64,6 +64,9 @@ when you only need a single account. For multi-account, use `database` and
 manage tokens via the bundled `/nuki/accounts` UI or by inserting rows into
 `nuki_accounts` directly. See [NUKI API authentication](nuki-api-authentication.md).
 
+The bundled UI answers `403` outside the `local` environment until you say who may open it. See
+[Who may open the UI](ui-and-localization.md#who-may-open-the-ui).
+
 ## Hello world
 
 ```php

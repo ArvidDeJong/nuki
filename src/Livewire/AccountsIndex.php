@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Livewire;
 
+use Darvis\Nuki\Concerns\AuthorizesMainUser;
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Models\NukiAccount;
 use Darvis\Nuki\Support\NukiConfig;
@@ -16,6 +17,8 @@ use Livewire\Component;
 
 class AccountsIndex extends Component
 {
+    use AuthorizesMainUser;
+
     /** @var array<string, array{status: string, message: string}> */
     public array $verification = [];
 

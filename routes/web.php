@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Darvis\Nuki\Http\Middleware\AuthorizeUi;
 use Darvis\Nuki\Http\Middleware\SetLocale;
 use Darvis\Nuki\Livewire\AccountsIndex;
 use Darvis\Nuki\Livewire\ActivityTimeline;
@@ -19,6 +20,8 @@ if (NukiConfig::authUsersEnabled()) {
     $middleware[] = 'auth:darvis-nuki';
 }
 
+// After the host app's own middleware, so a session and a signed in user exist when the gate is asked.
+$middleware[] = AuthorizeUi::class;
 $middleware[] = SetLocale::class;
 $middleware = array_values(array_unique($middleware));
 

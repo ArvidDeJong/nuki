@@ -10,9 +10,15 @@ use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Locked;
 
 trait UsesNukiAccount
 {
+    /**
+     * Locked: the browser may read the key, never write it. It changes through mount() and the
+     * `nuki-account-changed` event only, and both check the key against the user's accounts.
+     */
+    #[Locked]
     public string $accountKey = 'default';
 
     public function mountUsesNukiAccount(): void
@@ -25,6 +31,11 @@ trait UsesNukiAccount
         return (string) session('nuki.current_account', 'default');
     }
 
+    /**
+     * Every active account without package users, the user's own accounts with them.
+     *
+     * @return Collection<int, NukiAccount>
+     */
     public function getAvailableAccountsProperty(): Collection
     {
         $user = $this->currentNukiUser();
@@ -64,6 +75,34 @@ trait UsesNukiAccount
         $user = Auth::guard(AuthConfigRegistrar::GUARD)->user();
 
         return $user;
+    }
+
+    /**
+     * Whether the current user may work in this account: `default`, or one of the user's
+     * accessible accounts. Without package users every key is allowed, as it always was.
+     */
+    protected function canUseAccountKey(string $accountKey): bool
+    {
+        $user = $this->currentNukiUser();
+
+        if ($user === null || $accountKey === 'default') {
+            return true;
+        }
+
+        return $user->accessibleAccounts()->contains('account_key', $accountKey);
+    }
+
+    /**
+     * The key itself when the current user may use it, a 403 otherwise. Every
+     * `nuki-account-changed` handler goes through here, because the browser can send that event.
+     */
+    protected function authorizedAccountKey(string $accountKey): string
+    {
+        if (! $this->canUseAccountKey($accountKey)) {
+            abort(403);
+        }
+
+        return $accountKey;
     }
 
     private function resolveAccountKey(): string

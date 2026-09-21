@@ -30,11 +30,13 @@
                 @endforeach
             @endif
 
-            <flux:menu.separator />
+            @if ($this->canManageAccounts())
+                <flux:menu.separator />
 
-            <flux:menu.item icon="users" href="{{ route('nuki.accounts.index') }}">
-                {{ __('nuki::nuki.account_switcher.manage') }}
-            </flux:menu.item>
+                <flux:menu.item icon="users" href="{{ route('nuki.accounts.index') }}">
+                    {{ __('nuki::nuki.account_switcher.manage') }}
+                </flux:menu.item>
+            @endif
         </flux:menu>
     </flux:dropdown>
 </div>

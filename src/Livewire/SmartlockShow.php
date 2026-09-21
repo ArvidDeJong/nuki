@@ -14,6 +14,7 @@ use Darvis\Nuki\Support\WeekdayBitmask;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -23,6 +24,11 @@ class SmartlockShow extends Component
     use AuthorizesSmartlockAccess;
     use UsesNukiAccount;
 
+    /**
+     * Locked: set from the route in mount(), never by the browser. Every permission check below
+     * is about this id, so a writable id would make them all meaningless.
+     */
+    #[Locked]
     public int $smartlockId;
 
     public string $tab = 'logs';
@@ -61,8 +67,23 @@ class SmartlockShow extends Component
         $this->smartlockId = $smartlockId;
         $this->mountUsesNukiAccount();
 
+        $this->assertCanSeeSmartlock();
+
+        // Start on a tab the user may read; a tab without permission stays empty in the view.
+        if (! $this->canPerform('view_logs') && $this->canPerform('manage_auths')) {
+            $this->tab = 'auths';
+        }
+    }
+
+    /**
+     * Plain access to the lock itself, whatever the permissions on it. Asked again wherever data
+     * is loaded, because the account can change under a mounted page.
+     */
+    private function assertCanSeeSmartlock(): void
+    {
         $allowed = $this->userAccessibleSmartlockIds($this->accountKey);
-        if ($allowed !== null && ! in_array($smartlockId, $allowed, true)) {
+
+        if ($allowed !== null && ! in_array($this->smartlockId, $allowed, true)) {
             abort(403);
         }
     }
@@ -81,6 +102,9 @@ class SmartlockShow extends Component
     #[Computed]
     public function smartlock(): ?SmartLock
     {
+        // Outside the try: abort() throws, and the catch below would swallow it.
+        $this->assertCanSeeSmartlock();
+
         try {
             return Nuki::as($this->accountKey)->smartlocks()->find($this->smartlockId);
         } catch (\Throwable $e) {
@@ -93,6 +117,8 @@ class SmartlockShow extends Component
     #[Computed]
     public function logs(): Collection
     {
+        $this->assertCan($this->accountKey, $this->smartlockId, 'view_logs');
+
         try {
             return Nuki::as($this->accountKey)->logs()->forSmartlock($this->smartlockId, ['limit' => 50]);
         } catch (\Throwable $e) {
@@ -105,6 +131,9 @@ class SmartlockShow extends Component
     #[Computed]
     public function auths(): Collection
     {
+        // Keypad codes are in here, so reading the list takes the same permission as changing it.
+        $this->assertCan($this->accountKey, $this->smartlockId, 'manage_auths');
+
         try {
             return Nuki::as($this->accountKey)->auths()->forSmartlock($this->smartlockId);
         } catch (\Throwable $e) {
@@ -328,7 +357,7 @@ class SmartlockShow extends Component
     #[On('nuki-account-changed')]
     public function handleAccountChanged(string $accountKey): void
     {
-        $this->accountKey = $accountKey;
+        $this->accountKey = $this->authorizedAccountKey($accountKey);
         $this->error = null;
         unset($this->smartlock, $this->logs, $this->auths);
     }

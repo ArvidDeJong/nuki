@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Auth;
 trait AuthorizesSmartlockAccess
 {
     /**
-     * Smartlock-ids waar de huidige gebruiker tot heeft binnen het opgegeven
-     * account. Null = wildcard (hoofdgebruiker of auth_users uit).
+     * Smartlock ids the current user may see within the given account. Null is the wildcard:
+     * a main user, or package users switched off. A sub user always gets a list, an empty one
+     * for an account that has no row.
      *
      * @return array<int, int>|null
      */
@@ -28,7 +29,8 @@ trait AuthorizesSmartlockAccess
 
         $accountId = NukiAccount::findByKey($accountKey)?->id;
         if ($accountId === null) {
-            return null;
+            // No row, so no lock can have been assigned: a sub user sees nothing here, never everything.
+            return $user->isMain() ? null : [];
         }
 
         return $user->accessibleSmartlockIds($accountId);
