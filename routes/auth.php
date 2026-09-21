@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Darvis\Nuki\Http\Controllers\NukiLogoutController;
 use Darvis\Nuki\Http\Controllers\NukiVerifyEmailController;
+use Darvis\Nuki\Http\Middleware\AuthenticateNukiUser;
+use Darvis\Nuki\Http\Middleware\RedirectIfNukiUser;
 use Darvis\Nuki\Http\Middleware\SetLocale;
 use Darvis\Nuki\Livewire\Auth\ForgotPasswordPage;
 use Darvis\Nuki\Livewire\Auth\LoginOtpPage;
@@ -25,7 +27,7 @@ Route::middleware($authMiddleware)
     ->prefix(NukiConfig::authRoutePrefix())
     ->name('nuki.')
     ->group(function () {
-        Route::middleware('guest:darvis-nuki')->group(function () {
+        Route::middleware(RedirectIfNukiUser::class)->group(function () {
             Route::get('/login', LoginPage::class)->name('auth.login');
             Route::get('/login/otp', LoginOtpPage::class)->name('auth.otp');
 
@@ -47,7 +49,7 @@ Route::middleware($authMiddleware)
             }
         });
 
-        Route::middleware('auth:darvis-nuki')->group(function () {
+        Route::middleware(AuthenticateNukiUser::class)->group(function () {
             Route::post('/logout', NukiLogoutController::class)->name('auth.logout');
             Route::get('/profile', ProfilePage::class)->name('profile');
             Route::get('/sub-users', SubUsersIndex::class)->name('sub-users.index');

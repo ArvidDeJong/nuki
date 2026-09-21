@@ -12,24 +12,31 @@
 </head>
 <body class="min-h-full bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-900 dark:text-zinc-100">
     <flux:header container class="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <flux:brand href="{{ route('nuki.dashboard') }}" name="{{ NukiConfig::uiBrand() }}" />
+        {{-- The profile and sub user pages use this layout too, and they exist without the UI
+             routes (ui.enabled off, auth_users on). So nothing here may assume a UI route. --}}
+        @php($hasUi = \Illuminate\Support\Facades\Route::has('nuki.dashboard'))
+        <flux:brand href="{{ $hasUi ? route('nuki.dashboard') : url(NukiConfig::redirectAfterLogin()) }}"
+                    name="{{ NukiConfig::uiBrand() }}" />
+
+        @php($navUser = NukiConfig::authUsersEnabled() ? auth('darvis-nuki')->user() : null)
+        {{-- Accounts, webhooks and the connection are for a main user only; without package users there is no sub user. --}}
+        @php($navManage = $hasUi && (! NukiConfig::authUsersEnabled() || ($navUser && $navUser->isMain())))
 
         <flux:navbar class="ms-8 hidden md:flex">
-            <flux:navbar.item icon="squares-2x2" href="{{ route('nuki.dashboard') }}"
-                              :current="request()->routeIs('nuki.dashboard')">
-                {{ __('nuki::nuki.nav.dashboard') }}
-            </flux:navbar.item>
-            <flux:navbar.item icon="lock-closed" href="{{ route('nuki.smartlocks.index') }}"
-                              :current="request()->routeIs('nuki.smartlocks.*')">
-                {{ __('nuki::nuki.nav.smartlocks') }}
-            </flux:navbar.item>
-            <flux:navbar.item icon="clock" href="{{ route('nuki.activity.index') }}"
-                              :current="request()->routeIs('nuki.activity.*')">
-                {{ __('nuki::nuki.nav.activity') }}
-            </flux:navbar.item>
-            @php($navUser = NukiConfig::authUsersEnabled() ? auth('darvis-nuki')->user() : null)
-            {{-- Accounts and webhooks are for a main user only; without package users there is no sub user. --}}
-            @php($navManage = ! NukiConfig::authUsersEnabled() || ($navUser && $navUser->isMain()))
+            @if ($hasUi)
+                <flux:navbar.item icon="squares-2x2" href="{{ route('nuki.dashboard') }}"
+                                  :current="request()->routeIs('nuki.dashboard')">
+                    {{ __('nuki::nuki.nav.dashboard') }}
+                </flux:navbar.item>
+                <flux:navbar.item icon="lock-closed" href="{{ route('nuki.smartlocks.index') }}"
+                                  :current="request()->routeIs('nuki.smartlocks.*')">
+                    {{ __('nuki::nuki.nav.smartlocks') }}
+                </flux:navbar.item>
+                <flux:navbar.item icon="clock" href="{{ route('nuki.activity.index') }}"
+                                  :current="request()->routeIs('nuki.activity.*')">
+                    {{ __('nuki::nuki.nav.activity') }}
+                </flux:navbar.item>
+            @endif
             @if ($navManage)
                 <flux:navbar.item icon="users" href="{{ route('nuki.accounts.index') }}"
                                   :current="request()->routeIs('nuki.accounts.*')">
@@ -47,8 +54,6 @@
                                   :current="request()->routeIs('nuki.webhooks.*')">
                     {{ __('nuki::nuki.nav.webhooks') }}
                 </flux:navbar.item>
-            @endif
-            @if ($navManage)
                 <flux:navbar.item icon="key" href="{{ route('nuki.oauth.connect') }}"
                                   :current="request()->routeIs('nuki.oauth.*')">
                     {{ __('nuki::nuki.nav.connection') }}
@@ -58,7 +63,10 @@
 
         <flux:spacer />
 
-        <livewire:nuki.account-switcher />
+        {{-- The switcher is a UI component; it is not registered while the UI is off. --}}
+        @if ($hasUi)
+            <livewire:nuki.account-switcher />
+        @endif
 
         @php($authUser = NukiConfig::authUsersEnabled() ? auth('darvis-nuki')->user() : null)
 

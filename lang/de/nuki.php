@@ -481,6 +481,7 @@ return [
             'name' => 'Name',
             'password' => 'Passwort (mind. 8 Zeichen)',
             'created' => 'Hauptbenutzer :email erstellt (id :id).',
+            'unknown_account' => 'Unbekannter Account-Schlüssel: :keys. Es wurde nichts erstellt.',
         ],
         'oauth_authorize' => [
             'open_url' => 'Öffne die folgende URL in deinem Browser:',

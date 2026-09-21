@@ -155,6 +155,7 @@ With `auth_users.enabled`:
 - 403 on a smartlock page: the sub user has no active `nuki_user_smartlock` row for that lock in
   the current account.
 - 403 after switching account: the user has no access to that account.
+- 403 on `/nuki/activity?lock=…`: the sub user has no `view_logs` permission on that lock.
 
 ### `/nuki` answers 404
 
@@ -164,23 +165,11 @@ The routes are not registered. `NUKI_UI_ENABLED` has to be the boolean `true` (t
 
 ### `Route [login] not defined.`
 
-With `auth_users.enabled`, a visitor who is not signed in is handled by Laravel's `auth`
-middleware, which redirects to the route named `login` of **your** application, not to
-`/nuki/login`. Without such a route you get this error. Tell Laravel where guests of the
-`darvis-nuki` guard go, in `bootstrap/app.php`:
-
-```php
-use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
-
-->withMiddleware(function (Middleware $middleware): void {
-    $middleware->redirectGuestsTo(fn (Request $request) => $request->is('nuki', 'nuki/*')
-        ? route('nuki.auth.login')
-        : route('login'));
-})
-```
-
-Use your own prefix in place of `nuki` when you changed `NUKI_UI_PREFIX`.
+You are on a version before 1.3.0. There, with `auth_users.enabled`, a visitor who is not signed
+in was redirected to the route named `login` of **your** application, and without such a route you
+got this error. Update the package: from 1.3.0 on a guest of the package pages goes to
+`/nuki/login`, and the `redirectGuestsTo()` workaround this page used to show is no longer needed.
+See [Where a guest is sent](auth-routes.md#where-a-guest-is-sent).
 
 ### `Route [nuki.auth.login] not defined.`
 
@@ -220,9 +209,11 @@ A published `config/nuki.php` from before version 1.2.0 has a hard coded value f
 
 ### `Route [nuki.dashboard] not defined.`
 
-`NUKI_UI_ENABLED` is off while `auth_users` is on. The profile and sub user pages render in
-`ui.layout`, and the package's layout links to the pages you switched off. Set `ui.layout` to a
-layout of your own, or leave the UI on.
+`NUKI_UI_ENABLED` is off while `auth_users` is on, and the profile or sub user page renders in a
+layout that links to the dashboard. The package's own layout checks for the route since version
+1.3.0, so either you are on an older version, or you published the views
+(`resources/views/vendor/nuki/layouts/app.blade.php`) before that. Update, and compare your copy
+with the package's layout.
 
 ### A page is empty or broken after an update
 
@@ -265,8 +256,10 @@ gets a confirmation link and cannot sign in before using it. A user made with
 
 ### A main user sees no accounts in the switcher
 
-Nothing attaches a user to an account by itself, not the accounts page and not
-`nuki:user-create`. See
+A package user only sees the accounts they are attached to. Since version 1.3.0 the main user who
+creates an account on `/nuki/accounts` is attached to it, and `nuki:user-create --account=<key>`
+attaches a new user. An account that was made before 1.3.0, in code or by another user is not
+attached by itself. See
 [Attach a main user to an account](users-and-permissions.md#attach-a-main-user-to-an-account).
 
 ### A sub user sees no smartlocks

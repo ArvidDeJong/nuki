@@ -480,6 +480,7 @@ return [
             'name' => 'Name',
             'password' => 'Password (min 8 characters)',
             'created' => 'Main user :email created (id :id).',
+            'unknown_account' => 'Unknown account key: :keys. Nothing was created.',
         ],
         'oauth_authorize' => [
             'open_url' => 'Open the following URL in your browser:',

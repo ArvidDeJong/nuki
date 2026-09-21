@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Livewire;
 
+use Darvis\Nuki\Auth\Users\AuthConfigRegistrar;
 use Darvis\Nuki\Concerns\AuthorizesMainUser;
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Models\NukiAccount;
+use Darvis\Nuki\Models\NukiUser;
 use Darvis\Nuki\Support\NukiConfig;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
@@ -114,7 +117,13 @@ class AccountsIndex extends Component
         }
 
         if ($this->editingId === null) {
-            NukiAccount::create($attributes);
+            $account = NukiAccount::create($attributes);
+
+            // Without this the new account is in nobody's switcher, not even its maker's.
+            $this->currentMainUser()?->accounts()->syncWithoutDetaching([
+                $account->id => ['role' => NukiAccount::ROLE_OWNER],
+            ]);
+
             session()->flash('status', __('nuki::nuki.flash.account_created', ['key' => $this->accountKey]));
         } else {
             // Through the model, never the query builder: only the model applies the encrypted
@@ -190,6 +199,21 @@ class AccountsIndex extends Component
         $account->delete();
         session()->flash('status', __('nuki::nuki.flash.account_deleted', ['key' => $account->account_key]));
         unset($this->accounts);
+    }
+
+    /**
+     * The signed in main user, or null without package users. With them, the boot hook of
+     * AuthorizesMainUser has already refused everybody else.
+     */
+    private function currentMainUser(): ?NukiUser
+    {
+        if (! NukiConfig::authUsersEnabled()) {
+            return null;
+        }
+
+        $user = Auth::guard(AuthConfigRegistrar::GUARD)->user();
+
+        return $user instanceof NukiUser && $user->isMain() ? $user : null;
     }
 
     private function resetForm(): void

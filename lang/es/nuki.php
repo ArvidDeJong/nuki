@@ -481,6 +481,7 @@ return [
             'name' => 'Nombre',
             'password' => 'Contraseña (mín. 8 caracteres)',
             'created' => 'Usuario principal :email creado (id :id).',
+            'unknown_account' => 'Clave de cuenta desconocida: :keys. No se ha creado nada.',
         ],
         'oauth_authorize' => [
             'open_url' => 'Abre la siguiente URL en tu navegador:',

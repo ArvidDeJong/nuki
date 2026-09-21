@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Darvis\Nuki\Livewire;
 
+use Darvis\Nuki\Concerns\AuthorizesSmartlockAccess;
 use Darvis\Nuki\Concerns\UsesNukiAccount;
+use Darvis\Nuki\DTOs\LogEntry;
 use Darvis\Nuki\DTOs\SmartLock;
 use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Support\NukiConfig;
@@ -16,6 +18,7 @@ use Livewire\Component;
 
 class Dashboard extends Component
 {
+    use AuthorizesSmartlockAccess;
     use UsesNukiAccount;
 
     public ?string $error = null;
@@ -35,24 +38,52 @@ class Dashboard extends Component
     public function smartlocks(): Collection
     {
         try {
-            return Nuki::as($this->accountKey)->smartlocks()->all();
+            $locks = Nuki::as($this->accountKey)->smartlocks()->all();
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
 
             return collect();
         }
+
+        // The totals are computed from this list, so a sub user's cards only count their own locks.
+        $allowed = $this->userAccessibleSmartlockIds($this->accountKey);
+
+        if ($allowed === null) {
+            return $locks;
+        }
+
+        return $locks
+            ->filter(fn (SmartLock $lock): bool => in_array($lock->smartlockId, $allowed, true))
+            ->values();
     }
 
     #[Computed]
     public function recentLogs(): Collection
     {
+        $readable = $this->userSmartlockIdsWithPermission($this->accountKey, 'view_logs');
+
+        if ($readable === []) {
+            return collect();
+        }
+
         try {
-            return Nuki::as($this->accountKey)->logs()->all(['limit' => 8]);
+            // The account wide log takes one lock id at most, so for a sub user a longer list is
+            // fetched in the same single call and cut down here.
+            $logs = Nuki::as($this->accountKey)->logs()->all(['limit' => $readable === null ? 8 : 100]);
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
 
             return collect();
         }
+
+        if ($readable === null) {
+            return $logs;
+        }
+
+        return $logs
+            ->filter(fn (LogEntry $log): bool => in_array($log->smartlockId, $readable, true))
+            ->take(8)
+            ->values();
     }
 
     #[Computed]

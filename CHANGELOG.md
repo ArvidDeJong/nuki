@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **A sub user saw every lock of an account on the dashboard and the whole activity log.** The
+  dashboard listed and counted all locks with their battery and door state, and both the dashboard
+  and the activity timeline showed the account wide log, whatever the sub user's permissions were.
+  The timeline filter (`/nuki/activity?lock=<id>`) accepted any lock id. A sub user now only sees
+  the locks they have an active permission row for, and log entries only of locks with the
+  `view_logs` permission; a filter on any other lock is a 403. A main user, and an installation
+  without package users, see everything as before. Nothing to do.
+- **The sub user editor reached accounts that were not the main user's.** A main user was offered
+  every active account, could list the locks of any of them, could give a sub user access on any
+  of them, and could overwrite the permission row of somebody else's sub user by id. The editor
+  now only offers the accounts the main user is attached to and refuses the rest with a 403, and a
+  row is only changed through the sub user it belongs to. The sub user pages check for a main user
+  on every request, not only when the page loads. Nothing to do, unless a main user manages sub
+  users on an account they are not attached to: attach them (see below).
+
+### Fixed
+- **An account was unreachable for the main user who had just created it.** Since 1.2.0 the
+  account switcher only lists attached accounts, and nothing attached anybody. A main user who
+  creates an account on `/nuki/accounts` is now attached to it as `owner`. An account that exists
+  already is not touched: attach it once with
+  `$user->accounts()->syncWithoutDetaching([$account->id => ['role' => 'owner']])`. **If you
+  attached users to accounts by hand, nothing changes for you.** Without package users nothing
+  changes either.
+- **A guest of the package pages was sent to the host application's `login` route**, or got
+  `Route [login] not defined.` when there was none, and a signed in package user who opened
+  `/nuki/login` landed on the host application's `dashboard`, `home` or `/`. The package routes
+  now use their own middleware (`AuthenticateNukiUser`, `RedirectIfNukiUser`): a guest goes to
+  `/nuki/login`, a signed in user to `auth_users.redirect_after_login`. Your application's
+  `redirectGuestsTo()` is not touched. If you added the `redirectGuestsTo()` closure from the
+  1.2.1 documentation, you can remove it; leaving it does no harm.
+- **`/nuki/profile` and `/nuki/sub-users` answered 500 with `NUKI_UI_ENABLED=false`**
+  (`Route [nuki.dashboard] not defined.`). The layout now leaves out the UI links and the account
+  switcher when those routes do not exist, and the brand links to
+  `auth_users.redirect_after_login`. If you published the views, compare
+  `layouts/app.blade.php` with the package's version.
+
+### Added
+- `php artisan nuki:user-create --account=<account_key>`, repeatable: attaches the new main user
+  to existing accounts as `owner`. An unknown key is an error and nothing is created.
+- `Darvis\Nuki\Http\Middleware\AuthenticateNukiUser`, to put your own routes behind the package
+  guard with a redirect to the package login, and the constants `NukiAccount::ROLE_OWNER` and
+  `NukiAccount::ROLE_MEMBER`.
+
+### Changed
+- With package users on, a sub user sees fewer locks and log entries on the dashboard and the
+  activity timeline (see Security), and a guest lands on `/nuki/login` instead of on your
+  application's login page.
+
 ## [1.2.1] - 2026-09-21
 
 ### Fixed
