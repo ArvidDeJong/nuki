@@ -114,7 +114,9 @@ class AccountsIndex extends Component
             NukiAccount::create($attributes);
             session()->flash('status', __('nuki::nuki.flash.account_created', ['key' => $this->accountKey]));
         } else {
-            NukiAccount::where('id', $this->editingId)->update($attributes);
+            // Through the model, never the query builder: only the model applies the encrypted
+            // cast, so a builder update would store the token as plain text.
+            NukiAccount::findOrFail($this->editingId)->update($attributes);
             session()->flash('status', __('nuki::nuki.flash.account_updated', ['key' => $this->accountKey]));
         }
 

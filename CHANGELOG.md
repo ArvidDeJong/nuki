@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Editing an account in the bundled UI stored a new API token as plain text.** The accounts
+  screen saved the change with a query builder update, which skips the `encrypted` cast on
+  `api_token`. The token then sat readable in `nuki_accounts`, and the next read of that account
+  threw a `DecryptException`, which took the accounts screen down. The change is saved through the
+  model now. An account that was created and never edited with a new token is not affected.
+  After upgrading, open every account you edited a token for and enter the token again, or rotate
+  it in NUKI Web. To find them: a value in `nuki_accounts.api_token` that does not start with
+  `eyJ` is plain text.
+
 ## [1.1.1] - 2026-09-21
 
 ### Added
