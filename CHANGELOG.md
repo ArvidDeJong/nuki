@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-21
+
 ### Fixed
 Documentation only; nothing in the package changes. The corrections that matter when you relied
 on the old text:
