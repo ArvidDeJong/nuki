@@ -1,7 +1,7 @@
 ---
-title: API reference
-nav_order: 5
-description: "Every public method on the smartlock, log, authorization, webhook, OAuth and account resources, and the DTOs they return."
+title: "API reference"
+nav_order: 6
+description: "Every public method of the darvis/nuki facade: smartlocks, logs, authorizations, webhooks, OAuth and account, the objects they return, commands and exceptions."
 ---
 
 # API reference
@@ -9,7 +9,8 @@ description: "Every public method on the smartlock, log, authorization, webhook,
 Every interaction with the NUKI Web API runs through the
 [Nuki facade](https://github.com/ArvidDeJong/nuki/blob/main/src/Facades/Nuki.php), which resolves a singleton
 [Nuki manager](https://github.com/ArvidDeJong/nuki/blob/main/src/Nuki.php). The manager exposes six resource factories.
-Each resource is stateless — instantiate them via the manager, do not cache.
+A resource is a small object that holds the account key it was made for. Ask the manager for one
+each time instead of keeping a reference, or a later `Nuki::as()` does not reach it.
 
 ```php
 use Darvis\Nuki\Facades\Nuki;
@@ -50,9 +51,14 @@ Source: [src/Resources/SmartLocks.php](https://github.com/ArvidDeJong/nuki/blob/
 | `lockAndGoWithUnlatch(int $smartlockId)` | `void` | `action($id, 5)`. |
 | `action(int $smartlockId, int $action, ?int $option = null)` | `void` | Low-level call to `POST /smartlock/{id}/action` with arbitrary action code + optional option flag. |
 | `update(int $smartlockId, array $attributes)` | `void` | Update user-controllable fields (`name`, `favourite`, `defaultName`, advanced flags). Pass only keys you want to change — NUKI merges server-side. |
-| `sync(int $smartlockId)` | `void` | Force a state refresh from the bridge / Wi-Fi-equipped device. |
+| `sync(int $smartlockId)` | `void` | `POST /smartlock/{id}/sync`: asks NUKI to refresh the state it has for the lock. |
 
-Action constants on the class for clarity:
+The actions return nothing. A call that did not throw means NUKI accepted the command, not that
+the bolt moved: call `sync()` and `find()` again, or listen for the `DEVICE_STATUS`
+[webhook](webhooks.md). An action is a `POST` and is repeated on a 5xx like every call; see
+[`http.retries`](configuration.md#http--outbound-http-tuning).
+
+Action constants on the class:
 
 ```php
 SmartLocks::ACTION_UNLOCK                  // 1
@@ -65,6 +71,9 @@ SmartLocks::ACTION_LOCK_AND_GO_WITH_UNLATCH // 5
 Example:
 
 ```php
+use Darvis\Nuki\Facades\Nuki;
+use Illuminate\Support\Facades\Log;
+
 $locks = Nuki::smartlocks()->all();
 
 foreach ($locks->where('batteryCritical', true) as $lock) {
@@ -101,9 +110,12 @@ Source: [src/Resources/SmartlockAuths.php](https://github.com/ArvidDeJong/nuki/b
 | `all(array $filters = [])` | `Collection<int, Authorization>` | All authorizations across the account. |
 | `create(int $smartlockId, array $attributes)` | `void` | `PUT /smartlock/{id}/auth`. |
 | `update(int $smartlockId, string $authId, array $attributes)` | `void` | `POST /smartlock/{id}/auth/{authId}`. |
-| `delete(int $smartlockId, string $authId)` | `void` | |
+| `delete(int $smartlockId, string $authId)` | `void` | `DELETE /smartlock/{id}/auth/{authId}`. |
 
-Authorization type constants (per NUKI):
+The filter and attribute arrays go to NUKI as they are; the package does not validate them.
+`$authId` is the `id` property of an `Authorization`, a string.
+
+Authorization type constants on the class:
 
 ```php
 SmartlockAuths::TYPE_APP          // 0
@@ -114,9 +126,10 @@ SmartlockAuths::TYPE_KEYPAD_CODE  // 13
 SmartlockAuths::TYPE_Z_KEY        // 14
 ```
 
-Restricting a keypad code to weekday + window:
+A keypad code that only works on Monday, Wednesday and Friday within a period:
 
 ```php
+use Darvis\Nuki\Facades\Nuki;
 use Darvis\Nuki\Resources\SmartlockAuths;
 use Darvis\Nuki\Support\WeekdayBitmask;
 
@@ -141,22 +154,25 @@ inbound side (receiving callbacks from NUKI) see [Webhooks](webhooks.md).
 | `subscribe(string $callbackUrl, array $events)` | `WebhookSubscription` | `PUT /api/notification` with `notificationType: webhook` and the given `webhookFeatures`. Returns the new subscription. |
 | `unsubscribe(string $id)` | `void` | `DELETE /api/notification/{id}`. |
 
-NUKI's webhook events (use any subset in `$events`): `DEVICE_STATUS`,
-`DEVICE_CONFIG`, `DEVICE_LOGS`, `ACCOUNT_USER`, etc. — see the NUKI Web API
-docs for the authoritative list.
+`$events` is passed to NUKI as it is. The `nuki:webhook-register` command uses `DEVICE_STATUS`,
+`DEVICE_CONFIG`, `DEVICE_LOGS` and `ACCOUNT_USER` by default; the NUKI Web API documentation has
+the list. `subscribe()` fills `WebhookSubscription::$id` from the key `id` of the answer; when it
+is empty, look in `->raw`.
 
 ## `OAuth`
 
 Source: [src/Resources/OAuth.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Resources/OAuth.php). Only relevant
-when `NUKI_AUTH=oauth`.
+when `NUKI_AUTH=oauth`. `Nuki::oauth()` ignores `Nuki::as()`: every method takes the account key
+as an argument. The package has no callback route; see
+[The callback route is yours to build](nuki-api-authentication.md#the-callback-route-is-yours-to-build).
 
 | Method | Returns | Description |
 |---|---|---|
-| `authorizationUrl(?string $state = null, ?array $scopes = null)` | `string` | Builds the URL to redirect the user to for consent. `state` is recommended for CSRF protection; `scopes` overrides the configured defaults. |
+| `authorizationUrl(?string $state = null, ?array $scopes = null)` | `string` | Builds the URL to redirect the user to for consent. Pass a random `state` and compare it yourself in your callback route; the package never checks it. `scopes` overrides the configured defaults. |
 | `exchangeCode(string $code, string $accountKey = 'default')` | `NukiToken` | Exchanges an authorization code for a token, stores it under `$accountKey`. |
 | `refresh(string $accountKey = 'default')` | `NukiToken` | Force a refresh using the stored refresh token. The authenticator does this automatically when needed — call this only when you want to refresh proactively. |
 | `token(string $accountKey = 'default')` | `?NukiToken` | Returns the stored token (or null). |
-| `revoke(string $accountKey = 'default')` | `void` | Removes the stored token. Does **not** call a NUKI revocation endpoint (NUKI offers none). |
+| `revoke(string $accountKey = 'default')` | `void` | Removes the stored token. It does not call NUKI. |
 
 ## `Account`
 
@@ -164,7 +180,7 @@ Source: [src/Resources/Account.php](https://github.com/ArvidDeJong/nuki/blob/mai
 
 | Method | Returns | Description |
 |---|---|---|
-| `info(bool $fresh = false)` | `?AccountInfo` | `GET /account`. Result is cached for one hour under `nuki:account-info:{accountKey}`. Pass `$fresh = true` to force a refetch. Returns `null` on HTTP error or empty payload. |
+| `info(bool $fresh = false)` | `?AccountInfo` | `GET /account`. Result is cached for one hour under `nuki:account-info:{accountKey}`. Pass `fresh: true` to skip the cache. Returns `null` on any failure, also a missing token, and on an empty answer; it never throws. |
 
 ## DTOs
 
@@ -234,20 +250,34 @@ Three commands ship with the package:
 | Command | Description |
 |---|---|
 | `nuki:oauth-authorize` | Interactive OAuth authorization-code dance from the terminal. Options: `--account=<key>` (default `default`), `--code=<code>` (skip prompt). See [NukiOAuthAuthorizeCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiOAuthAuthorizeCommand.php). |
-| `nuki:user-create` | Create the first main `NukiUser` for the package's own auth guard. Options: `--email`, `--name`, `--password`, `--no-2fa`. See [NukiUserCreateCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiUserCreateCommand.php) and [Users and permissions](users-and-permissions.md). |
-| `nuki:webhook-register` | Register a callback URL with NUKI. Argument: optional `url` (defaults to `APP_URL` + `nuki.webhook.route`). Options: `--account=<key>`, `--events=<list>` (default `DEVICE_STATUS`, `DEVICE_CONFIG`, `DEVICE_LOGS`, `ACCOUNT_USER`). See [NukiWebhookRegisterCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiWebhookRegisterCommand.php). |
+| `nuki:user-create` | Create a main `NukiUser` for the package's own auth guard. Options: `--email`, `--name`, `--password` (asked for when left out) and `--no-2fa`, which stores `two_factor_enabled = false`; that column is not read at login, so the user still gets a code while `auth_users.otp.enabled` is `true`. See [NukiUserCreateCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiUserCreateCommand.php) and [Users and permissions](users-and-permissions.md). |
+| `nuki:webhook-register` | Register a callback URL with NUKI. Argument: optional `url` (defaults to `APP_URL` + `nuki.webhook.route`). Options: `--account=<key>` (default `default`), `--events=<name>`, repeatable (default `DEVICE_STATUS`, `DEVICE_CONFIG`, `DEVICE_LOGS`, `ACCOUNT_USER`). See [NukiWebhookRegisterCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiWebhookRegisterCommand.php). |
 
 ## Errors
 
-Hierarchy under [src/Exceptions/](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/):
+| Exception | When | What it carries |
+|---|---|---|
+| [AuthenticationException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/AuthenticationException.php) | No token for the account key, a failed OAuth exchange or refresh, incomplete OAuth settings. Nothing was sent to the lock API. | The message. |
+| [ApiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/ApiException.php) | NUKI answered with a 4xx or 5xx. | `->status` (int), `->body` (the raw answer as a string; decode it yourself), `->endpoint` (for example `GET /smartlock/17`). The message is `NUKI API GET /smartlock/17 returned HTTP 404: <first 300 characters of the body>`. |
+| [NukiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/NukiException.php) | The base class of the two above, and thrown itself for an unknown `auth`, `token_resolver` or `oauth.token_store` value. | The message. |
+| `Illuminate\Http\Client\ConnectionException` | The server could not be reached, also after the retries. | Laravel's exception. It is **not** a `NukiException`. |
 
-- [NukiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/NukiException.php) — base class.
-- [AuthenticationException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/AuthenticationException.php) —
-  missing/expired token, failed OAuth exchange, invalid config.
-- [ApiException](https://github.com/ArvidDeJong/nuki/blob/main/src/Exceptions/ApiException.php) — non-success HTTP from
-  NUKI; carries status and parsed body. Constructed via
-  `ApiException::fromResponse($response)` inside `HttpClient`.
+```php
+use Darvis\Nuki\Exceptions\ApiException;
+use Darvis\Nuki\Exceptions\NukiException;
+use Darvis\Nuki\Facades\Nuki;
+use Illuminate\Http\Client\ConnectionException;
 
-`HttpClient` retries connection errors, HTTP 429 and 5xx with exponential
-backoff (`http.retries` attempts, `http.retry_sleep` × 2^n milliseconds), so
-you only see exceptions when retries are exhausted.
+try {
+    Nuki::smartlocks()->unlock($smartlockId);
+} catch (ApiException $e) {
+    report($e);                       // $e->status, $e->body, $e->endpoint
+} catch (NukiException|ConnectionException $e) {
+    report($e);
+}
+```
+
+A connection error, an HTTP 429 and a 5xx are tried again before you see an exception:
+`http.retries` attempts in total (default 3, the first one included), with a fixed pause of
+`http.retry_sleep` milliseconds (default 200) in between. Any other 4xx is not repeated. The
+package logs nothing itself.

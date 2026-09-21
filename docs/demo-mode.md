@@ -1,7 +1,7 @@
 ---
-title: Demo mode
-nav_order: 10
-description: "Running the whole package on canned fixtures instead of a real NUKI account, for screenshots and walk-through videos."
+title: "Demo mode"
+nav_order: 11
+description: "Run darvis/nuki on made up locks, logs and keypad codes with NUKI_DEMO=true, without a NUKI account: what is faked, the seeder and the limits."
 ---
 
 # Demo mode
@@ -31,29 +31,32 @@ This flips `nuki.demo.enabled` and triggers two things at boot in
 
 Every endpoint the package currently talks to:
 
-- `GET  /smartlock` — list (four locks: front door, side door, garage, office).
-- `GET  /smartlock/{id}` — single lock.
+- `GET  /smartlock` — five locks, ids `17000000001` to `17000000005`.
+- `GET  /smartlock/{id}` — single lock; an unknown id gets the first lock.
 - `GET  /smartlock/{id}/log` — per-lock activity.
 - `GET  /smartlock/log` — account-wide activity.
 - `GET  /smartlock/{id}/auth` — per-lock authorizations.
 - `GET  /smartlock/auth` — account-wide authorizations.
-- `POST /smartlock/{id}/action` — accepted; no state change persisted.
+- `POST /smartlock/{id}/action` — accepted; nothing changes, the lock keeps its state.
+- `PUT  /smartlock/{id}/auth`, `POST` and `DELETE /smartlock/{id}/auth/{authId}` — accepted; nothing is stored.
 - `POST /smartlock/{id}` — name updates accepted.
 - `POST /smartlock/{id}/sync` — accepted.
 - `GET  /account` — account info.
 - `GET  /api/notification` — webhook subscriptions.
 - `PUT  /api/notification` — accepts new subscription.
 - `DELETE /api/notification/{id}` — accepts removal.
-- `POST /oauth/token` — returns a demo token so the OAuth UI is browsable.
+- `POST /oauth/token` — returns a demo token (only when `oauth.token_url` is on `api.nuki.io`, the default).
 
-The fixture data is intentionally realistic: Dutch names, plausible battery
-levels, **one lock with `batteryCritical: true`** so the warning badge has
-something to highlight, varied log triggers.
+Any other path on `api.nuki.io` gets an empty `200` answer.
+
+The data has Dutch names and one lock with `batteryCritical: true`, so the warning badge has
+something to show.
 
 ## Seed the multi-account switcher
 
-The `AccountSwitcher` is empty unless there's data in `nuki_accounts`. Seed
-four demo accounts:
+The locks come from the fixtures, the accounts from your database. Without rows in
+`nuki_accounts` the switcher only offers `default`. Seed four demo accounts (`default`,
+`werkplaats`, `vakantiehuis` and `klant-bakkerij`):
 
 ```bash
 php artisan db:seed --class="Darvis\\Nuki\\Database\\Seeders\\NukiDemoSeeder"
@@ -68,23 +71,25 @@ php artisan vendor:publish --tag=nuki-seeders
 
 ## Auth users in demo mode
 
-If you also enabled `NUKI_AUTH_USERS_ENABLED=true`, run
-`php artisan nuki:user-create` to bootstrap a main user — demo mode does
-not seed `nuki_users` automatically. You can then create sub-users with
-the bundled `/nuki/sub-users` UI and assign them to the seeded accounts to
-showcase the full permission model.
+Demo mode seeds no users. With `NUKI_AUTH_USERS_ENABLED=true`, create a main user with
+`php artisan nuki:user-create` and
+[attach it to the seeded accounts](users-and-permissions.md#attach-a-main-user-to-an-account);
+without that the user only has `default`. Then add sub users on `/nuki/sub-users`.
 
-## Disabling for tests
+## Who may open the demo
 
-Tests rely on `Http::fake()` themselves (see
-[tests/TestCase.php](https://github.com/ArvidDeJong/nuki/blob/main/tests/TestCase.php)). The demo flag should always be
-`false` in `phpunit.xml` (it is). Don't toggle it on inside test setup — the
-two fakes will collide.
+Demo mode does not open the pages. Outside the `local` environment `/nuki` still answers `403`
+until your application defines the `viewNuki` gate; see
+[Who may open the UI](ui-and-localization.md#who-may-open-the-ui).
 
-## Adding a new endpoint while in demo mode
+## Keep it off in tests
 
-When you add a new method to a resource (see [API reference](api-reference.md)),
-also add a matching branch to
-[`DemoFixtures::respondTo()`](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php). Otherwise the
-demo dashboard silently returns `[]` for that resource and your reviewers
-spend an hour looking for the bug.
+Demo mode installs its own `Http::fake()` for `api.nuki.io/*` while the application boots, and the
+fakes of your test then come second. Leave `NUKI_DEMO` out of `phpunit.xml`; use the fixture data
+directly instead, see [Testing](testing.md#payloads-that-look-like-the-real-thing).
+
+## For contributors: a new endpoint needs a fixture
+
+When you add a method to a resource in the package, also add a matching branch to
+[`DemoFixtures::respondTo()`](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/DemoFixtures.php). Otherwise demo
+mode answers that call with an empty array.

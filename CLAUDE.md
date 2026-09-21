@@ -18,8 +18,9 @@ The [README.md](README.md) is consumer-facing (install, env vars, facade example
 
 ```bash
 composer test          # run the Pest suite
-composer lint          # apply Pint formatting
-composer lint:check    # check formatting without writing
+composer lint          # Pint, check only
+composer format        # Pint, fixes the files
+composer analyse       # Larastan level 8, with phpstan-baseline.neon
 
 vendor/bin/pest tests/Feature/SmartLocksTest.php   # single test file
 vendor/bin/pest --filter="locks a smartlock"       # single test by description
@@ -27,7 +28,7 @@ vendor/bin/pest --filter="locks a smartlock"       # single test by description
 
 Tests use Pest 3/4 + Orchestra Testbench. Bootstrap lives in [tests/Pest.php](tests/Pest.php) and [tests/TestCase.php](tests/TestCase.php) — the latter registers `LivewireServiceProvider` and `NukiServiceProvider`, sets `nuki.auth=token`, `nuki.token_resolver=config`, and enables webhook routes with a fixed secret. `Http::fake()` is the standard fixture; no test should hit the real NUKI API.
 
-CI runs the same suite plus Pint via [.github/workflows/tests.yml](.github/workflows/tests.yml): a matrix of PHP 8.2/8.3/8.4 × Laravel 11/12/13 (excluding PHP 8.2 + Laravel 13), and a single Pint check job. Keep both green before tagging a release.
+CI is [.github/workflows/tests.yml](.github/workflows/tests.yml), which calls the shared workflow in `ArvidDeJong/.github` (see [../CLAUDE.md](../CLAUDE.md)): the PHP × Laravel × prefer-lowest/prefer-stable matrix plus one Pint and Larastan job. Keep it green before tagging a release.
 
 ## Architecture: manager + resources
 
@@ -76,9 +77,9 @@ below.
 
 [src/Http/HttpClient.php](src/Http/HttpClient.php) is the choke point for every outbound NUKI request:
 
-- Injects per-request auth headers via `Authenticator->authenticate()` (account-aware).
-- Retries on connection failures, HTTP 429, and 5xx with exponential backoff (`http.retry_sleep` × 2^attempt ms).
-- Throws `Exceptions\ApiException::fromResponse($response)` on HTTP errors; auth failures throw `AuthenticationException`. Both extend `NukiException`.
+- Injects per-request auth headers via `Authenticator->apply($request, $accountKey)` (account-aware).
+- Retries on connection failures, HTTP 429, and 5xx: `http.retries` is the **total** number of attempts and `http.retry_sleep` a fixed pause in milliseconds between them. There is no backoff, whatever the comment in `config/nuki.php` says. A POST (a lock action) is retried like any other call.
+- Throws `Exceptions\ApiException::fromResponse($response, $endpoint)` on HTTP errors, with the raw body string in `->body`; auth failures throw `AuthenticationException`. Both extend `NukiException`. A connection failure after the last attempt surfaces as Laravel's `ConnectionException`, which does not.
 
 When adding endpoints, route them through `HttpClient->get/put/post/delete()` so retries and error handling stay uniform — don't call `Http::` directly.
 
@@ -106,7 +107,7 @@ Identifiers the permission checks hang on are `#[Locked]`: `accountKey` in the t
 Optional, enabled with `NUKI_AUTH_USERS_ENABLED=true`. Completely separate from "NUKI API authentication" above — that one talks to NUKI; this one is the end-user login for the package's bundled UI.
 
 - One table [nuki_users](database/migrations/2026_05_12_000000_create_nuki_users_table.php) with self-referencing `parent_id` (`null` = main user, otherwise sub). Both kinds log in via the `darvis-nuki` auth guard with email + password.
-- Email OTP as 2FA: after a valid password, a 6-digit code is mailed via [NukiLoginOtpMail](src/Mail/NukiLoginOtpMail.php) and validated in [LoginOtpPage](src/Livewire/Auth/LoginOtpPage.php). Skipped if `two_factor_enabled` is false on the user or `auth_users.otp.enabled` is false globally.
+- Email OTP as 2FA: after a valid password, a 6-digit code is mailed via [NukiLoginOtpMail](src/Mail/NukiLoginOtpMail.php) and validated in [LoginOtpPage](src/Livewire/Auth/LoginOtpPage.php). Skipped only when `auth_users.otp.enabled` is false globally; `LoginPage` does not read the per user `two_factor_enabled` column (nor does `--no-2fa` change anything at login), and the docs say so.
 - Account binding: pivot `nuki_user_account` (many-to-many to `NukiAccount` with `role` ∈ `{owner, member}`). Subs **inherit** account access from their parent (`NukiUser::accessibleAccounts()`).
 - Smartlock binding: pivot `nuki_user_smartlock` with permissions (`can_lock`/`unlock`/`view_logs`/`manage_auths`), validity window (`allowed_from`/`until`) and a weekday bitmask (`allowed_weekdays`). Subs **never** inherit smartlock access — they always need an explicit pivot row.
 - Main users: `accessibleSmartlockIds()` returns `null` (= wildcard, all locks). Subs: returns explicit ID list.

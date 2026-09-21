@@ -1,5 +1,5 @@
 title: NUKI for Laravel
-description: "darvis/nuki wraps the NUKI Web API in a Laravel package: smartlocks, activity logs, authorizations, a signed webhook receiver and a Livewire/Flux UI, with optional package users and per smartlock permissions."
+description: "darvis/nuki is a Laravel package for the NUKI Web API: list, lock and unlock smartlocks, read activity logs, manage keypad codes, receive signed webhooks, with a Livewire and Flux UI and optional users with permissions per lock."
 url: https://arviddejong.github.io
 baseurl: /nuki
 
@@ -16,9 +16,9 @@ package:
   repository: https://github.com/ArvidDeJong/nuki
   packagist: https://packagist.org/packages/darvis/nuki
   license_url: https://github.com/ArvidDeJong/nuki/blob/main/LICENSE
-  requires: "PHP 8.2+, Laravel 11, 12 or 13, Livewire 3 or 4, Flux 2"
+  requires: "PHP 8.2+, Laravel 11, 12 or 13, Livewire 3.5+ or 4, Flux 2"
   platforms: [Laravel, Livewire]
-  keywords: [laravel, nuki, smartlock, smart lock, web api, iot, webhook, livewire, flux, access control, oauth]
+  keywords: [laravel, nuki, nuki web api, smartlock, smart lock, door lock, keypad code, access control, webhook, oauth, livewire, flux, php]
 
 # Developer credit in the footer and the structured data.
 developer:
