@@ -1,7 +1,7 @@
 ---
-title: FAQ
-nav_order: 12
-description: "Short answers about darvis/nuki: tokens, multi account setups, webhooks, the bundled UI, package users and demo mode."
+title: "FAQ"
+nav_order: 14
+description: "Short answers about darvis/nuki: what it is, versions, the API token, several NUKI accounts, safety, webhooks, users per lock, demo mode and testing."
 faq: true
 ---
 

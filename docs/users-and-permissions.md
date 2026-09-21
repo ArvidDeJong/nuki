@@ -1,7 +1,7 @@
 ---
-title: Users and permissions
-nav_order: 6
-description: "The optional darvis-nuki guard, main and sub users, the per smartlock permission matrix, validity windows and the weekday bitmask."
+title: "Users and permissions"
+nav_order: 7
+description: "The optional users of darvis/nuki: the darvis-nuki guard, main and sub users, attaching accounts, permissions per smartlock, time windows and the login code."
 ---
 
 # Users and permissions
@@ -12,14 +12,31 @@ per-smartlock permissions, the validity window and the weekday bitmask. It is
 completely independent from how the package authenticates against the NUKI
 Web API — for that, see [NUKI API authentication](nuki-api-authentication.md).
 
-Everything on this page is opt-in. Without `NUKI_AUTH_USERS_ENABLED=true`,
-none of the tables, routes or guards are touched.
+Everything on this page is opt-in. Without `NUKI_AUTH_USERS_ENABLED=true` the guard and the routes
+are not registered. The tables are created by `php artisan migrate` either way and stay empty.
 
-## TL;DR
+A guard is Laravel's name for one way of signing in, with its own user model and session; see the
+[Laravel documentation on guards](https://laravel.com/docs/authentication#adding-custom-guards).
+The package's guard is separate from your application's users: a `NukiUser` is not an
+`App\Models\User`.
+
+## From nothing to a signed in main user
+
+1. Set `NUKI_AUTH_USERS_ENABLED=true` in `.env` (the word `true`, not `1`) and run
+   `php artisan config:clear` and `php artisan migrate`.
+2. Make sure your application can send mail. Signing in needs two mails: a confirmation link the
+   first time, and a login code every time.
+3. Create the user: `php artisan nuki:user-create --email=admin@example.com --name=Admin`. The
+   command asks for the password.
+4. Open `/nuki/login` and sign in. The first attempt sends a confirmation link and shows "Confirm
+   your email address"; open the link, sign in again and enter the emailed code.
+5. [Attach the user to the NUKI accounts](#attach-a-main-user-to-an-account) they work in.
+
+## The model in one picture
 
 ```
 ┌── NukiUser (main, parent_id = NULL) ──────────────────────────────────────┐
-│   accessible accounts: own ∪ (own subs' parent accounts is N/A here)       │
+│   accessible accounts: the accounts attached to this user                  │
 │   accessible smartlocks: WILDCARD (every smartlock the account exposes)    │
 │                                                                            │
 │   ├── NukiUser (sub, parent_id = main.id)                                  │
@@ -37,7 +54,7 @@ none of the tables, routes or guards are touched.
   `nuki_user_smartlock` with `can_lock` / `can_unlock` / `can_view_logs` /
   `can_manage_auths` flags.
 
-## 1. Feature flag
+## What switching it on does
 
 Enable in `.env`:
 
@@ -69,14 +86,16 @@ When this flag is on, [NukiServiceProvider](https://github.com/ArvidDeJong/nuki/
 
 2. Loads [routes/auth.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/auth.php) — see [Auth routes](auth-routes.md).
 
-3. Wraps every UI route from [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php) in the
-   `auth:darvis-nuki` middleware so unauthenticated visitors are redirected to
-   `/nuki/login`.
+3. Adds the `auth:darvis-nuki` middleware to every UI route from
+   [routes/web.php](https://github.com/ArvidDeJong/nuki/blob/main/routes/web.php). A visitor who is not signed in is
+   then redirected by Laravel to the `login` route of **your application**, not to `/nuki/login`;
+   see [Where a guest is sent](auth-routes.md#where-a-guest-is-sent) for the three lines that
+   change that.
 
 4. Registers the auth Livewire components (`nuki.auth.login`,
    `nuki.auth.otp`, `nuki.auth.register`, `nuki.auth.forgot-password`,
-   `nuki.auth.reset-password`, `nuki.profile`, `nuki.sub-users-index`,
-   `nuki.sub-user-show`).
+   `nuki.auth.reset-password`, `nuki.auth.verify-email`, `nuki.profile`,
+   `nuki.sub-users-index`, `nuki.sub-user-show`).
 
 Constants for hard-coded use:
 
@@ -87,7 +106,7 @@ AuthConfigRegistrar::GUARD;    // 'darvis-nuki'
 AuthConfigRegistrar::PROVIDER; // 'darvis-nuki-users'
 ```
 
-## 2. The `NukiUser` model
+## The `NukiUser` model
 
 Source: [src/Models/NukiUser.php](https://github.com/ArvidDeJong/nuki/blob/main/src/Models/NukiUser.php). Table:
 [nuki_users](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000000_create_nuki_users_table.php).
@@ -100,13 +119,13 @@ Source: [src/Models/NukiUser.php](https://github.com/ArvidDeJong/nuki/blob/main/
 | `parent_id` | bigint, nullable, FK → `nuki_users.id` | `NULL` = main user, otherwise sub. |
 | `name` | string | Display name. |
 | `email` | string, unique | Login identifier. |
-| `email_verified_at` | timestamp, nullable | Reserved; the package does not currently force email verification before login. |
+| `email_verified_at` | timestamp, nullable | Set when the user opens the confirmation link. While `auth_users.email_verification.enabled` is `true` (the default), a user without it cannot sign in. Not mass assignable. |
 | `password` | string | Hashed via the `hashed` cast. |
 | `remember_token` | rememberToken | Standard Laravel. |
-| `two_factor_enabled` | bool, default `true` | Per-user 2FA switch. Combined with `auth_users.otp.enabled` globally. |
+| `two_factor_enabled` | bool, default `true` | Stored, and **not read at login**: while `auth_users.otp.enabled` is `true` every user gets a login code, whatever this column says. |
 | `is_active` | bool, default `true` | When `false`, the user cannot log in (the `LoginPage` filters on this). |
 | `last_login_at` | timestamp, nullable | Updated on successful login. |
-| `locale` | string(5), nullable | Preferred UI locale; falls back to host app / `nuki.ui.default_locale`. |
+| `locale` | string(5), nullable | Preferred UI language, set on the profile page. See [Localization](ui-and-localization.md#localization) for the fallbacks. |
 | `timestamps` | | |
 
 ### Relations
@@ -141,7 +160,7 @@ $user->canAccessSmartlock(int $accountId, int $smartlockId, string $permission):
 //            hasPermission($permission).
 ```
 
-## 3. The permission matrix
+## The permission matrix
 
 Source: [NukiUserSmartlockAccess](https://github.com/ArvidDeJong/nuki/blob/main/src/Models/NukiUserSmartlockAccess.php).
 Table: [nuki_user_smartlock](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000400_create_nuki_user_smartlock_table.php).
@@ -162,7 +181,7 @@ most one pivot per (account, lock) combination.
 | `can_manage_auths` | bool, default `false` | Allowed to create/edit/delete keypad codes and other authorizations on this lock. |
 | `allowed_from` | timestamp, nullable | Start of the validity window. `NULL` = no lower bound. |
 | `allowed_until` | timestamp, nullable | End of the validity window. `NULL` = no upper bound. |
-| `allowed_weekdays` | tinyint, nullable | NUKI weekday bitmask. `NULL` or `0` = no weekday restriction. |
+| `allowed_weekdays` | tinyint, nullable | [Weekday bitmask](#weekday-bitmask). `NULL` or `0` = no weekday restriction. |
 | `is_active` | bool, default `true` | Master switch for this row. |
 | `timestamps` | | |
 
@@ -185,18 +204,18 @@ values returns `false`.
 
 ### Weekday bitmask
 
-Source: [WeekdayBitmask](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/WeekdayBitmask.php). Follows the NUKI
-Web API convention (the same field is named `allowedWeekDays` there):
+Source: [WeekdayBitmask](https://github.com/ArvidDeJong/nuki/blob/main/src/Support/WeekdayBitmask.php). A bitmask is one
+number that holds seven yes/no answers, one bit per day. The helper takes Dutch day codes:
 
-| Day | Bit |
-|---|---|
-| ma | 64 |
-| di | 32 |
-| wo | 16 |
-| do | 8 |
-| vr | 4 |
-| za | 2 |
-| zo | 1 |
+| Code | Day | Bit |
+|---|---|---|
+| `ma` | Monday | 64 |
+| `di` | Tuesday | 32 |
+| `wo` | Wednesday | 16 |
+| `do` | Thursday | 8 |
+| `vr` | Friday | 4 |
+| `za` | Saturday | 2 |
+| `zo` | Sunday | 1 |
 
 ```php
 use Darvis\Nuki\Support\WeekdayBitmask;
@@ -206,19 +225,23 @@ WeekdayBitmask::toDays(84);                      // ['ma', 'wo', 'vr']
 WeekdayBitmask::matchesDate(84, now());          // true on Mon/Wed/Fri
 ```
 
-The same bitmask is what NUKI expects in the `allowedWeekDays` field on
-authorizations (see [api-reference.md](api-reference.md#smartlockauths)).
-That is intentional — the package's own permissions are deliberately
-encoded with NUKI's wire format so the two stay aligned.
+`fromDays()` returns `null` for an empty list, which means "no restriction". The bundled smartlock
+page sends the same number to NUKI as `allowedWeekDays` when it saves a keypad code (see the
+[API reference](api-reference.md#smartlockauths)), so one helper serves both.
 
-## 4. Authorizing access in your code
+## Authorizing access in your code
 
 The trait [AuthorizesSmartlockAccess](https://github.com/ArvidDeJong/nuki/blob/main/src/Concerns/AuthorizesSmartlockAccess.php)
 is mixed into the bundled Livewire components and is the canonical way to
 gate access. Use it from your own controllers / components too.
 
+In `app/Http/Controllers/MyOwnLockController.php`:
+
 ```php
+namespace App\Http\Controllers;
+
 use Darvis\Nuki\Concerns\AuthorizesSmartlockAccess;
+use Darvis\Nuki\Facades\Nuki;
 
 class MyOwnLockController extends Controller
 {
@@ -260,19 +283,25 @@ What the bundled pages enforce for a package user:
 - `AccountsIndex` (API tokens) and `WebhooksIndex` are for a main user: a sub user gets a `403`
   on the page and on every action, and the navigation hides both links.
 
-## 5. Email OTP (2FA)
+## The emailed login code (OTP)
 
 [LoginPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginPage.php) handles the password step. On
 a valid password it:
 
-1. Checks `nuki.auth_users.otp.enabled` (global) AND `$user->two_factor_enabled`
-   (per-user). If either is `false`, the user is logged in immediately.
-2. Throttles via `LoginThrottle` (`auth_users.otp.rate_limit.*`).
-3. Generates a code through `NukiUserOtpCode::generate(...)`. The plain code
+1. Refuses a user who has not confirmed their email address (while
+   `auth_users.email_verification.enabled` is `true`): it mails a new confirmation link and shows
+   the notice page.
+2. Checks `auth_users.otp.enabled`. When it is `false`, the user is signed in immediately, and that
+   goes for everyone. There is **no per user switch**: `two_factor_enabled` and `--no-2fa` are
+   stored and not read here.
+3. Throttles via `LoginThrottle` (`auth_users.otp.rate_limit.*`): at most `max_per_window` codes
+   per email address and IP per window.
+4. Generates a code through `NukiUserOtpCode::generate(...)`. The plain code
    is mailed; only the hash is stored on `nuki_user_otp_codes`.
-4. Mails [NukiLoginOtpMail](https://github.com/ArvidDeJong/nuki/blob/main/src/Mail/NukiLoginOtpMail.php) in the user's
+5. Mails [NukiLoginOtpMail](https://github.com/ArvidDeJong/nuki/blob/main/src/Mail/NukiLoginOtpMail.php) in the user's
    `locale`.
-5. Stashes pending state in the session and redirects to `/nuki/login/otp`.
+6. Keeps the pending login in the session and redirects to `/nuki/login/otp`. The pending login
+   is valid for 15 minutes.
 
 [LoginOtpPage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/LoginOtpPage.php) validates the code
 against the stored hash, checks `expires_at`, marks `consumed_at`, and
@@ -289,7 +318,7 @@ Relevant config: `auth_users.otp.enabled`, `auth_users.otp.expiry_minutes`,
 `ip`, `user_agent`. Indexed on `(nuki_user_id, consumed_at)` and
 `expires_at`.
 
-## 6. Password reset
+## Password reset
 
 [NukiPasswordResetService](https://github.com/ArvidDeJong/nuki/blob/main/src/Auth/Users/NukiPasswordResetService.php)
 runs the flow:
@@ -311,7 +340,7 @@ Table:
 [nuki_password_resets](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000200_create_nuki_password_resets_table.php).
 Primary key is `email` (one outstanding reset per address).
 
-## 7. Creating and managing users
+## Creating and managing users
 
 ### First main user — CLI
 
@@ -322,7 +351,12 @@ php artisan nuki:user-create \
     --password=secret123
 ```
 
-Add `--no-2fa` to disable email OTP for this user.
+Every option you leave out is asked for. `--no-2fa` stores `two_factor_enabled = false` on the
+user; that column is not read at login, so the user still gets a login code while
+`auth_users.otp.enabled` is `true`.
+
+The new user has no confirmed email address. With the default settings the first sign in mails a
+confirmation link, and the user can only sign in after opening it.
 
 The command is the way to create a main user. The `/nuki/register` page does the same for any
 visitor, which is why it is off by default: a main user may operate every lock. Switch it on with
@@ -331,15 +365,19 @@ visitor, which is why it is off by default: a main user may operate every lock. 
 Source: [NukiUserCreateCommand](https://github.com/ArvidDeJong/nuki/blob/main/src/Console/Commands/NukiUserCreateCommand.php).
 Always creates a **main** user (`parent_id = null`, `is_active = true`).
 
-### Sub-users — UI
+### Sub users in the UI
 
-Once the main user logs in, `/nuki/sub-users` lists their subs and
-`/nuki/sub-users/{id}` is the per-sub editor (account assignments,
-smartlock pivots, weekday grid). Components:
+Once the main user logs in, `/nuki/sub-users` lists their sub users and
+`/nuki/sub-users/{id}` is the editor for one of them: a row per smartlock with the account it is
+on, the four permissions, the period and the weekday grid. Components:
 [SubUsersIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUsersIndex.php),
 [SubUserShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUserShow.php).
 
-### Sub-users — programmatic
+A new sub user has no confirmed email address either: the first sign in mails the confirmation
+link. The "two factor" switch in the sub user form fills `two_factor_enabled`, which is not read
+at login.
+
+### Sub users in code
 
 ```php
 use Darvis\Nuki\Models\NukiUser;
@@ -382,24 +420,40 @@ That sub user will now see exactly one lock in the bundled UI, can lock and
 unlock it but cannot manage keypad codes, and only between the start and end
 of this month, and only on Mondays, Wednesdays and Fridays.
 
-## 8. Account binding (`nuki_user_account`)
+## Attach a main user to an account
 
-Pivot for user ↔ account, with a free-form `role` column (default `member`).
-Source: [migration](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000300_create_nuki_user_account_table.php).
+The table `nuki_user_account` links a user to a NUKI account, with a free-form `role` column
+(default `member`; the package does not read the role). Source:
+[migration](https://github.com/ArvidDeJong/nuki/blob/main/database/migrations/2026_05_12_000300_create_nuki_user_account_table.php).
 
-Use the relation to attach:
+**Nothing in the package fills this table.** Creating an account on the `/nuki/accounts` page does
+not attach the main user who created it, and `nuki:user-create` attaches nothing either. Until you
+attach one, a package user has no accessible accounts: the account switcher lists only `default`,
+and switching to any other account answers `403`.
+
+So after you create an account or a main user, attach them yourself, for example in
+`php artisan tinker` or in a seeder:
 
 ```php
+use Darvis\Nuki\Models\NukiAccount;
+use Darvis\Nuki\Models\NukiUser;
+
+$user = NukiUser::firstWhere('email', 'admin@example.com');
+$account = NukiAccount::findByKey('tenant-42');
+
 $user->accounts()->syncWithoutDetaching([
     $account->id => ['role' => 'owner'],
 ]);
 ```
 
+The account shows up in the user's switcher on the next page load. Only accounts with `is_active`
+true count.
+
 Sub users inherit account access from their parent via
 `NukiUser::accessibleAccounts()`, so you usually only need to assign accounts
 to mains. Direct sub assignments are still respected if you create them.
 
-## 9. Account switching at runtime
+## Account switching at runtime
 
 [UsesNukiAccount](https://github.com/ArvidDeJong/nuki/blob/main/src/Concerns/UsesNukiAccount.php) trait, used by
 [AccountSwitcher](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountSwitcher.php) and every account-aware
@@ -409,5 +463,7 @@ component:
 - `AccountSwitcher` dispatches the `nuki-account-changed` Livewire event.
 - Listening components use `#[On('nuki-account-changed')]` and reset their
   state when the user switches.
-- The trait also gracefully falls back to `'default'` when the auth user has
-  no accessible accounts.
+- For a package user the trait falls back to the first accessible account, or to `'default'` when
+  the user has none.
+- A package user can only switch to `default` or to an accessible account; anything else is a
+  `403`.

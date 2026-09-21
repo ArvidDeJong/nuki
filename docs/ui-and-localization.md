@@ -1,15 +1,15 @@
 ---
-title: UI and localization
-nav_order: 9
-description: "The bundled Livewire pages, the four shipped languages, swapping the layout and scoping a page to one account."
+title: "UI and localization"
+nav_order: 10
+description: "The bundled Livewire pages of darvis/nuki: who may open them, the components and their routes, your own layout, and the four languages and how one is chosen."
 ---
 
 # UI and localization
 
-## Toggling the bundled UI
+## Switch the bundled UI on or off
 
-Enabled by default. Turn off to use the package purely as a NUKI Web API
-client:
+The pages are registered by default, and closed to everyone outside the `local` environment until
+you open them (next section). Switch them off to use the package as a NUKI Web API client only:
 
 ```dotenv
 NUKI_UI_ENABLED=false
@@ -67,10 +67,10 @@ Auto-registered with `nuki.*` aliases by
 |---|---|---|---|
 | `nuki.dashboard` | [Dashboard](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Dashboard.php) | `/dashboard` | KPI cards (total locks, locked, critical battery, open doors), recent activity feed, per-lock battery bars. |
 | `nuki.smartlocks-index` | [SmartlocksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlocksIndex.php) | `/` | List of smartlocks; filtered for sub users. Quick lock/unlock actions. |
-| `nuki.smartlock-show` | [SmartlockShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlockShow.php) | `/smartlocks/{id}` | Single-lock detail: state, recent logs, authorizations, rename + sync buttons. |
+| `nuki.smartlock-show` | [SmartlockShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SmartlockShow.php) | `/smartlocks/{smartlockId}` | Single-lock detail: state, recent logs, authorizations, rename + sync buttons. |
 | `nuki.activity-timeline` | [ActivityTimeline](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/ActivityTimeline.php) | `/activity` | Visual timeline grouped per day; filter by lock or period. |
 | `nuki.webhooks-index` | [WebhooksIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/WebhooksIndex.php) | `/webhooks` | List + manage NUKI webhook subscriptions. |
-| `nuki.oauth-connect` | [OAuthConnect](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/OAuthConnect.php) | `/oauth/connect` | UI entry point for the OAuth dance (only meaningful when `NUKI_AUTH=oauth`). |
+| `nuki.oauth-connect` | [OAuthConnect](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/OAuthConnect.php) | `/oauth/connect` | Shows the stored OAuth token of the current account, generates an authorization URL and disconnects. It does not receive the redirect from NUKI; [that route is yours](nuki-api-authentication.md#the-callback-route-is-yours-to-build). Only meaningful when `NUKI_AUTH=oauth`. |
 | `nuki.accounts-index` | [AccountsIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountsIndex.php) | `/accounts` | CRUD for `nuki_accounts` (token mode, multi-account). |
 | `nuki.account-switcher` | [AccountSwitcher](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/AccountSwitcher.php) | — | Dropdown used in the top navigation; dispatches the `nuki-account-changed` Livewire event. |
 
@@ -87,11 +87,19 @@ Auto-registered with `nuki.*` aliases by
 | `nuki.sub-users-index` | [SubUsersIndex](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUsersIndex.php) | `/sub-users` |
 | `nuki.sub-user-show` | [SubUserShow](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/SubUserShow.php) | `/sub-users/{id}` |
 
-You can embed any of these in your own Blade files:
+The main components are registered while `ui.enabled` is `true`, the auth components while
+`auth_users.enabled` is `true`. `nuki.auth.verify-email`
+([VerifyEmailNoticePage](https://github.com/ArvidDeJong/nuki/blob/main/src/Livewire/Auth/VerifyEmailNoticePage.php),
+`/email/verify`) is registered as well.
+
+You can render one in a Blade file of your own:
 
 ```blade
 <livewire:nuki.smartlocks-index />
 ```
+
+The `AuthorizeUi` middleware is on the package's routes, not on the component. A component you
+place on your own page is as open as that page, so put the page behind your own middleware.
 
 ## Account-aware components
 
@@ -108,17 +116,32 @@ class MyDashboard extends Component
     use UsesNukiAccount;
 
     #[On('nuki-account-changed')]
-    public function refresh(): void
+    public function handleAccountChanged(string $accountKey): void
     {
-        $this->locks = Nuki::as($this->accountKey)->smartlocks()->all();
+        // Never assign the raw argument: the browser can send this event too.
+        $this->accountKey = $this->authorizedAccountKey($accountKey);
+    }
+
+    public function render()
+    {
+        return view('livewire.my-dashboard', [
+            'locks' => Nuki::as($this->accountKey)->smartlocks()->all(),
+        ]);
     }
 }
 ```
 
+This class belongs in `app/Livewire/MyDashboard.php`, with a view of your own in
+`resources/views/livewire/my-dashboard.blade.php`.
+
 The trait:
 
-- Mounts `$accountKey` from `session('nuki.current_account')` (or first
-  accessible account for the authenticated user).
+- Sets `$accountKey` when the component mounts, from `session('nuki.current_account')`. For a
+  package user it falls back to the user's first accessible account, or to `default` when there is
+  none. The property is `#[Locked]`: the browser can read it and cannot change it.
+- Has `authorizedAccountKey(string $accountKey)`, which returns the key when the current user may
+  use it (`default`, or one of the user's accessible accounts; any key without package users) and
+  aborts with `403` otherwise.
 - Exposes `$availableAccounts` and `$currentAccountLabel` computed properties
   for use in Blade.
 - `AccountSwitcher` writes the new value to the session (for a package user only when the account
@@ -130,7 +153,8 @@ The trait:
 
 The bundled views use Flux components exclusively
 (`<flux:card>`, `<flux:button>`, `<flux:badge>`, `<flux:callout>` and so on).
-Flux 2.0+ must be available in the host application. If you publish the
+Flux 2 is a Composer requirement of the package, and the free edition has every component the
+views use. Your layout loads the Flux and Tailwind assets. If you publish the
 views (`--tag=nuki-views`) and customise them, keep the Flux components in
 place — don't drop in hand-rolled Tailwind buttons or form controls.
 
@@ -145,22 +169,27 @@ Override `nuki.ui.layout` to wrap the pages in your own chrome:
 ],
 ```
 
-The layout must yield `slot` (Livewire default) and call `@fluxScripts`
-somewhere before `</body>`.
+The layout is a Blade component layout: it echoes the `$slot` variable where the page goes, and
+calls `@fluxAppearance` in the `<head>` and `@fluxScripts` before `</body>`. The package's own
+[layouts/app.blade.php](https://github.com/ArvidDeJong/nuki/blob/main/resources/views/layouts/app.blade.php)
+is the example to copy; it loads your application's `resources/css/app.css` and
+`resources/js/app.js` through Vite, so Tailwind in your build has to cover the package views.
 
 ## Localization
 
 Four locales ship: `en`, `nl`, `de`, `es`. Resolution happens per request
 inside [SetLocale](https://github.com/ArvidDeJong/nuki/blob/main/src/Http/Middleware/SetLocale.php), in this order:
 
-1. The authenticated `NukiUser->locale` (when `NUKI_AUTH_USERS_ENABLED=true`).
-2. `session('nuki.locale')` for guests and anonymous flows.
+1. The `locale` of the signed in `NukiUser` (when `NUKI_AUTH_USERS_ENABLED=true`). The user sets
+   it on the `/nuki/profile` page.
+2. `session('nuki.locale')`. The package never writes this value; set it from your own code, for
+   example from a language menu of your application.
 3. The host application's `app()->getLocale()`, if it appears in
    `nuki.ui.locales`.
 4. `nuki.ui.default_locale` (default `en`).
 
-`Carbon::setLocale()` is set alongside Laravel's locale, so `diffForHumans()`
-and `isoFormat('L LT')` follow the active language automatically.
+A value that is not a key of `nuki.ui.locales` is skipped. `Carbon::setLocale()` is set alongside
+Laravel's locale, so dates such as `diffForHumans()` follow the language.
 
 Set the package default:
 
@@ -186,14 +215,13 @@ defaults, so you can change a single phrase without forking the whole file.
 
 Two Blade layouts are bundled under `nuki::layouts.*`:
 
-- `nuki::layouts.app` — the authenticated app shell (navigation, account
-  switcher, locale switcher). Used by every protected page.
-- `nuki::layouts.auth` — a Tailwind UI split-screen layout for the login /
-  OTP / register / password-reset screens. Form column on the left, brand
+- `nuki::layouts.app` — the shell of the pages: navigation, account switcher and a menu with the
+  profile and logout links. There is no language menu; see [Localization](#localization).
+- `nuki::layouts.auth` — a split-screen layout for the login, OTP, register, password reset and
+  email verification pages. Form column on the left, brand
   panel with gradient and feature bullets on the right (`lg+`). Collapses
   to single-column on mobile.
 
-Both pull Flux scripts and the user's selected locale.
 
 ### Branding the auth pages
 

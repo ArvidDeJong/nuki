@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+Documentation only; nothing in the package changes. The corrections that matter when you relied
+on the old text:
+
+- **Retries.** The docs described exponential backoff (`http.retry_sleep` × 2^n) and called
+  `http.retries` the number of retries. `http.retries` is the total number of attempts, the first
+  one included, and the pause between them is fixed. A lock action is a POST and is retried on a
+  5xx like any other call; set `http.retries` to `1` when a second command is worse than an error.
+- **Exceptions.** "All exceptions inherit from `NukiException`" was wrong: a server that cannot be
+  reached surfaces as Laravel's `ConnectionException`, which does not. Catch
+  `NukiException|ConnectionException`. `ApiException::$body` is the raw answer as a string, not a
+  parsed body.
+- **The login code per user.** The docs said `two_factor_enabled = false` and the `--no-2fa`
+  option skip the emailed code for one user. They do not: while `auth_users.otp.enabled` is `true`
+  every user gets a code, and the column is not read at login.
+- **Email verification.** `email_verified_at` was documented as "reserved". It is enforced: with
+  the default settings a user, also one made with `nuki:user-create`, first has to open the
+  confirmation link.
+- **Where a guest goes.** The docs said a visitor who is not signed in is redirected to
+  `/nuki/login`. Laravel's `auth` middleware sends them to the `login` route of your application,
+  and without one the answer is `Route [login] not defined.` The auth routes page has the
+  `redirectGuestsTo()` snippet that points guests of the package pages at the package login.
+- **A signed in user on the login page** was said to go to `auth_users.redirect_after_login`.
+  Laravel's `guest` middleware decides: the `dashboard` or `home` route of your application, or `/`.
+- **OAuth.** The docs showed `NUKI_OAUTH_REDIRECT_URL=.../nuki/oauth/callback` as if that route
+  existed. The package has no callback route and never checks `state`; your application builds the
+  route and the check. The API authentication page has a complete example.
+- **The `config` token resolver** was said to return the token for every account key. It only
+  knows `default`; any other key throws an `AuthenticationException`. Token mode with the
+  `database` resolver is multi account, which the Boost guideline denied.
+- **Accounts and users.** Nothing attaches a main user to an account, not the accounts page and
+  not `nuki:user-create`. The users page now says so and shows the
+  `$user->accounts()->syncWithoutDetaching([...])` call an owner runs today.
+- **The webhook test example** posted an array and signed `json_encode($payload)`, which answers
+  401. The example now sends the raw body with `call()`.
+- **Troubleshooting.** "A 401 from NUKI clears the token" (only a refused refresh does),
+  "duplicate for everything with the array cache store" (the array store forgets everything, so
+  nothing is a duplicate), the advice for "table already exists" and the headings that were not
+  the literal messages are corrected.
+- Smaller ones: Livewire and Flux are Composer requirements, not optional; demo mode has five
+  locks, not four; there is no locale switcher in the layout, a user picks a language on the
+  profile page; with `NUKI_UI_ENABLED=false` the profile and sub user pages need your own
+  `ui.layout`; the migrations create every table whichever features are on.
+
+### Added
+- Documentation pages: [Quick start](https://arviddejong.github.io/nuki/quickstart.html), a
+  complete page with routes, controller and view, and
+  [Testing](https://arviddejong.github.io/nuki/testing.html), how to test your own code without
+  calling NUKI. `getting-started.md` became `installation.md`, with numbered steps and a "Check
+  that it works" section; the old address `/getting-started.html` no longer exists.
+- The README follows the order of the other darvis packages, with a Features and a Requirements
+  section.
+
 ## [1.2.0] - 2026-09-21
 
 ### Security
