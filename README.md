@@ -131,6 +131,12 @@ login / OTP / register / password-reset Livewire screens. Main users can
 create sub-users with per-smartlock permissions, a validity window and a
 weekday bitmask. See [docs/users-and-permissions.md](docs/users-and-permissions.md).
 
+## Laravel Boost
+
+The package ships [Laravel Boost](https://laravel.com/docs/boost) resources: a guideline
+and a `nuki-development` skill. Run `php artisan boost:install`, or
+`php artisan boost:update --discover` in a project that already uses Boost.
+
 ## Testing
 
 ```bash

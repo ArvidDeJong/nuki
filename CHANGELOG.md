@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- A Laravel Boost skill, `nuki-development`, in `resources/boost/skills/`. It covers how a call
+  runs and what every failure gives you (exception class and message), smartlock actions, logs and
+  keypad codes, multi account with `Nuki::as()`, the OAuth callback the host application has to
+  build, the webhook receiver and its pitfalls, closing off the bundled UI and its users, reading
+  settings through `NukiConfig`, and testing without calling the NUKI Web API.
+- A social preview image for the documentation site (`docs/assets/images/social-preview.png`),
+  set as the default Open Graph and Twitter card image for every page.
+
 ## [1.1.0] - 2026-09-21
 
 ### Added
