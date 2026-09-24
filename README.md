@@ -137,6 +137,10 @@ composer analyse   # Larastan
 
 See [CHANGELOG.md](CHANGELOG.md).
 
+## Support the package
+
+If darvis/nuki saves you time, a star on [GitHub](https://github.com/ArvidDeJong/nuki) or a favourite on [Packagist](https://packagist.org/packages/darvis/nuki) helps other developers find it.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
